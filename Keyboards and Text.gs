@@ -1,3 +1,115 @@
+//Macros
+var TESTMODE = false;
+
+//Symbols
+var groupSy = "\ud83d\udc6b"; 
+var driveSy = "\ud83d\udcc1";
+var csSy = "\ud83d\udcbb";
+var ugSy = "\ud83d\udcca";
+var moodleSy = "\ud83d\udccb";
+var reviewsSy = "\ud83d\udcad";
+var facebookSy = "\ud83d\udc65";
+var scansSy = "\ud83d\udcda";
+var attentionSy = "\ud83d\udc49";
+var downSy = "\ud83d\udc47";
+var YouTubeSy = "\ud83d\udcfa";
+var mainSy = "\ud83c\udfe0";
+var Korona = "אסט - עדכונים";
+var help = "Talk To Me" +" \ud83d\udd34";
+var About = "About "+ "\ud83c\udf0e";
+var WantToHelp = "I want to help";
+var fun = "Groups for Hobbies " + "\ud83d\ude0e"
+    
+var ride = "Ride Groups \ud83d\ude97";
+var faculty = "Department Groups \ud83c\udfeb";
+var add = "Add course to the bot \ud83d\udcd7";
+var course = "Courses \ud83d\udcda";
+var usefulLink = "Useful Links \ud83d\udd25";
+var feedback = "feedback \ud83d\udcdd"; 
+var calendar = "Calendar \ud83d\udcc5";
+
+var drive = "Drive "+driveSy;
+var courseGroup = "Telegram group "+groupSy;
+var testock = "Scans - testock "+scansSy;
+var facebook = "Facebook "+facebookSy;
+var youTube = "YouTube " +YouTubeSy;
+var reviews = "Reviews "+reviewsSy;
+var mainMenu = "Main Menu "+mainSy;
+var ug = "Ug "+ugSy;
+var moodle = "Moodle "+moodleSy;
+var cs = "CS "+csSy;
+
+var ContactFacebook = "facebook";
+var ContactEmail = "email";
+var ContactLinkdIn = "linkedin";
+var WantToTalk = "Anonymous talk with a student";
+var SFS = "Students Business "+	"\ud83d\udcb8";
+
+//function that makes an internal keyboard from the numbers in the spreadsheet. 
+function makeKeyBoard(id, names, numbers){
+  var num = names.length;
+  var newKeyBoard = [];
+  for (var i = 0; i < num; i++) {
+    //sendText(id, names[i] + " - " + numbers[i]);//test
+    newKeyBoard.push([{"text": names[i], 'callback_data': numbers[i]}]);
+  }
+  newKeyBoard.push([{"text": 'Main Menu \ud83c\udfe0', 'callback_data': 'Main Menu \ud83c\udfe0'}]);
+  sendText(id, "Select from the list below", newKeyBoard);
+}
+  
+
+//sendText(chatId, text, keyBoard)
+//Description: sends text to chatId with(optional) exeternal keyboared.
+//input: chat id, string and(optional) the name of the exeternal keyboared.
+function sendText(chatId, text, keyBoard) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify({
+        "inline_keyboard": keyBoard,
+      })
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
+
+//sendKey(chatId, text, keyBoard)
+//Description: sends text to chatId with internal keyboared(optional).
+//input: chat id, string and the name of the internal keyboared(optional).
+function sendKey(chatId, text, keyBoard) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      parse_mode: "Markdown",
+      reply_markup: JSON.stringify({
+        "keyboard": keyBoard,
+      })
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
+
+function removeKey(chatId, text) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      reply_markup: JSON.stringify({
+        remove_keyboard: true })
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
+
 //keyBoards
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
