@@ -1,9 +1,10 @@
 //Global variables
 var token = "1294202090:AAHTprM7OhYtfdjRxijFqs4LbNvH3s3QJh4";
 var url = "https://api.telegram.org/bot" + token;
-var webAppUrl = "https://script.google.com/macros/s/AKfycbwMNOS2VcpA1iYozgqDkeyu08pBZaBg9LU2ggmcEwLrIabn1SjD/exec";
+// var webAppUrl = "https://script.google.com/macros/s/AKfycbwMNOS2VcpA1iYozgqDkeyu08pBZaBg9LU2ggmcEwLrIabn1SjD/exec";
+var webAppUrl = "https://script.google.com/macros/s/AKfycbyLvw9DwFF-W8ioq-frTPSfqVqIdWWgy_dkt9EYgYHC2sf6tzIy_F7aa6LWGoxhMTQf1A/exec";
 var numberOfCourses = 2000; 
-var numberOfReviews = 2*26; 
+var numberOfReviews = 2*26;
 
 //Exels
 var helpList = "https://docs.google.com/spreadsheets/d/1Tnt-wUk7D3KwEEKJmYg7HLLIqlucveOnA87wEWMcFdg/edit?usp=sharing";
