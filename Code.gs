@@ -73,7 +73,6 @@ function doGet(e) {
   return HtmlService.createHtmlOutput("Hello " + JSON.stringify(e)); 
 }
 
-//doPost(e)
 //Description: main function. Execution of the requestes.
 //input: JSON. It may contain callback_query - input from exeternal keyboard, 
 //or massege - input from text sent from the user or internal keyboard.
@@ -84,7 +83,7 @@ function doPost(e){
   var courses = coursesEX.getActiveSheet();
   var contents = JSON.parse(e.postData.contents);
   
-  //internal keyboard command
+  //internal keyboard command - different from regular text
   if (contents.callback_query){
     var id = contents.callback_query.from.id;
     var data = contents.callback_query.data;
@@ -267,7 +266,7 @@ function doPost(e){
     }
   }
   
-  //external massage command
+  //external massage command - same as regular text
   else if (contents.message){
     //Statistics update
     var current = users.getRange(2, 12).getValue();
@@ -340,7 +339,7 @@ function doPost(e){
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
       set(id, 0, name, 0);
       return;
-    }else if (text == 'תפריט ראשי' || text == 'Main Menu' || text == mainMenu){
+    }else if (text == 'תפריט ראשי' || text == 'Main Menu' || text == mainMenu || text == "home"){
       sendKey(id, "How may I help you?", mainKeyBoard);
       set(id, 0, name, 0);
       return;
@@ -770,8 +769,8 @@ function doPost(e){
         }
       }
       else{ //len in 0  
-        set(id, 0, name, 0);
-        sendKey(id, "can't find "+text+".", mainKeyBoard);
+        //set(id, 0, name, 0);
+        sendKey(id, "can't find "+text+". Try typing somthing else or type 'home' to return to main menu.");
       }
     }else if (mode == "Settings and Preference"){
       if (text == "Gender"){
