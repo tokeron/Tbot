@@ -140,7 +140,7 @@ function getLinks(){
   while(courseNumber !== -1){
     var crsName = old.getRange(row, 2).getValue()
     var telegramLink = old.getRange(row, 3).getValue();
-    var exelLink = old.getRange(row, 4).getValue();
+    var excelLink = old.getRange(row, 4).getValue();
     var teamsLink = old.getRange(row, 6).getValue();
     if (courseNumber == null || courseNumber == "" || courseNumber == 0) {
       
@@ -153,14 +153,14 @@ function getLinks(){
       if (nextCourse){
         var courseRow = nextCourse.getRow();
         crs.getRange(courseRow, 3).setValue(telegramLink);
-        crs.getRange(courseRow, 4).setValue(exelLink);
+        crs.getRange(courseRow, 4).setValue(excelLink);
         crs.getRange(courseRow, 6).setValue(teamsLink);
       }else{//add course
         var nextFreeRow = crs.getRange(1, 2).getValue();
         crs.getRange(nextFreeRow, 2).setValue(crsName);
         crs.getRange(nextFreeRow, 1).setValue(courseNumber);
         crs.getRange(nextFreeRow, 3).setValue(telegramLink);
-        crs.getRange(nextFreeRow, 4).setValue(exelLink);
+        crs.getRange(nextFreeRow, 4).setValue(excelLink);
         crs.getRange(nextFreeRow, 6).setValue(teamsLink);
         crs.getRange(1, 2).setValue(++nextFreeRow);
       }

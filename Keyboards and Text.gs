@@ -307,86 +307,86 @@ var tgcsKeyBoard = [
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var exelKeyBoard = [
+var excelKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }],
   [{ text: drive }],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook },  { text: 'Panopto' },    ],
   [{ text: "Add telegram group" }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var texelKeyBoard = [
+var texcelKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }],
   [{ text: drive }, { text: 'Teams Group \ud83d\udc6a'}],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook }, { text: 'Panopto' }],
   [{ text: "Add telegram group" }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var gexelKeyBoard = [
+var gexcelKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }],
   [{ text: drive }, { text: courseGroup }],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook },   { text: 'Panopto' }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var tgexelKeyBoard = [
+var tgexcelKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }],
   [{ text: drive }, { text: courseGroup }, { text: 'Teams Group \ud83d\udc6a'}],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook },   { text: 'Panopto' }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var exelCsKeyBoard = [
+var excelCsKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }, { text: cs }],
   [{ text: drive }],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook },   { text: 'Panopto' }],
   [{ text: "Add telegram group" }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var texelCsKeyBoard = [
+var texcelCsKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }], 
   [{ text: ug }, { text: moodle }, { text: cs }],
   [{ text: drive }, { text: 'Teams Group \ud83d\udc6a'}],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook }, { text: 'Panopto' }],
   [{ text: "Add telegram group" }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var gexelCsKeyBoard = [
+var gexcelCsKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }, { text: cs }],
   [{ text: drive }, { text: courseGroup }],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook },   { text: 'Panopto' }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
 
-var tgexelCsKeyBoard = [
+var tgexcelCsKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: ug }, { text: moodle }, { text: cs }],
   [{ text: drive }, { text: courseGroup }, { text: 'Teams Group \ud83d\udc6a'}],
-  [{ text: testock }, { text: "All tests - exel" }],
+  [{ text: testock }, { text: "All tests - excel" }],
   [{ text: facebook },  { text: 'Panopto' }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
