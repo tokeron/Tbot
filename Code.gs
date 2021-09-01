@@ -83,24 +83,6 @@ function doPost(e){
   var courses = coursesEX.getActiveSheet();
   var contents = JSON.parse(e.postData.contents);
   var file;
-  if (contents.message.photo){
-    var id = contents.message.from.id;
-    sendText(id, "got an image..");
-    file = downloadFile(contents.message.photo[contents.message.photo.length - 1].file_id);
-  }
-  if (contents.message.document){
-    var id = contents.message.from.id;
-    sendText(id, "got an doc..");
-    var fileid = contents.message.document.file_id;
-    sendText(id, "got an doc.2.");
-    var fileName = contents.message.document.file_name;
-    sendText(id, "got an doc.1.");
-    file = downloadFile(fileid, fileName, id);
-    sendText(id, "got an doc.3.");
-    var studentId = "123456789";   // studentId
-    var printType = "bws";         // avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
-    sendEmail(file,contents.message.chat.id,studentId, printType,fileName );
-  } 
   
   //internal keyboard command - different from regular text
   if (contents.callback_query){
@@ -287,6 +269,19 @@ function doPost(e){
   
   //external massage command - same as regular text
   else if (contents.message){
+    if (contents.message.photo){
+      var id = contents.message.from.id;
+      file = downloadFile(contents.message.photo[contents.message.photo.length - 1].file_id);
+    }
+    if (contents.message.document){
+      var id = contents.message.from.id;
+      var fileid = contents.message.document.file_id;
+      var fileName = contents.message.document.file_name;
+      file = downloadFile(fileid, fileName, id);
+      var studentId = "123456789";   // studentId
+      var printType = "bws";         // avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
+      sendEmail(file,contents.message.chat.id,studentId, printType,fileName );
+  } 
     //Logger.log('test..101');
     //Statistics update
     var current = users.getRange(2, 12).getValue();
