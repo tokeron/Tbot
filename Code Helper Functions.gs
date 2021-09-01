@@ -214,7 +214,7 @@ function simpleText(id, text){
 
 
 function sendOpt(id, name, courses, courseRow){
-  var exel = false;
+  var excel = false;
   var cs = false;
   var teams = false;
   set(id, 'Course', name, courseRow);
@@ -246,27 +246,27 @@ function sendOpt(id, name, courses, courseRow){
   if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
     cs = true;
   }
-  if (courses.getRange(courseRow, 4).getValue()) exel = true;
+  if (courses.getRange(courseRow, 4).getValue()) excel = true;
   if (courses.getRange(courseRow, 6).getValue()) teams = true;
-  if (exel && cs && teams){
+  if (excel && cs && teams){
     sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", tgexelCsKeyBoard);
-    else sendKey(id, "choose the required information", texelCsKeyBoard);
+    if (link) sendKey(id, "choose the required information", tgexcelCsKeyBoard);
+    else sendKey(id, "choose the required information", texcelCsKeyBoard);
   }
-  else if (exel && cs){
+  else if (excel && cs){
     sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gexelCsKeyBoard);
-    else sendKey(id, "choose the required information", exelCsKeyBoard);
+    if (link) sendKey(id, "choose the required information", gexcelCsKeyBoard);
+    else sendKey(id, "choose the required information", excelCsKeyBoard);
   }
   else if (cs && teams){
     sendText(id, courseName + " - "+ courseNumber );
     if (link) sendKey(id, "choose the required information", tgcsKeyBoard);
     else sendKey(id, "choose the required information", tcsKeyBoard)
       }
-  else if (exel && teams){
+  else if (excel && teams){
     sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", tgexelKeyBoard);
-    else sendKey(id, "choose the required information", texelKeyBoard)
+    if (link) sendKey(id, "choose the required information", tgexcelKeyBoard);
+    else sendKey(id, "choose the required information", texcelKeyBoard)
       }
   else if (teams){
     sendText(id, courseName + " - "+ courseNumber );
@@ -278,10 +278,10 @@ function sendOpt(id, name, courses, courseRow){
     if (link) sendKey(id, "choose the required information", gcsKeyBoard);
     else sendKey(id, "choose the required information", csKeyBoard)
       }
-  else if (exel){
+  else if (excel){
     sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gexelKeyBoard);
-    else sendKey(id, "choose the required information", exelKeyBoard)
+    if (link) sendKey(id, "choose the required information", gexcelKeyBoard);
+    else sendKey(id, "choose the required information", excelKeyBoard)
       }
   else{
     sendText(id, courseName + " - "+ courseNumber );
@@ -301,7 +301,7 @@ function getDone(id, name, command, users, courses){
     var courseNumber = courses.getRange(courseRow, 1).getValue();
     var courseName = courses.getRange(courseRow, 2).getValue();
     var group = courses.getRange(courseRow, 3).getValue();
-    var exel = courses.getRange(courseRow, 4).getValue();
+    var excel = courses.getRange(courseRow, 4).getValue();
     var teams = courses.getRange(courseRow, 6).getValue();
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
@@ -334,9 +334,9 @@ function getDone(id, name, command, users, courses){
         var currentCounter = users.getRange(2, 11).getValue();
         users.getRange(2, 11).setValue(++currentCounter);
         break;
-      case 'All tests - exel':
-        sendText(id, "Looking for a link to the tests exel " + groupSy);
-        sendText(id, exel);
+      case 'All tests - excel':
+        sendText(id, "Looking for a link to the tests excel " + groupSy);
+        sendText(id, excel);
         var currentCounter = users.getRange(2, 11).getValue();
         users.getRange(2, 11).setValue(++currentCounter);
         break;
@@ -391,7 +391,7 @@ function getDone(id, name, command, users, courses){
         }
         sendText(id, "Looking for a link to the test scans " + scansSy);
         scansHandler(id, courseNumber);
-        if (exel) sendText(id, exel);
+        if (excel) sendText(id, excel);
         reviewsHandler(id, courseRow, courses, 1);
         facebookHandler(id, courseNumber, courseName);
         youtubeHandler(id, courseNumber, courseName);

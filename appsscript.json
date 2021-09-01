@@ -1,13 +1,7 @@
 {
   "timeZone": "Asia/Jerusalem",
   "dependencies": {
-    "enabledAdvancedServices": [
-      {
-        "userSymbol": "BigQuery",
-        "serviceId": "bigquery",
-        "version": "v2"
-      }
-    ]
+    "enabledAdvancedServices": []
   },
   "webapp": {
     "executeAs": "USER_DEPLOYING",

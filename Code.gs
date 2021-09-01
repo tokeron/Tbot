@@ -73,18 +73,17 @@ function doGet(e) {
   return HtmlService.createHtmlOutput("Hello " + JSON.stringify(e)); 
 }
 
-//doPost(e)
 //Description: main function. Execution of the requestes.
 //input: JSON. It may contain callback_query - input from exeternal keyboard, 
 //or massege - input from text sent from the user or internal keyboard.
 function doPost(e){
-  var userEx = SpreadsheetApp.openByUrl(userExel);
+  var userEx = SpreadsheetApp.openByUrl(userExcel);
   var users = userEx.getActiveSheet();
-  var coursesEX = SpreadsheetApp.openByUrl(courseExel);
+  var coursesEX = SpreadsheetApp.openByUrl(courseExcel);
   var courses = coursesEX.getActiveSheet();
   var contents = JSON.parse(e.postData.contents);
   
-  //internal keyboard command
+  //internal keyboard command - different from regular text
   if (contents.callback_query){
     var id = contents.callback_query.from.id;
     var data = contents.callback_query.data;
@@ -175,7 +174,7 @@ function doPost(e){
       set(id, 0, name, 0);
       sendText(id, "Course number " + data + " is not on your list anymore");
     }else if (mode == SFS){//students fo students
-      var app = SpreadsheetApp.openByUrl(businessExel);
+      var app = SpreadsheetApp.openByUrl(businessExcel);
       var busi = app.getSheetByName('info');
       
       var maxCol = busi.getRange(2, 2).getValue();
@@ -267,7 +266,7 @@ function doPost(e){
     }
   }
   
-  //external massage command
+  //external massage command - same as regular text
   else if (contents.message){
     //Statistics update
     var current = users.getRange(2, 12).getValue();
@@ -293,7 +292,7 @@ function doPost(e){
     }
     ///////////////////////////////////////////////password - not in use for now
     /*
-    var app = SpreadsheetApp.openByUrl(userExel);
+    var app = SpreadsheetApp.openByUrl(userExcel);
     var ss = app.getActiveSheet();
     var rows = ss.createTextFinder(id).findAll();
     if (rows.length == 0){
@@ -340,7 +339,7 @@ function doPost(e){
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
       set(id, 0, name, 0);
       return;
-    }else if (text == 'תפריט ראשי' || text == 'Main Menu' || text == mainMenu){
+    }else if (text == 'תפריט ראשי' || text == 'Main Menu' || text == mainMenu || text == "home"){
       sendKey(id, "How may I help you?", mainKeyBoard);
       set(id, 0, name, 0);
       return;
@@ -383,7 +382,7 @@ function doPost(e){
       removeKey(id, "You can send your feedback now");
       set(id, 'feedback');
     }else if (text == drive || text == courseGroup || text == reviews || text == 'Get all' || text == facebook
-              || text == youTube || text == ug || text == cs || text == 'All tests - exel'
+              || text == youTube || text == ug || text == cs || text == 'All tests - Excel'
               || text == moodle || text == testock || text == "Panopto"||  text == "Course info" || text == 'Teams Group \ud83d\udc6a'){
       getDone(id, name, text, users, courses);
     } 
@@ -569,7 +568,7 @@ function doPost(e){
       sendKey(id, "Choose the settings you are willing to change", settingsKeyBoard);
     }else if (text == SFS){
       sendText(id, "Students for Students is a project designed to encourage students to support other students businesses");
-      var app = SpreadsheetApp.openByUrl(businessExel);
+      var app = SpreadsheetApp.openByUrl(businessExcel);
       var busi = app.getSheetByName('info');
       
       var maxCol = busi.getRange(2, 2).getValue();
@@ -627,7 +626,7 @@ function doPost(e){
       set(id, 0, name, 0);
       sendKey(id, "What would you like to do next?", mainKeyBoard);
     }else if (mode == 'Ride'){
-      var RidesEX = SpreadsheetApp.openByUrl(facultyRidesExel);
+      var RidesEX = SpreadsheetApp.openByUrl(facultyRidesExcel);
       var Rides = RidesEX.getActiveSheet();
       var list = Rides.createTextFinder(text).findAll();
       if (list.length > 0){
@@ -721,7 +720,7 @@ function doPost(e){
           sendKey(id,'What would you like to do next?',mainKeyBoard)
         }
       }
-    }else if (mode == 'Add exams exel'){
+    }else if (mode == 'Add exams Excel'){
       var courseRow = 0;
       var idRow = row;
       courseRow = users.getRange(idRow, 4).getValue();
@@ -729,7 +728,7 @@ function doPost(e){
       var courseName = courses.getRange(courseRow, 2).getValue();
       if (courseRow){
         courses.getRange(courseRow, 4).setValue(text);
-        sendText(id, "The exel is added to " + courseNumber + ' ' + courseName);
+        sendText(id, "The Excel is added to " + courseNumber + ' ' + courseName);
       }
     }else if (mode == "faculty" || otherMode == "הנדסת חשמל" || otherMode == "ChooseElectricProgram" ){
       facultyGroupHandler(id, text, mode, otherMode);
@@ -770,8 +769,8 @@ function doPost(e){
         }
       }
       else{ //len in 0  
-        set(id, 0, name, 0);
-        sendKey(id, "can't find "+text+".", mainKeyBoard);
+        //set(id, 0, name, 0);
+        sendKey(id, "can't find "+text+". Try typing somthing else or type 'home' to return to main menu.");
       }
     }else if (mode == "Settings and Preference"){
       if (text == "Gender"){
@@ -914,7 +913,7 @@ function doPost(e){
       //      }
       //      sendText(id, "Course number " + text + " is not on your list anymore");
     }else if (mode == SFS){
-      var app = SpreadsheetApp.openByUrl(businessExel);
+      var app = SpreadsheetApp.openByUrl(businessExcel);
       var busi = app.getSheetByName('info');
       
       var maxCol = busi.getRange(2, 2).getValue();
@@ -1075,7 +1074,7 @@ function doPost(e){
         }
       }
     }else if (mode == "GoodPass"){//helper function of STS: edit business // (id, GoodPass, busi name, information to change)
-      var app = SpreadsheetApp.openByUrl(businessExel);
+      var app = SpreadsheetApp.openByUrl(businessExcel);
       var busi = app.getSheetByName('info');
       
       var maxCol = busi.getRange(2, 2).getValue();
