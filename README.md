@@ -14,5 +14,4 @@ Team members:
 - Hila Kornis
 - Dolev Shema
 - Maor Ben-Zaquen
-- Ishay Gavriel
 - Ron Elkaslasi
