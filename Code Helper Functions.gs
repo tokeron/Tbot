@@ -723,3 +723,29 @@ function set(id, data, name, num){
     return;
   }
 }
+
+//function do download file from user
+function downloadFile(fileid,fileName, userId){
+  sendText(userId, "downloading...");
+  var response = UrlFetchApp.fetch(url + '/getFile?file_id=' + fileid);
+  sendText(userId, "downloading...1");
+  var urlphoto = 'https://api.telegram.org/file/bot' + token + '/' + JSON.parse(response.getContentText()).result["file_path"];
+  sendText(userId, "downloading...2");
+  var file = UrlFetchApp.fetch(urlphoto);
+  //var blob = file.getBlob();
+  //blob.setName(fileName)
+  //var jum = DriveApp.createFile(blob).setName(new Date().toLocaleString());
+  return file
+}
+
+//sunction to send an emailwith file
+function sendEmail(file,chat_id, studentId,printType,fileName){
+  sendText(chat_id, "sending..");
+  //GmailApp.sendEmail('dontokeron@gmail.com', studentId,"hello", {
+  GmailApp.sendEmail('Print.' + printType + '@campus.technion.ac.il', studentId,"print for me please", {
+    attachments: [file],
+    name: 'Automatic Emailer Script'
+    //replyTo: "tbotaviv" +chat_id + "@gmail.com"
+});
+  sendText(chat_id, "done..");
+}
