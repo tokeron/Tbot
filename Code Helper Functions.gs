@@ -749,3 +749,13 @@ function sendEmail(file,chat_id, studentId,printType,fileName){
 });
   sendText(chat_id, "done..");
 }
+
+function calculaAvg(rowToCalculate){
+    var startingCol = 1;
+    var DB = SpreadsheetApp.openByUrl(dataBase);
+    var salary = DB.getSheetByName("salary");
+    var number = salary.getRange(rowToCalculate, startingCol).getValue();
+    for (i = 0 ; i < number; i++){
+      
+    }
+}
