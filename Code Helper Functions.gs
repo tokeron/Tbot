@@ -462,21 +462,21 @@ function facultyGroupHandler(id, data, mode, otherData){
     sendKey(id, "Choose your study program from the list below ", electricProgramsKeyBoard);
     set(id, data, 0, "ChooseElectricProgram");
   }else if (otherData == "ChooseElectricProgram"){
-    var telegramExel = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1nal2_52Pk29eosF81WpYhgCnLMPWziGBUPUROj_8yS8/edit#gid=0");
-    var FacultyExel = telegramExel.getSheetByName("Electric");
-    var row = FacultyExel.createTextFinder(mode).findNext();
+    var telegramExcel = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1nal2_52Pk29eosF81WpYhgCnLMPWziGBUPUROj_8yS8/edit#gid=0");
+    var FacultyExcel = telegramExcel.getSheetByName("Electric");
+    var row = FacultyExcel.createTextFinder(mode).findNext();
     var i = row.getRow();
     var programCol = 2;// default Electrical Engineering
     if (data == "Computer and Software Engineering") programCol = 3;
     else if (data == "Computer Engineering") programCol = 4;
     else if (data == "Electrical Engineering and Physics") programCol = 5;
     var pathName = data;
-    var Semester = FacultyExel.getRange(i,1).getValue();
-    var currLink = FacultyExel.getRange(i,programCol).getValue();
+    var Semester = FacultyExcel.getRange(i,1).getValue();
+    var currLink = FacultyExcel.getRange(i,programCol).getValue();
     sendText(id, currLink + ' - ' + Semester + ' - ' + pathName);
     set(id,0,0,0);
   }else{
-    var facultyEX = SpreadsheetApp.openByUrl(facultyRidesExel);
+    var facultyEX = SpreadsheetApp.openByUrl(facultyRidesExcel);
     var faculties = facultyEX.getActiveSheet();
     var row = faculties.createTextFinder(data).findNext();
     var i = row.getRow();
@@ -689,7 +689,7 @@ function reviewsHandler(id, i, courses, isAll){
 //input: user id, data(string) that determines the state of the student in the sheets,
 //name of the user and num that most of the time is the number of the course
 function set(id, data, name, num){
-  var app = SpreadsheetApp.openByUrl(userExel);
+  var app = SpreadsheetApp.openByUrl(userExcel);
   var ss = app.getActiveSheet();
   var rowFinder = ss.createTextFinder(id);
   var row = rowFinder.findNext();
