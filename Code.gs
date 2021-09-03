@@ -219,6 +219,23 @@ function doPost(e){
         numberList.push("Add a Topic \ud83c\udfea");
         makeKeyBoard(id, courseList, numberList);
         set(id, SFS, name, "Wait");
+        /*
+      }else if (mode == "Glass Door"){
+        if (text == "ברר משכורת"){//send faculty keboard
+          set(id, text, 0, 0);
+          sendKey(id, "Choose you facukty", coursesKeyBoardEn);
+        }else{
+          
+        }
+      }else if (mode == "ברר משכורת"){//how many years keyboard
+          set(id, "sendYearsNext", 0, 0);
+          sendKey(id, "Choose you facukty", numbersKeyBoard);
+      }else if (mode == "sendYearsNext"){//where do  you work?
+          set(id, "calculate avg", 0, 0);
+          sendKey(id, "Choose you facukty", coursesKeyBoardEn);
+      }else if (mode == "calculate avg"){
+        calculateAvg();
+      */
       }
       else{
         var currBusi = busi.createTextFinder(data).findNext();
@@ -1111,6 +1128,9 @@ function doPost(e){
       busi.getRange(busiRow, busiCol).setValue(text);
       sendKey(id, "The "+otherMode+" has been updated to "+ text, mainKeyBoard);
       return;
+    }else if(text == "Glass Door"){
+      set(id, text, name, 0);
+      sendKey(id, "What do you want to do? ", GDKeyBoard);
     }
     else{
       sendKey(id,"How may I help you?",mainKeyBoard);

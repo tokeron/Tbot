@@ -9,7 +9,7 @@ function establishSQL(){
 
 //function that runs once a day and deletes long convarsations from yesterday.
 function deleteNotInUse(){
-  var userEx = SpreadsheetApp.openByUrl(userExel);
+  var userEx = SpreadsheetApp.openByUrl(userExcel);
   var users = userEx.getActiveSheet();
   var today = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
   var talkFinder = users.createTextFinder("Talk");
@@ -47,7 +47,7 @@ function getCourses(){
 
 function updateCourses(){
   var str = getCourses();
-  var crs = SpreadsheetApp.openByUrl(courseExel).getActiveSheet();
+  var crs = SpreadsheetApp.openByUrl(courseExcel).getActiveSheet();
   //var crs = ss.getSheetByName('Courses');
   while (str.indexOf("general") !== -1){
     str = str.slice(str.indexOf("general"));
@@ -130,10 +130,10 @@ function updateCourses(){
 
 
 function getLinks(){
-  var coursesExelNew = "https://docs.google.com/spreadsheets/d/1hkWNJhWBHJfsVWV-0DcMRphsJXE79JvuJAXhvlnC7OY/edit#gid=0";
-  var newCrs = SpreadsheetApp.openByUrl(coursesExelNew);
+  var coursesExcelNew = "https://docs.google.com/spreadsheets/d/1hkWNJhWBHJfsVWV-0DcMRphsJXE79JvuJAXhvlnC7OY/edit#gid=0";
+  var newCrs = SpreadsheetApp.openByUrl(coursesExcelNew);
   var crs = newCrs.getSheetByName('Courses');
-  var old = SpreadsheetApp.openByUrl(courseExel).getActiveSheet();
+  var old = SpreadsheetApp.openByUrl(courseExcel).getActiveSheet();
   
   var row = 966;
   var courseNumber = old.getRange(row, 1).getValue();
