@@ -217,7 +217,7 @@ function sendOpt(id, name, courses, courseRow){
   var excel = false;
   var cs = false;
   var teams = false;
-  set(id, 'Course', name, courseRow);
+  oldSet(id, 'Course', name, courseRow);
   var courseNumber = courses.getRange(courseRow, 1).getValue();
   var courseName = courses.getRange(courseRow, 2).getValue();
   var mode = courses.getRange(courseRow, 5).getValue();
@@ -404,7 +404,7 @@ function getDone(id, name, command, users, courses){
         sendText(id, "Looking for moodle link " + moodleSy);
         sendText(id, "https://moodle.technion.ac.il/course/search.php?search="+courseNumber);
         driveHandler(id, courseNumber, courseName);
-        set(id, 0, name, 0)
+        oldSet(id, 0, name, 0)
         sendKey(id, "What would you like to do next?", mainKeyBoard);
         break;
     }
@@ -457,10 +457,10 @@ function scansHandler(id, number){
 function facultyGroupHandler(id, data, mode, otherData){
   if(data == "הנדסת חשמל") {
     sendKey(id, "Choose your semester from the list below ", electricSemesterKeyBoard);
-    set(id, 0, 0, data);
+    oldSet(id, 0, 0, data);
   }else if (otherData == "הנדסת חשמל"){
     sendKey(id, "Choose your study program from the list below ", electricProgramsKeyBoard);
-    set(id, data, 0, "ChooseElectricProgram");
+    oldSet(id, data, 0, "ChooseElectricProgram");
   }else if (otherData == "ChooseElectricProgram"){
     var telegramExcel = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1nal2_52Pk29eosF81WpYhgCnLMPWziGBUPUROj_8yS8/edit#gid=0");
     var FacultyExcel = telegramExcel.getSheetByName("Electric");
@@ -474,7 +474,7 @@ function facultyGroupHandler(id, data, mode, otherData){
     var Semester = FacultyExcel.getRange(i,1).getValue();
     var currLink = FacultyExcel.getRange(i,programCol).getValue();
     sendText(id, currLink + ' - ' + Semester + ' - ' + pathName);
-    set(id,0,0,0);
+    oldSet(id,0,0,0);
   }else{
     var facultyEX = SpreadsheetApp.openByUrl(facultyRidesExcel);
     var faculties = facultyEX.getActiveSheet();
@@ -683,43 +683,41 @@ function reviewsHandler(id, i, courses, isAll){
   }
 }
 
-//important function set(id, data, name, num)
+//important function oldSet(id, data, name, num)
 //Description: the function changes the cell in the sheets according to the data and num variables. 
 //That way the bot can "remmeber" the previous commands in order to complete the commands.
 //input: user id, data(string) that determines the state of the student in the sheets,
 //name of the user and num that most of the time is the number of the course
-function set(id, data, name, num){
-  var app = SpreadsheetApp.openByUrl(userExcel);
-  var ss = app.getActiveSheet();
-  var rowFinder = ss.createTextFinder(id);
-  var row = rowFinder.findNext();
-  while (row !== null && row.getColumn() !== 1) row = rowFinder.findNext();
-  if (row !== null){
-    row = row.getRow();
-    ss.getRange(row, 2).setValue(data);
-    if (name) ss.getRange(row, 3).setValue(name);
-    else if (name == 0) ss.getRange(row, 3).setValue(0);
-    if (num) ss.getRange(row, 4).setValue(num);
-    else if (num == 0)ss.getRange(row, 4).setValue(0);
+function oldSet(id, data, name, num){
+  set(id, name, data, num);
+}
+
+function set(id, name, mode1, mode2, mode3, mode4, mode5){
+  userFinder = users.createTextFinder(id);
+  user = userFinder.findNext();
+  while (user !== null && user.getColumn() !== 1) user = userFinder.findNext(); //seach the row with the id in the first row
+  if (user !== null){
+    row = user.getRow();
+    if (name || name == 0)   users.getRange(row, 2).setValue(name);
+    if (mode1 || mode1 == 0) users.getRange(row, 4).setValue(mode1);
+    if (mode2 || mode2 == 0) users.getRange(row, 5).setValue(mode2);
+    if (mode3 || mode3 == 0) users.getRange(row, 6).setValue(mode3);
+    if (mode4 || mode4 == 0) users.getRange(row, 7).setValue(mode4);
+    if (mode5 || mode5 == 0) users.getRange(row, 8).setValue(mode5);
     return;
   }
-  else{
-    //   sendText(id, row);//test
-    var next = ss.getRange(2, 4).getValue();
-//    if (next == numberOfCourses){
-//      // Fetch the email address
-//      var emailAddress = "technobot404@gmail.com";
-//      // Send Alert Email.
-//      var message = "The 'mode' list is full!!"; 
-//      var subject = 'You have a problem in TBot';
-//      MailApp.sendEmail(emailAddress, subject, message);
-//      sendText(id, 'There is a temporary error');
-//    }
-    ss.getRange(next, 1).setValue(id);
-    ss.getRange(next, 2).setValue(data);
-    if (name) ss.getRange(next, 3).setValue(name);
-    if (num) ss.getRange(next, 4).setValue(num);
-    ss.getRange(2, 4).setValue(++next);
+  else{ //new user
+    var nextRow = ss.getRange(1, 4).getValue();
+
+    users.getRange(nextRow, 1).setValue(id);
+    if (name || name == 0)   users.getRange(row, 2).setValue(name);
+    if (mode1 || mode1 == 0) users.getRange(row, 4).setValue(mode1);
+    if (mode2 || mode2 == 0) users.getRange(row, 5).setValue(mode2);
+    if (mode3 || mode3 == 0) users.getRange(row, 6).setValue(mode3);
+    if (mode4 || mode4 == 0) users.getRange(row, 7).setValue(mode4);
+    if (mode5 || mode5 == 0) users.getRange(row, 8).setValue(mode5);
+
+    users.getRange(1, 4).setValue(++nextRow);
     return;
   }
 }
