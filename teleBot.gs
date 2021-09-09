@@ -35,10 +35,10 @@ function getUpdates() {
 }
 
 /**
- * Sends text with optional external keyboard.
+ * Sends text with optional internal keyboard.
  * @param {(String|Number)} chatId Identifier of the chat to send the text to.
  * @param {String} text The text to send.
- * @param {Keyboard} keyboard The keyboard to pop-up.
+ * @param {TelegramInlineKeyboard} keyboard The inline keyboard to send.
  */
 //sendText(chatId, text, keyboard)
 //Description: sends text to chatId with(optional) exeternal keyboard.
@@ -59,6 +59,12 @@ function sendText(chatId, text, keyboard) {
   UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
 }
 
+/**
+ * Sends text with optional external keyboard.
+ * @param {(String|Number)} chatId Identifier of the chat to send the text to.
+ * @param {String} text The text to send.
+ * @param {TelegramKeyboard} keyboard The keyboard to pop-up.
+ */
 //sendKey(chatId, text, keyBoard)
 //Description: sends text to chatId with internal keyboared(optional).
 //input: chat id, string and the name of the internal keyboared(optional).
@@ -77,7 +83,11 @@ function sendKey(chatId, text, keyBoard) {
   };
   UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
 }
-
+/**
+ * Sends text and remove the external keyboard.
+ * @param {(String|Number)} chatId Identifier of the chat to send the text to.
+ * @param {String} text The text to send.
+ */
 function removeKey(chatId, text) {
   var data = {
     method: "post",
