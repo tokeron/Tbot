@@ -100,7 +100,7 @@ function findHelper(id){
   return helperId;
 }
 
-
+// most of it can be replaced be single Object.
 function simpleText(id, text){
   if(text == About){
     sendText(id, "Hi! My name is Michael Toker and I am a student at the Computer Science department at the Technion");
@@ -724,38 +724,29 @@ function set(id, data, name, num){
   }
 }
 
-//function do download file from user
-function downloadFile(fileid,fileName, userId){
-  sendText(userId, "downloading...");
-  var response = UrlFetchApp.fetch(url + '/getFile?file_id=' + fileid);
-  sendText(userId, "downloading...1");
-  var urlphoto = 'https://api.telegram.org/file/bot' + token + '/' + JSON.parse(response.getContentText()).result["file_path"];
-  sendText(userId, "downloading...2");
-  var file = UrlFetchApp.fetch(urlphoto);
-  //var blob = file.getBlob();
-  //blob.setName(fileName)
-  //var jum = DriveApp.createFile(blob).setName(new Date().toLocaleString());
-  return file
+
+
+/**
+ * fetch and increment the script-property with the given key.
+ * @param {String} key the name of the variable to increment.
+ * @return {Number} the old value of key.
+ */
+function fetchAndInc(key){
+  var v = +ScriptProperties.getProperty(key);
+  ScriptProperties.setProperty(key,1+v);
+  return v;
 }
 
-//sunction to send an emailwith file
-function sendEmail(file,chat_id, studentId,printType,fileName){
-  sendText(chat_id, "sending..");
-  //GmailApp.sendEmail('dontokeron@gmail.com', studentId,"hello", {
-  GmailApp.sendEmail('Print.' + printType + '@campus.technion.ac.il', studentId,"print for me please", {
-    attachments: [file],
-    name: 'Automatic Emailer Script'
-    //replyTo: "tbotaviv" +chat_id + "@gmail.com"
-});
-  sendText(chat_id, "done..");
+/**
+ * fetch and decrement the script-property with the given key.
+ * @param {String} key the name of the variable to decrement.
+ * @return {Number} the old value of key.
+ */
+function fetchAndDec(key){
+  var v = +ScriptProperties.getProperty(key);
+  ScriptProperties.setProperty(key,v-1);
+  return v;
 }
 
-function calculaAvg(rowToCalculate){
-    var startingCol = 1;
-    var DB = SpreadsheetApp.openByUrl(dataBase);
-    var salary = DB.getSheetByName("salary");
-    var number = salary.getRange(rowToCalculate, startingCol).getValue();
-    for (i = 0 ; i < number; i++){
-      
-    }
-}
+
+

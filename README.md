@@ -15,3 +15,5 @@ Team members:
 - Dolev Shema
 - Maor Ben-Zaquen
 - Ron Elkaslasi
+- [David Shem-Tov](https://github.com/d-s-t)
+- [Aviv Shem-Tov](https://github.com/staviv)

@@ -1,3 +1,4 @@
+
 //Macros
 var TESTMODE = false;
 
@@ -58,62 +59,12 @@ function makeKeyBoard(id, names, numbers){
 }
   
 
-//sendText(chatId, text, keyBoard)
-//Description: sends text to chatId with(optional) exeternal keyboared.
-//input: chat id, string and(optional) the name of the exeternal keyboared.
-function sendText(chatId, text, keyBoard) {
-  var data = {
-    method: "post",
-    payload: {
-      method: "sendMessage",
-      chat_id: String(chatId),
-      text: text,
-      parse_mode: "HTML",
-      reply_markup: JSON.stringify({
-        "inline_keyboard": keyBoard,
-      })
-    }
-  };
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
-}
 
-//sendKey(chatId, text, keyBoard)
-//Description: sends text to chatId with internal keyboared(optional).
-//input: chat id, string and the name of the internal keyboared(optional).
-function sendKey(chatId, text, keyBoard) {
-  var data = {
-    method: "post",
-    payload: {
-      method: "sendMessage",
-      chat_id: String(chatId),
-      text: text,
-      parse_mode: "Markdown",
-      reply_markup: JSON.stringify({
-        "keyboard": keyBoard,
-      })
-    }
-  };
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
-}
-
-function removeKey(chatId, text) {
-  var data = {
-    method: "post",
-    payload: {
-      method: "sendMessage",
-      chat_id: String(chatId),
-      text: text,
-      reply_markup: JSON.stringify({
-        remove_keyboard: true })
-    }
-  };
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
-}
 
 //keyBoards
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
-  [{ text: SFS}/*, {text: "Glass Door"}*/,{ text: help }],
+  [{ text: SFS}, { text: help }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
   [{ text: usefulLink}], //{text: add}],
   [{ text: feedback}],
@@ -185,7 +136,7 @@ var printKeyBoard = [
   [{ text: mainMenu }]
   ]
 
-
+/*
 var coursesKeyBoardEn = [
   [{ text: "Computer Science" }, { text: 'Electrical Engineering' }, { text: 'Mechanical Engineering' }],
   [{ text: 'Civil and Environmental Engineering' }, { text: 'Industrial Engineering and Management' }, { text: 'Biomedical Engineering' }],
@@ -195,7 +146,7 @@ var coursesKeyBoardEn = [
   [{ text: "עברית" }],
   [{ text: mainMenu }]
 ]
-
+*/
 
 var coursesKeyBoard = [
   [{text: "סטודנטים בטכניון" }],
@@ -495,11 +446,3 @@ var funKeyBoard = [
   [{ text : "פיתוח פרויקטים"}],
   [{ text: mainMenu }]
 ]
-
-var GDKeyBoard = [
-  [{ text : "הכנס את המשכורת שלך"}],
-  [{ text : "ברר משכורות"}],
-  [{ text: mainMenu }]
-]
-
-
