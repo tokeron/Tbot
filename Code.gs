@@ -5,58 +5,6 @@
 // The bot can handle multiple requests, analyze commands, and execute them.drive
 // The bot is in constant testing and improvement. 
 
-//Macros
-var TESTMODE = false;
-
-//Symbols
-var groupSy = "\ud83d\udc6b"; 
-var driveSy = "\ud83d\udcc1";
-var csSy = "\ud83d\udcbb";
-var ugSy = "\ud83d\udcca";
-var moodleSy = "\ud83d\udccb";
-var reviewsSy = "\ud83d\udcad";
-var facebookSy = "\ud83d\udc65";
-var scansSy = "\ud83d\udcda";
-var attentionSy = "\ud83d\udc49";
-var downSy = "\ud83d\udc47";
-var YouTubeSy = "\ud83d\udcfa";
-var mainSy = "\ud83c\udfe0";
-var Korona = "אסט - עדכונים";
-var help = "Talk To Me" +" \ud83d\udd34";
-var About = "About "+ "\ud83c\udf0e";
-var WantToHelp = "I want to help";
-var fun = "Groups for Hobbies " + "\ud83d\ude0e"
-    
-var ride = "Ride Groups \ud83d\ude97";
-var faculty = "Department Groups \ud83c\udfeb";
-var add = "Add course to the bot \ud83d\udcd7";
-var course = "Courses \ud83d\udcda";
-var usefulLink = "Useful Links \ud83d\udd25";
-var feedback = "feedback \ud83d\udcdd"; 
-var calendar = "Calendar \ud83d\udcc5";
-
-var drive = "Drive "+driveSy;
-var courseGroup = "Telegram group "+groupSy;
-var testock = "Scans - testock "+scansSy;
-var facebook = "Facebook "+facebookSy;
-var youTube = "YouTube " +YouTubeSy;
-var reviews = "Reviews "+reviewsSy;
-var mainMenu = "Main Menu "+mainSy;
-var ug = "Ug "+ugSy;
-var moodle = "Moodle "+moodleSy;
-var cs = "CS "+csSy;
-
-var ContactFacebook = "facebook";
-var ContactEmail = "email";
-var ContactLinkdIn = "linkedin";
-var WantToTalk = "Anonymous talk with a student";
-var SFS = "Students Business "+	"\ud83d\udcb8";
- 
- //Run every time webAppUrl is changed to connect the bot with this new webAppUrl
- function setWebhook() {
-  var response =  UrlFetchApp.fetch(url + "/setWebhook?url=" + webAppUrl);
-  Logger.log(response.getContentText());
-}
 
 //functions that handels the fetching the commands from the users
 function getMe() {
@@ -64,14 +12,10 @@ function getMe() {
   Logger.log(response.getContentText());
 }
 
-function getUpdates() {
-  var response =  UrlFetchApp.fetch(url + "/getUpdates");
-  Logger.log(response.getContentText());
-}
-
 function doGet(e) {
   return HtmlService.createHtmlOutput("Hello " + JSON.stringify(e)); 
 }
+
 
 //Description: main function. Execution of the requestes.
 //input: JSON. It may contain callback_query - input from exeternal keyboard, 
@@ -82,7 +26,7 @@ function doPost(e){
   var coursesEX = SpreadsheetApp.openByUrl(courseExcel);
   var courses = coursesEX.getActiveSheet();
   var contents = JSON.parse(e.postData.contents);
-  var file;
+  
   
   //internal keyboard command - different from regular text
   if (contents.callback_query){
@@ -219,23 +163,6 @@ function doPost(e){
         numberList.push("Add a Topic \ud83c\udfea");
         makeKeyBoard(id, courseList, numberList);
         set(id, SFS, name, "Wait");
-        /*
-      }else if (mode == "Glass Door"){
-        if (text == "ברר משכורת"){//send faculty keboard
-          set(id, text, 0, 0);
-          sendKey(id, "Choose you facukty", coursesKeyBoardEn);
-        }else{
-          
-        }
-      }else if (mode == "ברר משכורת"){//how many years keyboard
-          set(id, "sendYearsNext", 0, 0);
-          sendKey(id, "Choose you facukty", numbersKeyBoard);
-      }else if (mode == "sendYearsNext"){//where do  you work?
-          set(id, "calculate avg", 0, 0);
-          sendKey(id, "Choose you facukty", coursesKeyBoardEn);
-      }else if (mode == "calculate avg"){
-        calculateAvg();
-      */
       }
       else{
         var currBusi = busi.createTextFinder(data).findNext();
@@ -286,24 +213,18 @@ function doPost(e){
   
   //external massage command - same as regular text
   else if (contents.message){
-    if (contents.message.photo){
-      var id = contents.message.from.id;
-      file = downloadFile(contents.message.photo[contents.message.photo.length - 1].file_id);
-    }
-    if (contents.message.document){
-      var id = contents.message.from.id;
-      var fileid = contents.message.document.file_id;
-      var fileName = contents.message.document.file_name;
-      file = downloadFile(fileid, fileName, id);
-      var studentId = "123456789";   // studentId
-      var printType = "bws";         // avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
-      sendEmail(file,contents.message.chat.id,studentId, printType,fileName );
-  } 
     //Logger.log('test..101');
     //Statistics update
+    
+  
+    if (contents.message.photo || contents.message.document){
+      handlePrint(contents.message);
+      return;
+    }
     var current = users.getRange(2, 12).getValue();
     users.getRange(2, 12).setValue(++current);
    
+  
     //Clean text
     var id = contents.message.from.id;
     var name = contents.message.from.first_name;
@@ -1128,9 +1049,6 @@ function doPost(e){
       busi.getRange(busiRow, busiCol).setValue(text);
       sendKey(id, "The "+otherMode+" has been updated to "+ text, mainKeyBoard);
       return;
-    }else if(text == "Glass Door"){
-      set(id, text, name, 0);
-      sendKey(id, "What do you want to do? ", GDKeyBoard);
     }
     else{
       sendKey(id,"How may I help you?",mainKeyBoard);
