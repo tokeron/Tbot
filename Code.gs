@@ -20,12 +20,6 @@ function doGet(e) {
 //input: JSON. It may contain callback_query - input from exeternal keyboard, 
 //or massege - input from text sent from the user or internal keyboard.
 function doPost(e){
-  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase)
-  var courses = dataBaseEx.getSheetByName(courses)
-  var statistics = dataBaseEx.getSheetByName(statistics)
-  var telegram = dataBaseEx.getSheetByName(telegram)
-  var businesses = dataBaseEx.getSheetByName(businesses)
-  var users = dataBaseEx.getSheetByName(users)
   //var userEx = SpreadsheetApp.openByUrl(userExcel);
   //var users = userEx.getActiveSheet();
   //var coursesEX = SpreadsheetApp.openByUrl(courseExcel);
@@ -36,10 +30,27 @@ function doPost(e){
   
   //internal keyboard command - different from regular text
   if (contents.callback_query){
+    handleCallback(contents);
+  }  
+  //external massage command - same as regular text
+  else if (contents.message){
+    handleMessage(contents);
+  }
+}
+
+  function handleCallback(contents){
+    //open spreadsheets
+    var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+    var courses = dataBaseEx.getSheetByName("courses");
+    var statistics = dataBaseEx.getSheetByName("statistics");
+    var telegramLinks = dataBaseEx.getSheetByName("telegram");
+    var businesses = dataBaseEx.getSheetByName("businesses");
+    var users = dataBaseEx.getSheetByName("users");
+
     var id = contents.callback_query.from.id;
     var data = contents.callback_query.data;
     var name = contents.callback_query.from.first_name;
-    
+    //sendText(id, "Test");
     if (data == 'Search For Another Course'){
       removeKey(id, "Please insert the course number or course name (can be partial name)"
                 +"in order to search for a course. To add it to your list simply choose 'Add to my list'");
@@ -91,9 +102,6 @@ function doPost(e){
       sendKey(id, "How may I help you?", mainKeyBoard);
     }
     if (mode1 == "help by number"){ // helper get in contact with a student
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var helperRow = mode2;
       var integer = parseInt(data, 10);
       var needsHelpCol = 9 + integer;
@@ -128,10 +136,7 @@ function doPost(e){
       }
       oldSet(id, 0, name, 0);
       sendText(id, "Course number " + data + " is not on your list anymore");
-    }else if (mode1 == SFS){//students fo students
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+    }else if (mode1 == SFS){//students fo students      
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -237,11 +242,18 @@ function doPost(e){
       }
     }
   }
-  
-  //external massage command - same as regular text
-  else if (contents.message){
-    var current = users.getRange(2, 12).getValue();
-    users.getRange(2, 12).setValue(++current);
+
+  function handleMessage(contents){
+    //open spreadsheets
+    var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+    var courses = dataBaseEx.getSheetByName("courses");
+    var statistics = dataBaseEx.getSheetByName("statistics");
+    var telegramLinks = dataBaseEx.getSheetByName("telegram");
+    var businesses = dataBaseEx.getSheetByName("businesses");
+    var users = dataBaseEx.getSheetByName("users");
+
+    //var current = users.getRange(2, 12).getValue();
+    //users.getRange(2, 12).setValue(++current);
    
   
     //Clean text
@@ -362,8 +374,6 @@ function doPost(e){
       getDone(id, name, text, users, courses);
     } 
     else if(text == WantToHelp){
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
       var helperFinder = helpers.createTextFinder(id);
       var nextCell = helperFinder.findNext();
       while (nextCell !== null && nextCell.getColumn() !== 1){
@@ -410,7 +420,7 @@ function doPost(e){
       var added = false;
       if (row){
         var idRow = row;
-        var courseToAdd = users.getRange(idRow, 4).getValue();
+        var courseToAdd = mode2; //users.getRange(idRow, 4).getValue();
         var currCol = 14;
         while (currCol <= 29){
           var currNumber = users.getRange(idRow, currCol).getValue();
@@ -476,9 +486,6 @@ function doPost(e){
 //      sendText(id, "היי, ראיתי שניסית לדבר עם מישהו ולא היה לי עם מי לחבר אותך. כעת יש סטודנט פנוי שישמח לדבר איתך. אם אתה עדיין מעוניין לדבר תשלח חזרה את המילה כן");
 //      sendText(id, "done")
     }else if(text == WantToTalk){ //set an anonymous talk //id wanted to talk
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var helperCol = 2;
       sendText(id, "Searching for an helper for you.. You can always change your preference for an helper and i'll try to find"+
                " the best one for you.. ");
@@ -516,9 +523,6 @@ function doPost(e){
         return;
       }
     }else if (text == "Settings and Preference"){
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var cellFinder = needsHelp.createTextFinder(id);
       var needsHelpCell = cellFinder.findNext();
       while(needsHelpCell !== null && needsHelpCell.getColumn() !== 1){
@@ -544,9 +548,7 @@ function doPost(e){
       sendKey(id, "Choose the settings you are willing to change", settingsKeyBoard);
     }else if (text == SFS){
       sendText(id, "Students for Students is a project designed to encourage students to support other students businesses");
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -602,8 +604,8 @@ function doPost(e){
       oldSet(id, 0, name, 0);
       sendKey(id, "What would you like to do next?", mainKeyBoard);
     }else if (mode1 == 'Ride'){
-      var RidesEX = SpreadsheetApp.openByUrl(facultyRidesExcel);
-      var Rides = RidesEX.getActiveSheet();
+      var RidesEX = SpreadsheetApp.openByUrl(dataBase);
+      var Rides = RidesEX.getSheetByName("telegramLinks");
       var list = Rides.createTextFinder(text).findAll();
       if (list.length > 0){
         var row = list[0].getRow();
@@ -766,10 +768,6 @@ function doPost(e){
         oldSet(id, mode1, name, text);
         return;
       }
-      //getData
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var rowFinder = needsHelp.createTextFinder(id);
       var currID = rowFinder.findNext();
       var row;
@@ -888,10 +886,7 @@ function doPost(e){
       //        users.getRange(row, index-1).setValue(0);
       //      }
       //      sendText(id, "Course number " + text + " is not on your list anymore");
-    }else if (mode1 == SFS){
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+    }else if (mode1 == SFS){     
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -1049,10 +1044,7 @@ function doPost(e){
           sendText(id, textToSend);
         }
       }
-    }else if (mode1 == "GoodPass"){//helper function of STS: edit business // (id, GoodPass, busi name, information to change)
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+    }else if (mode1 == "GoodPass"){//helper function of STS: edit business // (id, GoodPass, busi name, information to change)      
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -1076,5 +1068,5 @@ function doPost(e){
     else{
       sendKey(id,"How may I help you?",mainKeyBoard);
     }
-  }
 }
+
