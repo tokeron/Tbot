@@ -5,67 +5,10 @@
 // The bot can handle multiple requests, analyze commands, and execute them.drive
 // The bot is in constant testing and improvement. 
 
-//Macros
-var TESTmode1 = false;
-
-//Symbols
-var groupSy = "\ud83d\udc6b"; 
-var driveSy = "\ud83d\udcc1";
-var csSy = "\ud83d\udcbb";
-var ugSy = "\ud83d\udcca";
-var moodleSy = "\ud83d\udccb";
-var reviewsSy = "\ud83d\udcad";
-var facebookSy = "\ud83d\udc65";
-var scansSy = "\ud83d\udcda";
-var attentionSy = "\ud83d\udc49";
-var downSy = "\ud83d\udc47";
-var YouTubeSy = "\ud83d\udcfa";
-var mainSy = "\ud83c\udfe0";
-var Korona = "אסט - עדכונים";
-var help = "Talk To Me" +" \ud83d\udd34";
-var About = "About "+ "\ud83c\udf0e";
-var WantToHelp = "I want to help";
-var fun = "Groups for Hobbies " + "\ud83d\ude0e"
-    
-var ride = "Ride Groups \ud83d\ude97";
-var faculty = "Department Groups \ud83c\udfeb";
-var add = "Add course to the bot \ud83d\udcd7";
-var course = "Courses \ud83d\udcda";
-var usefulLink = "Useful Links \ud83d\udd25";
-var feedback = "feedback \ud83d\udcdd"; 
-var calendar = "Calendar \ud83d\udcc5";
-
-var drive = "Drive "+driveSy;
-var courseGroup = "Telegram group "+groupSy;
-var testock = "Scans - testock "+scansSy;
-var facebook = "Facebook "+facebookSy;
-var youTube = "YouTube " +YouTubeSy;
-var reviews = "Reviews "+reviewsSy;
-var mainMenu = "Main Menu "+mainSy;
-var ug = "Ug "+ugSy;
-var moodle = "Moodle "+moodleSy;
-var cs = "CS "+csSy;
-
-var ContactFacebook = "facebook";
-var ContactEmail = "email";
-var ContactLinkdIn = "linkedin";
-var WantToTalk = "Anonymous talk with a student";
-var SFS = "Students Business "+	"\ud83d\udcb8";
- 
- //Run every time webAppUrl is changed to connect the bot with this new webAppUrl
- function setWebhook() {
-  var response =  UrlFetchApp.fetch(url + "/setWebhook?url=" + webAppUrl);
-  Logger.log(response.getContentText());
-}
 
 //functions that handels the fetching the commands from the users
 function getMe() {
   var response =  UrlFetchApp.fetch(url + "/getMe");
-  Logger.log(response.getContentText());
-}
-
-function getUpdates() {
-  var response =  UrlFetchApp.fetch(url + "/getUpdates");
   Logger.log(response.getContentText());
 }
 
@@ -89,6 +32,7 @@ function doPost(e){
   //var courses = coursesEX.getActiveSheet();
   var contents = JSON.parse(e.postData.contents);
   var file;
+  
   
   //internal keyboard command - different from regular text
   if (contents.callback_query){
@@ -292,24 +236,10 @@ function doPost(e){
   
   //external massage command - same as regular text
   else if (contents.message){
-    if (contents.message.photo){
-      var id = contents.message.from.id;
-      file = downloadFile(contents.message.photo[contents.message.photo.length - 1].file_id);
-    }
-    if (contents.message.document){
-      var id = contents.message.from.id;
-      var fileid = contents.message.document.file_id;
-      var fileName = contents.message.document.file_name;
-      file = downloadFile(fileid, fileName, id);
-      var studentId = "123456789";   // studentId
-      var printType = "bws";         // avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
-      sendEmail(file,contents.message.chat.id,studentId, printType,fileName );
-    } 
-    //Logger.log('test..101');
-    //Statistics update
-    //var current = users.getRange(2, 12).getValue();
-    //users.getRange(2, 12).setValue(++current);
+    var current = users.getRange(2, 12).getValue();
+    users.getRange(2, 12).setValue(++current);
    
+  
     //Clean text
     var id = contents.message.from.id;
     var name = contents.message.from.first_name;
@@ -371,9 +301,8 @@ function doPost(e){
       sendText(id, 'Your massage sent');
     }*/
     
-    if (text == "/start"){ // || text == "hey" || text == 'היי' || text == "hello" || text == 'hi'
+    if (text == "/start"){ // || text == "hey" || text == 'היי' || text == "hello" || text == 'hi' 
       sendText(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6");  
-      sendKey(id, "How may I help you?", mainKeyBoard);
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
       oldSet(id, 0, name, 0);
       return;

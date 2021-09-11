@@ -100,7 +100,7 @@ function findHelper(id){
   return helperId;
 }
 
-
+// most of it can be replaced be single Object.
 function simpleText(id, text){
   if(text == About){
     sendText(id, "Hi! My name is Michael Toker and I am a student at the Computer Science department at the Technion");
@@ -688,9 +688,25 @@ function reviewsHandler(id, i, courses, isAll){
 //That way the bot can "remmeber" the previous commands in order to complete the commands.
 //input: user id, data(string) that determines the state of the student in the sheets,
 //name of the user and num that most of the time is the number of the course
+
 function oldSet(id, data, name, num){
   set(id, name, data, num);
 }
+
+/**
+ * important function oldSet(id, data, name, num)
+ * Description: the function changes the cell in the sheets according to the data and num variables. 
+ * That way the bot can "remmeber" the previous commands in order to complete the commands.
+ * input: user id, data(string) that determines the state of the student in the sheets,
+ * name of the user and num that most of the time is the number of the course
+ * @param {id} key the name of the variable to decrement.
+ * @param {name}  
+ * @param {mode1} helper parameter for "remembering" previous user data
+ * @param {mode2} helper parameter for "remembering" previous user data
+ * @param {mode3} helper parameter for "remembering" previous user data
+ * @param {mode4} helper parameter for "remembering" previous user data
+ * @param {mode5} helper parameter for "remembering" previous user data 
+ */
 
 function set(id, name, mode1, mode2, mode3, mode4, mode5){
   userFinder = users.createTextFinder(id);
@@ -722,38 +738,25 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
   }
 }
 
-//function do download file from user
-function downloadFile(fileid,fileName, userId){
-  sendText(userId, "downloading...");
-  var response = UrlFetchApp.fetch(url + '/getFile?file_id=' + fileid);
-  sendText(userId, "downloading...1");
-  var urlphoto = 'https://api.telegram.org/file/bot' + token + '/' + JSON.parse(response.getContentText()).result["file_path"];
-  sendText(userId, "downloading...2");
-  var file = UrlFetchApp.fetch(urlphoto);
-  //var blob = file.getBlob();
-  //blob.setName(fileName)
-  //var jum = DriveApp.createFile(blob).setName(new Date().toLocaleString());
-  return file
+/**
+ * fetch and increment the script-property with the given key.
+ * @param {String} key the name of the variable to increment.
+ * @return {Number} the old value of key.
+ */
+function fetchAndInc(key){
+  var v = +ScriptProperties.getProperty(key);
+  ScriptProperties.setProperty(key,1+v);
+  return v;
 }
 
-//sunction to send an emailwith file
-function sendEmail(file,chat_id, studentId,printType,fileName){
-  sendText(chat_id, "sending..");
-  //GmailApp.sendEmail('dontokeron@gmail.com', studentId,"hello", {
-  GmailApp.sendEmail('Print.' + printType + '@campus.technion.ac.il', studentId,"print for me please", {
-    attachments: [file],
-    name: 'Automatic Emailer Script'
-    //replyTo: "tbotaviv" +chat_id + "@gmail.com"
-});
-  sendText(chat_id, "done..");
+/**
+ * fetch and decrement the script-property with the given key.
+ * @param {String} key the name of the variable to decrement.
+ * @return {Number} the old value of key.
+ */
+function fetchAndDec(key){
+  var v = +ScriptProperties.getProperty(key);
+  ScriptProperties.setProperty(key,v-1);
+  return v;
 }
 
-function calculaAvg(rowToCalculate){
-    var startingCol = 1;
-    var DB = SpreadsheetApp.openByUrl(dataBase);
-    var salary = DB.getSheetByName("salary");
-    var number = salary.getRange(rowToCalculate, startingCol).getValue();
-    for (i = 0 ; i < number; i++){
-      
-    }
-}
