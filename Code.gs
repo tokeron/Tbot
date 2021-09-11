@@ -78,11 +78,15 @@ function doPost(e){
     var mode1 = 0;
     var mode2 = 0;
     var mode3 = 0;
+    var mode4 = 0;
+    var mode5 = 0;
     if (cell) {
       var row = cell.getRow(); 
-      mode1 = users.getRange(row, 2).getValue();
-      mode2 = users.getRange(row, 4).getValue();
-      mode3 = users.getRange(row, 3).getValue();
+      mode1 = users.getRange(row, 4).getValue();
+      mode2 = users.getRange(row, 5).getValue();
+      mode3 = users.getRange(row, 6).getValue();
+      mode4 = users.getRange(row, 7).getValue();
+      mode5 = users.getRange(row, 8).getValue();
     }else{
       sendKey(id, "How may I help you?", mainKeyBoard);
     }
@@ -407,8 +411,8 @@ function doPost(e){
       if (row){
         var idRow = row;
         var courseToAdd = users.getRange(idRow, 4).getValue();
-        var currCol = 10;
-        while (currCol <= 26){
+        var currCol = 14;
+        while (currCol <= 29){
           var currNumber = users.getRange(idRow, currCol).getValue();
           if (courseToAdd == currNumber){
             sendText(id, "This course is already in your course list");
@@ -420,11 +424,12 @@ function doPost(e){
             var currCourseName = courses.getRange(courseToAdd, 2).getValue();
             sendText(id, currCourseName+" is added to your list")
             added = true;
-            currCol = 27;
+            return;
           }
         }
         if (!(added)){
           sendtext(id, "The list is full");
+          return;
         }
       }
     }else if(text == "My Courses \ud83d\udccc"){
