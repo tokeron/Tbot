@@ -217,7 +217,7 @@ function sendOpt(id, name, courses, courseRow){
   var excel = false;
   var cs = false;
   var teams = false;
-  set(id, 'Course', name, courseRow);
+  oldSet(id, 'Course', name, courseRow);
   var courseNumber = courses.getRange(courseRow, 1).getValue();
   var courseName = courses.getRange(courseRow, 2).getValue();
   var mode = courses.getRange(courseRow, 5).getValue();
@@ -312,66 +312,66 @@ function getDone(id, name, command, users, courses){
         sendText(id, "Looking for a link to the drive "+ driveSy);
         driveHandler(id, courseNumber, courseName);
         var currentCounter = users.getRange(2, 9).getValue();
-        users.getRange(2, 9).setValue(++currentCounter);
+        //users.getRange(2, 9).setValue(++currentCounter);
         break;
       case courseGroup:
         sendText(id, "Looking for telegram group" + groupSy);
         if (group) sendText(id, group);
         else sendText(id, "There is no telegram group for this course yet. you can open and add a groupby using 'Add group'");
-        var currentCounter = users.getRange(2, 8).getValue();
-        users.getRange(2, 8).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 8).getValue();
+        //users.getRange(2, 8).setValue(++currentCounter);
         break;
       case "Teams Group \ud83d\udc6a":
         sendText(id, "Looking for Teams Group \ud83d\udc6a" + groupSy);
         if (teams) sendText(id, teams);
         else sendText(id, "There is no Teams Group \ud83d\udc6a for this course yet. you can open and add a groupby using 'Add group'")
-        var currentCounter = users.getRange(2, 8).getValue();
-        users.getRange(2, 8).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 8).getValue();
+        //users.getRange(2, 8).setValue(++currentCounter);
         break;
       case testock:
         sendText(id, "Looking for a link to the test scans " + scansSy);
         scansHandler(id, courseNumber);
-        var currentCounter = users.getRange(2, 11).getValue();
-        users.getRange(2, 11).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 11).getValue();
+        //users.getRange(2, 11).setValue(++currentCounter);
         break;
       case 'All tests - excel':
         sendText(id, "Looking for a link to the tests excel " + groupSy);
         sendText(id, excel);
-        var currentCounter = users.getRange(2, 11).getValue();
-        users.getRange(2, 11).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 11).getValue();
+        //users.getRange(2, 11).setValue(++currentCounter);
         break;
       case reviews:
         reviewsHandler(id, courseRow, courses, 0);
-        var currentCounter = users.getRange(2, 10).getValue();
-        users.getRange(2, 10).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 10).getValue();
+        //users.getRange(2, 10).setValue(++currentCounter);
         break;
       case facebook:
         facebookHandler(id, courseNumber, courseName);
-        var currentCounter = users.getRange(2, 7).getValue();
-        users.getRange(2, 7).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 7).getValue();
+        //users.getRange(2, 7).setValue(++currentCounter);
         break;
       case youTube:
         youtubeHandler(id, courseNumber, courseName)
-        var currentCounter = users.getRange(2, 7).getValue();
-        users.getRange(2, 7).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 7).getValue();
+        //users.getRange(2, 7).setValue(++currentCounter);
         break;
       case ug:
         sendText(id, "Looking for ug link " + ugSy);
         sendText(id, "https://ug3.technion.ac.il/rishum/course/"+courseNumber);
-        var currentCounter = users.getRange(2, 6).getValue();
-        users.getRange(2, 6).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 6).getValue();
+        //users.getRange(2, 6).setValue(++currentCounter);
         break;
       case cs:
         sendText(id, "Looking for computer science link " + csSy);
         sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
-        var currentCounter = users.getRange(2, 6).getValue();
-        users.getRange(2, 6).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 6).getValue();
+        //users.getRange(2, 6).setValue(++currentCounter);
         break;
       case moodle:
         sendText(id, "Looking for moodle link " + moodleSy);
         sendText(id, "https://moodle.technion.ac.il/course/search.php?search="+courseNumber);
-        var currentCounter = users.getRange(2, 6).getValue();
-        users.getRange(2, 6).setValue(++currentCounter);
+        //var currentCounter = users.getRange(2, 6).getValue();
+        //users.getRange(2, 6).setValue(++currentCounter);
         break;
       case  "Course info":
         sendText(id, "Looking for info link ");
@@ -404,7 +404,7 @@ function getDone(id, name, command, users, courses){
         sendText(id, "Looking for moodle link " + moodleSy);
         sendText(id, "https://moodle.technion.ac.il/course/search.php?search="+courseNumber);
         driveHandler(id, courseNumber, courseName);
-        set(id, 0, name, 0)
+        oldSet(id, 0, name, 0)
         sendKey(id, "What would you like to do next?", mainKeyBoard);
         break;
     }
@@ -454,13 +454,14 @@ function scansHandler(id, number){
   return;
 }
 //handler using sheets
+
 function facultyGroupHandler(id, data, mode, otherData){
   if(data == "הנדסת חשמל") {
     sendKey(id, "Choose your semester from the list below ", electricSemesterKeyBoard);
-    set(id, 0, 0, data);
+    oldSet(id, 0, 0, data);
   }else if (otherData == "הנדסת חשמל"){
     sendKey(id, "Choose your study program from the list below ", electricProgramsKeyBoard);
-    set(id, data, 0, "ChooseElectricProgram");
+    oldSet(id, data, 0, "ChooseElectricProgram");
   }else if (otherData == "ChooseElectricProgram"){
     var telegramExcel = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1nal2_52Pk29eosF81WpYhgCnLMPWziGBUPUROj_8yS8/edit#gid=0");
     var FacultyExcel = telegramExcel.getSheetByName("Electric");
@@ -474,20 +475,19 @@ function facultyGroupHandler(id, data, mode, otherData){
     var Semester = FacultyExcel.getRange(i,1).getValue();
     var currLink = FacultyExcel.getRange(i,programCol).getValue();
     sendText(id, currLink + ' - ' + Semester + ' - ' + pathName);
-    set(id,0,0,0);
+    oldSet(id,0,0,0);
   }else{
-    var facultyEX = SpreadsheetApp.openByUrl(facultyRidesExcel);
-    var faculties = facultyEX.getActiveSheet();
-    var row = faculties.createTextFinder(data).findNext();
+    var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+    var telegramLinks = dataBaseEx.getSheetByName("telegramLinks")
+    var row = telegramLinks.createTextFinder(data).findNext();
     var i = row.getRow();
-    var groupName = faculties.getRange(i,3).getValue();
-    var currLink = faculties.getRange(i,2).getValue();
+    var groupName = telegramLinks.getRange(i,3).getValue();
+    var currLink = telegramLinks.getRange(i,2).getValue();
     sendText(id, currLink + ' - ' + groupName);
     if (groupName == 'סטודנטים בטכניון') sendText(id, 'https://teams.microsoft.com/l/team/19%3afde92135b254443db1e887147bbfdc09%40thread.skype/conversations?groupId=484ee060-222c-465a-9d1b-65803822e19f&tenantId=f1502c4c-ee2e-411c-9715-c855f6753b84 - Teams Group')
   }
 }
  
-
 //handler using drive
 function driveHandler(id, courseNumber, courseName){
   var found = 0;
@@ -683,48 +683,63 @@ function reviewsHandler(id, i, courses, isAll){
   }
 }
 
-//important function set(id, data, name, num)
+//important function oldSet(id, data, name, num)
 //Description: the function changes the cell in the sheets according to the data and num variables. 
 //That way the bot can "remmeber" the previous commands in order to complete the commands.
 //input: user id, data(string) that determines the state of the student in the sheets,
 //name of the user and num that most of the time is the number of the course
-function set(id, data, name, num){
-  var app = SpreadsheetApp.openByUrl(userExcel);
-  var ss = app.getActiveSheet();
-  var rowFinder = ss.createTextFinder(id);
-  var row = rowFinder.findNext();
-  while (row !== null && row.getColumn() !== 1) row = rowFinder.findNext();
-  if (row !== null){
-    row = row.getRow();
-    ss.getRange(row, 2).setValue(data);
-    if (name) ss.getRange(row, 3).setValue(name);
-    else if (name == 0) ss.getRange(row, 3).setValue(0);
-    if (num) ss.getRange(row, 4).setValue(num);
-    else if (num == 0)ss.getRange(row, 4).setValue(0);
+
+function oldSet(id, data, name, num){
+  set(id, name, data, num);
+}
+
+/**
+ * important function oldSet(id, data, name, num)
+ * Description: the function changes the cell in the sheets according to the data and num variables. 
+ * That way the bot can "remmeber" the previous commands in order to complete the commands.
+ * input: user id, data(string) that determines the state of the student in the sheets,
+ * name of the user and num that most of the time is the number of the course
+ * @param {id} key the name of the variable to decrement.
+ * @param {name}  
+ * @param {mode1} helper parameter for "remembering" previous user data
+ * @param {mode2} helper parameter for "remembering" previous user data
+ * @param {mode3} helper parameter for "remembering" previous user data
+ * @param {mode4} helper parameter for "remembering" previous user data
+ * @param {mode5} helper parameter for "remembering" previous user data 
+ */
+
+function set(id, name, mode1, mode2, mode3, mode4, mode5){
+  //open spreadsheet
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  //if (!(users)) sendText(id, "users is not defined");
+  userFinder = users.createTextFinder(id);
+  user = userFinder.findNext();
+  while (user !== null && user.getColumn() !== 1) user = userFinder.findNext(); //seach the row with the id in the first row
+  if (user !== null){
+    row = user.getRow();
+    if (name || name == 0)   users.getRange(row, 2).setValue(name);
+    if (mode1 || mode1 == 0) users.getRange(row, 4).setValue(mode1);
+    if (mode2 || mode2 == 0) users.getRange(row, 5).setValue(mode2);
+    if (mode3 || mode3 == 0) users.getRange(row, 6).setValue(mode3);
+    if (mode4 || mode4 == 0) users.getRange(row, 7).setValue(mode4);
+    if (mode5 || mode5 == 0) users.getRange(row, 8).setValue(mode5);
     return;
   }
-  else{
-    //   sendText(id, row);//test
-    var next = ss.getRange(2, 4).getValue();
-//    if (next == numberOfCourses){
-//      // Fetch the email address
-//      var emailAddress = "technobot404@gmail.com";
-//      // Send Alert Email.
-//      var message = "The 'mode' list is full!!"; 
-//      var subject = 'You have a problem in TBot';
-//      MailApp.sendEmail(emailAddress, subject, message);
-//      sendText(id, 'There is a temporary error');
-//    }
-    ss.getRange(next, 1).setValue(id);
-    ss.getRange(next, 2).setValue(data);
-    if (name) ss.getRange(next, 3).setValue(name);
-    if (num) ss.getRange(next, 4).setValue(num);
-    ss.getRange(2, 4).setValue(++next);
+  else{ //new user
+    var nextRow = users.getRange(1, 4).getValue();
+    users.getRange(nextRow, 1).setValue(id);
+    if (name || name == 0)   users.getRange(nextRow, 2).setValue(name);
+    if (mode1 || mode1 == 0) users.getRange(nextRow, 4).setValue(mode1);
+    if (mode2 || mode2 == 0) users.getRange(nextRow, 5).setValue(mode2);
+    if (mode3 || mode3 == 0) users.getRange(nextRow, 6).setValue(mode3);
+    if (mode4 || mode4 == 0) users.getRange(nextRow, 7).setValue(mode4);
+    if (mode5 || mode5 == 0) users.getRange(nextRow, 8).setValue(mode5);
+
+    users.getRange(1, 4).setValue(++nextRow);
     return;
   }
 }
-
-
 
 /**
  * fetch and increment the script-property with the given key.
@@ -747,6 +762,4 @@ function fetchAndDec(key){
   ScriptProperties.setProperty(key,v-1);
   return v;
 }
-
-
 

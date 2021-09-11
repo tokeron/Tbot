@@ -16,33 +16,50 @@ function doGet(e) {
   return HtmlService.createHtmlOutput("Hello " + JSON.stringify(e)); 
 }
 
-
 //Description: main function. Execution of the requestes.
 //input: JSON. It may contain callback_query - input from exeternal keyboard, 
 //or massege - input from text sent from the user or internal keyboard.
 function doPost(e){
-  var userEx = SpreadsheetApp.openByUrl(userExcel);
-  var users = userEx.getActiveSheet();
-  var coursesEX = SpreadsheetApp.openByUrl(courseExcel);
-  var courses = coursesEX.getActiveSheet();
+  //var userEx = SpreadsheetApp.openByUrl(userExcel);
+  //var users = userEx.getActiveSheet();
+  //var coursesEX = SpreadsheetApp.openByUrl(courseExcel);
+  //var courses = coursesEX.getActiveSheet();
   var contents = JSON.parse(e.postData.contents);
+  var file;
   
   
   //internal keyboard command - different from regular text
   if (contents.callback_query){
+    handleCallback(contents);
+  }  
+  //external massage command - same as regular text
+  else if (contents.message){
+    handleMessage(contents);
+  }
+}
+
+  function handleCallback(contents){
+    //open spreadsheets
+    var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+    var courses = dataBaseEx.getSheetByName("courses");
+    var statistics = dataBaseEx.getSheetByName("statistics");
+    var telegramLinks = dataBaseEx.getSheetByName("telegram");
+    var businesses = dataBaseEx.getSheetByName("businesses");
+    var users = dataBaseEx.getSheetByName("users");
+
     var id = contents.callback_query.from.id;
     var data = contents.callback_query.data;
     var name = contents.callback_query.from.first_name;
-    
+    //sendText(id, "Test");
     if (data == 'Search For Another Course'){
       removeKey(id, "Please insert the course number or course name (can be partial name)"
                 +"in order to search for a course. To add it to your list simply choose 'Add to my list'");
-      set(id, "Course", name, 0);
+      oldSet(id, "Course", name, 0);
       return;
     }
     else if (data == mainMenu){
       sendKey(id, "How may I help you?", mainKeyBoard);
-      set(id, 0, name, 0);
+      oldSet(id, 0, name, 0);
       return;
     }
     else if(data == "Clean My List"){
@@ -61,35 +78,36 @@ function doPost(e){
       return;
     
     }else if (data == "Delete A Course From My List"){    
-      set(id, data, name, 0);
+      oldSet(id, data, name, 0);
       sendText(id, "Please tap on a course in order to delete it from your list");
       return;
     }
-    //get mode
+    //get mode1
     var cellFinder = users.createTextFinder(id);
     var cell = cellFinder.findNext();
     while (cell !== null && cell.getColumn() !== 1) cell = cellFinder.findNext(); 
-    var mode = 0;
-    var otherMode = 0;
-    var otherMode2 = 0;
+    var mode1 = 0;
+    var mode2 = 0;
+    var mode3 = 0;
+    var mode4 = 0;
+    var mode5 = 0;
     if (cell) {
       var row = cell.getRow(); 
-      mode = users.getRange(row, 2).getValue();
-      otherMode = users.getRange(row, 4).getValue();
-      otherMode2 = users.getRange(row, 3).getValue();
+      mode1 = users.getRange(row, 4).getValue();
+      mode2 = users.getRange(row, 5).getValue();
+      mode3 = users.getRange(row, 6).getValue();
+      mode4 = users.getRange(row, 7).getValue();
+      mode5 = users.getRange(row, 8).getValue();
     }else{
       sendKey(id, "How may I help you?", mainKeyBoard);
     }
-    if (mode == "help by number"){ // helper get in contact with a student
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
-      var helperRow = otherMode;
+    if (mode1 == "help by number"){ // helper get in contact with a student
+      var helperRow = mode2;
       var integer = parseInt(data, 10);
       var needsHelpCol = 9 + integer;
       var needsHelpId = helpers.getRange(helperRow, needsHelpCol).getValue();
-      set(id, "Talk","" ,needsHelpId);
-      set(needsHelpId, "Talk","" ,id);
+      oldSet(id, "Talk","" ,needsHelpId);
+      oldSet(needsHelpId, "Talk","" ,id);
       sendText(id, "You are connected with student number "+ data);
       removeKey(id, "To end the connection just type 'goodbye' or 'ביי'");
       sendText(needsHelpId, "Your helper want's to talk to you. You are connected");
@@ -97,7 +115,7 @@ function doPost(e){
       return;
     }
     //course have been chosen
-    if (mode == "Delete A Course From My List"){//course to delete
+    if (mode1 == "Delete A Course From My List"){//course to delete
       var flag = false;
       var courseCol = 0;
       var lastInCol;
@@ -116,12 +134,9 @@ function doPost(e){
         users.getRange(row, courseCol).setValue(lastCourse);
         users.getRange(row, index-1).setValue(0);
       }
-      set(id, 0, name, 0);
+      oldSet(id, 0, name, 0);
       sendText(id, "Course number " + data + " is not on your list anymore");
-    }else if (mode == SFS){//students fo students
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+    }else if (mode1 == SFS){//students fo students      
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -129,27 +144,27 @@ function doPost(e){
       var sectionsNum = busi.getRange(6, 2).getValue();
       var topicNum = busi.getRange(7, 2).getValue();   
       if (data == "Add a Topic \ud83c\udfea"){
-        set(id, mode, 0, data);
+        oldSet(id, mode1, 0, data);
         sendText(id, "We glad that you decided to join us! Please insert the topic");
         return;
       }else if (data == "Add a Business \ud83c\udfea"){
         sendText(id, "We glad that you decided to join us! Please insert your business name");
-        set(id, mode, 0, "Password");//abuse of notation: using name as additional data holder
+        oldSet(id, mode1, 0, "Password");//abuse of notation: using name as additional data holder
         return;
       }else if (data == "Delete My Business \ud83d\udcdb"){
-        set(id, SFS, name, data);
+        oldSet(id, SFS, name, data);
         sendText(id, "Please tap on your business in order to delete it from the list");
         return;
       }else if (data == "Edit My Business \ud83d\udcdd"){
-        set(id, SFS, name, data);
+        oldSet(id, SFS, name, data);
         sendText(id, "Please tap on your business in order to edit it");
         return;
-      }else if(otherMode == "Delete My Business \ud83d\udcdb"){
+      }else if(mode2 == "Delete My Business \ud83d\udcdb"){
         sendText(id, "In order to continue please provide your password");
-        set(id, SFS, data, "Pass");
-      }else if(otherMode == "Edit My Business \ud83d\udcdd"){
+        oldSet(id, SFS, data, "Pass");
+      }else if(mode2 == "Edit My Business \ud83d\udcdd"){
         sendText(id, "In order to continue please provide your password");
-        set(id, SFS, data, "PassToEdit");
+        oldSet(id, SFS, data, "PassToEdit");
       }else if(data == SFS){
         var courseList = [];
         var numberList = [];
@@ -162,7 +177,24 @@ function doPost(e){
         courseList.push("Add a Topic \ud83c\udfea");
         numberList.push("Add a Topic \ud83c\udfea");
         makeKeyBoard(id, courseList, numberList);
-        set(id, SFS, name, "Wait");
+        oldSet(id, SFS, name, "Wait");
+        /*
+      }else if (mode1 == "Glass Door"){
+        if (text == "ברר משכורת"){//send faculty keboard
+          oldSet(id, text, 0, 0);
+          sendKey(id, "Choose you facukty", coursesKeyBoardEn);
+        }else{
+          
+        }
+      }else if (mode1 == "ברר משכורת"){//how many years keyboard
+          oldSet(id, "sendYearsNext", 0, 0);
+          sendKey(id, "Choose you facukty", numbersKeyBoard);
+      }else if (mode1 == "sendYearsNext"){//where do  you work?
+          oldSet(id, "calculate avg", 0, 0);
+          sendKey(id, "Choose you facukty", coursesKeyBoardEn);
+      }else if (mode1 == "calculate avg"){
+        calculateAvg();
+      */
       }
       else{
         var currBusi = busi.createTextFinder(data).findNext();
@@ -192,9 +224,9 @@ function doPost(e){
         courseList.push(SFS);
         numberList.push(SFS);
         makeKeyBoard(id, courseList, numberList);
-        set(id, mode, data, data);
-      }else if (currBusi){//Show busiKeyBoard and set topic mode
-        set(id, mode, name, data);
+        oldSet(id, mode1, data, data);
+      }else if (currBusi){//Show busiKeyBoard and set topic mode1
+        oldSet(id, mode1, name, data);
         var description = busi.getRange(busiRow, busiCol+1).getValue();
         sendKey(id, description, busiKeyBoard);
         return;
@@ -210,19 +242,18 @@ function doPost(e){
       }
     }
   }
-  
-  //external massage command - same as regular text
-  else if (contents.message){
-    //Logger.log('test..101');
-    //Statistics update
-    
-  
-    if (contents.message.photo || contents.message.document){
-      handlePrint(contents.message);
-      return;
-    }
-    var current = users.getRange(2, 12).getValue();
-    users.getRange(2, 12).setValue(++current);
+
+  function handleMessage(contents){
+    //open spreadsheets
+    var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+    var courses = dataBaseEx.getSheetByName("courses");
+    var statistics = dataBaseEx.getSheetByName("statistics");
+    var telegramLinks = dataBaseEx.getSheetByName("telegram");
+    var businesses = dataBaseEx.getSheetByName("businesses");
+    var users = dataBaseEx.getSheetByName("users");
+
+    //var current = users.getRange(2, 12).getValue();
+    //users.getRange(2, 12).setValue(++current);
    
   
     //Clean text
@@ -261,7 +292,7 @@ function doPost(e){
       var row = rows[0].getRow();
       if (ss.getRange(row, 2).getValue() == "need to be verified"){
         if (text.includes(fisrtLogInPassword)){
-          set(id, 0, name, 0);
+          oldSet(id, 0, name, 0);
           sendKey(id, "How may I help you?", mainKeyBoard);
           sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
         }else if (text.includes("technion.ac.il")){
@@ -286,37 +317,37 @@ function doPost(e){
       sendText(id, 'Your massage sent');
     }*/
     
-    if (text == "/start"){ // || text == "hey" || text == 'היי' || text == "hello" || text == 'hi'
-      sendText(id, "Hi, test101 Holla " + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6");  
-      Logger.log('heyy');
-      console.log('Row');    
-      sendKey(id, "How may I help you?", mainKeyBoard);
-      console.log("hello!");  
+    if (text == "/start"){ // || text == "hey" || text == 'היי' || text == "hello" || text == 'hi' 
+      sendText(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6");  
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-      set(id, 0, name, 0);
+      oldSet(id, 0, name, 0);
       return;
     }else if (text == 'תפריט ראשי' || text == 'Main Menu' || text == mainMenu || text == "home"){
       sendKey(id, "How may I help you?", mainKeyBoard);
-      set(id, 0, name, 0);
+      oldSet(id, 0, name, 0);
       return;
     }
-    //find the user in the table and check his mode
-    var cellFinder = users.createTextFinder(id);
-    var cell = cellFinder.findNext();
-    while (cell !== null && cell.getColumn() !== 1) cell = cellFinder.findNext(); 
+    //find the user in the table and check his mode1
+    var userFinder = users.createTextFinder(id);
+    var user = userFinder.findNext();
+    while (user !== null && user.getColumn() !== 1) user = userFinder.findNext(); 
     var row = -1;
-    var mode;
-    var otherMode = 0;
-    var otherMode2 = 0;
-    if (cell) {
-      var row = cell.getRow(); 
-      mode = users.getRange(row, 2).getValue();
-      otherMode = users.getRange(row, 4).getValue();
-      otherMode2 = users.getRange(row, 3).getValue();
+    var mode1 = 0;
+    var mode2 = 0;
+    var mode3 = 0;
+    var mode4 = 0;
+    var mode5 = 0;
+    if (user) {
+      var row = user.getRow(); 
+      mode1 = users.getRange(row, 4).getValue();
+      mode2 = users.getRange(row, 5).getValue();
+      mode3 = users.getRange(row, 6).getValue();
+      mode3 = users.getRange(row, 7).getValue();
+      mode3 = users.getRange(row, 8).getValue();
       var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
-      users.getRange(row, 5).setValue(date);
+      users.getRange(row, 3).setValue(date);
     }else{
-      set(id,0,name,0);
+      set(id, name, mode1, mode2, mode3, mode4, mode5);
       sendKey(id, "How may I help you?", mainKeyBoard);
     }
     
@@ -327,24 +358,22 @@ function doPost(e){
     //Check for other commands
     if (text == ride || text == 'רשימת אזורים'){
       sendKey(id, "Send the required city name or choose your region from the list below " + downSy, rideKeyBoard);
-      set(id, "Ride");
+      oldSet(id, "Ride");
     }else if (text == course || text == 'Search For Another Course'){
       removeKey(id, "Please insert the course number or course name in hebrew");
-      set(id, "Course", name, 0);
+      oldSet(id, "Course", name, 0);
     } else if (text == faculty || text == "Department Groups \ud83c\udfeb"){
       sendKey(id, "Choose your faculty from the list below ", coursesKeyBoard);
-      set(id, 'faculty');
+      oldSet(id, 'faculty');
     }else if (text == feedback || text == "/feedback"){
       removeKey(id, "You can send your feedback now");
-      set(id, 'feedback');
+      oldSet(id, 'feedback');
     }else if (text == drive || text == courseGroup || text == reviews || text == 'Get all' || text == facebook
               || text == youTube || text == ug || text == cs || text == 'All tests - Excel'
               || text == moodle || text == testock || text == "Panopto"||  text == "Course info" || text == 'Teams Group \ud83d\udc6a'){
       getDone(id, name, text, users, courses);
     } 
     else if(text == WantToHelp){
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
       var helperFinder = helpers.createTextFinder(id);
       var nextCell = helperFinder.findNext();
       while (nextCell !== null && nextCell.getColumn() !== 1){
@@ -362,7 +391,7 @@ function doPost(e){
         }
         sendText(id, "Tap on the number of the student you want to talk with");
         makeKeyBoard(id, num, numList);
-        set(id, "help by number",0,helperRow);
+        oldSet(id, "help by number",0,helperRow);
       }else{
         sendText(id, "על מנת להיכנס למאגר העוזרים עלייך למלא את הטופס הבא וניצור איתך קשר בהקדם");
         sendText(id, "בשדה id בשאלוון הכנס בבקשה את המספר הבא: "+ id);
@@ -371,29 +400,29 @@ function doPost(e){
     }
     else if (text == 'Write a review'){
       removeKey(id, "Please write  your review");
-      set(id, text);
+      oldSet(id, text);
     }
     else if (text == add){
-      set(id, 'Add course');
+      oldSet(id, 'Add course');
       removeKey(id, "Please insert the course number, course name and group link in the following format:"
                 + " course number-course name-group link. If there is no telegram group, please insert: course number-course name-");
     }
     else if (text == 'Add telegram group'){
-      set(id, text);
+      oldSet(id, text);
       sendText(id, "Please insert the group link");
       sendText(id, "Note: to get a group link you need to open a group, then go to: Manage group (or click the edit symbol using smartphone) -> Group type -> Copy link");
       sendText(id, "Don't forget to make the group visible so new members will see messages that were sent before they joined");
     }  
     else if (text == "Add Teams link"){
-      set(id, text);
+      oldSet(id, text);
       sendText(id, "Please insert the group link");
     }else if (text == "Add to my course list \ud83d\udccd"){
       var added = false;
       if (row){
         var idRow = row;
-        var courseToAdd = users.getRange(idRow, 4).getValue();
-        var currCol = 10;
-        while (currCol <= 26){
+        var courseToAdd = mode2; //users.getRange(idRow, 4).getValue();
+        var currCol = 14;
+        while (currCol <= 29){
           var currNumber = users.getRange(idRow, currCol).getValue();
           if (courseToAdd == currNumber){
             sendText(id, "This course is already in your course list");
@@ -405,11 +434,12 @@ function doPost(e){
             var currCourseName = courses.getRange(courseToAdd, 2).getValue();
             sendText(id, currCourseName+" is added to your list")
             added = true;
-            currCol = 27;
+            return;
           }
         }
         if (!(added)){
           sendtext(id, "The list is full");
+          return;
         }
       }
     }else if(text == "My Courses \ud83d\udccc"){
@@ -438,7 +468,7 @@ function doPost(e){
           numberList.push("Clean My List");
           courseList.push("Search For Another Course");
           numberList.push("Search For Another Course");
-          set(id, "Course", name, 0);
+          oldSet(id, "Course", name, 0);
           makeKeyBoard(id, courseList, numberList);
         }
         else{
@@ -456,9 +486,6 @@ function doPost(e){
 //      sendText(id, "היי, ראיתי שניסית לדבר עם מישהו ולא היה לי עם מי לחבר אותך. כעת יש סטודנט פנוי שישמח לדבר איתך. אם אתה עדיין מעוניין לדבר תשלח חזרה את המילה כן");
 //      sendText(id, "done")
     }else if(text == WantToTalk){ //set an anonymous talk //id wanted to talk
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var helperCol = 2;
       sendText(id, "Searching for an helper for you.. You can always change your preference for an helper and i'll try to find"+
                " the best one for you.. ");
@@ -483,8 +510,8 @@ function doPost(e){
         }
       }
       if (helperId && isAvail){
-        set(id, "Talk","" ,helperId);
-        set(helperId, "Talk","" ,id);
+        oldSet(id, "Talk","" ,helperId);
+        oldSet(helperId, "Talk","" ,id);
         var needsHelpColFinder = helpers.createTextFinder(id);
         var needsHelpCol = needsHelpColFinder.findNext().getColumn();
         while (needsHelpCol == 1) needsHelpCol = needsHelpColFinder.findNext().getColumn();
@@ -496,9 +523,6 @@ function doPost(e){
         return;
       }
     }else if (text == "Settings and Preference"){
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var cellFinder = needsHelp.createTextFinder(id);
       var needsHelpCell = cellFinder.findNext();
       while(needsHelpCell !== null && needsHelpCell.getColumn() !== 1){
@@ -512,7 +536,7 @@ function doPost(e){
       }else{
         row = needsHelpCell.getRow();
       }
-      set(id, text, name, 0);
+      oldSet(id, text, name, 0);
       var gender = needsHelp.getRange(row, 3).getValue();
       var faculty = needsHelp.getRange(row, 4).getValue();
       var topic = needsHelp.getRange(row, 5).getValue();
@@ -524,9 +548,7 @@ function doPost(e){
       sendKey(id, "Choose the settings you are willing to change", settingsKeyBoard);
     }else if (text == SFS){
       sendText(id, "Students for Students is a project designed to encourage students to support other students businesses");
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -549,11 +571,11 @@ function doPost(e){
       //      courseList.push("Delete My Business \ud83d\udcdb");
       //      numberList.push("Delete My Business \ud83d\udcdb");
       makeKeyBoard(id, courseList, numberList);
-      set(id, text, name, "Wait");
+      oldSet(id, text, name, "Wait");
     }
     
-    //if mode - handle
-    else if (mode == "Talk"){
+    //if mode1 - handle
+    else if (mode1 == "Talk"){
       var otherId = users.getRange(row, 4).getValue();
       //sendText(id, otherId);//test
       //var app = SpreadsheetApp.openByUrl(helpList);
@@ -563,15 +585,15 @@ function doPost(e){
         sendText(otherId, text);
         sendText(id, "The conversation is over");
         sendText(otherId, "The conversation is over");
-        set(id, 0, name, 0);
-        set(otherId, 0, 0, 0);
+        oldSet(id, 0, name, 0);
+        oldSet(otherId, 0, 0, 0);
         sendKey(id, "How may I help you?", mainKeyBoard);
         sendKey(otherId, "How may I help you?", mainKeyBoard);
         //TODO send some feedback about the conversation
       }else{
         sendText(otherId, text);
       }
-    }else if (mode == 'feedback'){
+    }else if (mode1 == 'feedback'){
       // Fetch the email address
       var emailAddress = "technobot404@gmail.com";
       // Send Alert Email.
@@ -579,11 +601,11 @@ function doPost(e){
       var subject = 'You have a new feedback from technoBot user';
       MailApp.sendEmail(emailAddress, subject, message + 'id: '+id+' ');
       sendText(id, "Thank you for your feedback! \uD83D\uDE4F");
-      set(id, 0, name, 0);
+      oldSet(id, 0, name, 0);
       sendKey(id, "What would you like to do next?", mainKeyBoard);
-    }else if (mode == 'Ride'){
-      var RidesEX = SpreadsheetApp.openByUrl(facultyRidesExcel);
-      var Rides = RidesEX.getActiveSheet();
+    }else if (mode1 == 'Ride'){
+      var RidesEX = SpreadsheetApp.openByUrl(dataBase);
+      var Rides = RidesEX.getSheetByName("telegramLinks");
       var list = Rides.createTextFinder(text).findAll();
       if (list.length > 0){
         var row = list[0].getRow();
@@ -591,17 +613,17 @@ function doPost(e){
         var link = Rides.getRange(row,3).getValue();
         sendText(id, link + ' - ' + name);
       }
-    }else if (mode == 'Add course'){
+    }else if (mode1 == 'Add course'){
       if (!(courseNumber) || !(courseName)){
         sendText(id, "Wrong format. please inset your review in the followog format: course number-course name-group link");
         sendKey(id, "What would you like to do next?", mainKeyBoard);
       }
       else{
         courseAdd(id, courseNumber, courseName, courseLink, courses);
-        set(id, 0);
+        oldSet(id, 0);
         sendKey(id, "What would you like to do next?", mainKeyBoard);
       }
-    }else if (mode == 'Write a review'){
+    }else if (mode1 == 'Write a review'){
       var idRow = row;
       var courseRow = users.getRange(idRow, 4).getValue();
       var courseNumber = courses.getRange(courseRow, 1).getValue();
@@ -614,9 +636,9 @@ function doPost(e){
         courses.getRange(courseRow,j).setValue(text);
         sendText(id, "Your review is added to " + courseNumber + ' ' + courseName);
         sendKey(id, "What would you like to do next?", mainKeyBoard);
-        set(id, 0, name, 0);
+        oldSet(id, 0, name, 0);
       }
-    }else if (mode == 'Add telegram group'){
+    }else if (mode1 == 'Add telegram group'){
       //var row = users.createTextFinder(id).findAll();
 //      sendText(id, "Adding..");
       var courseRow = 0;
@@ -629,7 +651,7 @@ function doPost(e){
       if (group){
         sendText(id, 'The group is already exist');
         sendText(id, group);
-        set(id, 0, name, 0);
+        oldSet(id, 0, name, 0);
         sendKey(id,'What would you like to do next?',mainKeyBoard)
         return;
       }
@@ -639,16 +661,16 @@ function doPost(e){
         if (checkIfLink.length !== 2){
           sendText(id, 'This is not a link to telegram group. Please try again');
           sendKey(id,'What would you like to do next?',mainKeyBoard)
-          set(id, 0, name, 0);
+          oldSet(id, 0, name, 0);
         }
         else{
           courses.getRange(courseRow, 3).setValue(text);
           sendText(id, "The group is added to " + courseNumber + ' ' + courseName);
-          set(id, 0, name, 0);
+          oldSet(id, 0, name, 0);
           sendKey(id,'What would you like to do next?',mainKeyBoard)
         }
       }
-    }else if (mode == 'Add Teams link'){
+    }else if (mode1 == 'Add Teams link'){
       var courseRow = 0;
       var idRow = row;
       courseRow = users.getRange(idRow, 4).getValue();
@@ -658,7 +680,7 @@ function doPost(e){
       if (group){
         sendText(id, 'The group is already exist');
         sendText(id, group);
-        set(id, 0, name, 0);
+        oldSet(id, 0, name, 0);
         sendKey(id,'What would you like to do next?',mainKeyBoard)
         return;
       }
@@ -667,16 +689,16 @@ function doPost(e){
         if (checkIfLink.length !== 2){
           sendText(id, 'This is not a link to Teams Group \ud83d\udc6a. Please try again');
           sendKey(id,'What would you like to do next?',mainKeyBoard)
-          set(id, 0, name, 0);
+          oldSet(id, 0, name, 0);
         }
         else{
           courses.getRange(courseRow, 6).setValue(text);
           sendText(id, "The group is added to " + courseNumber + ' ' + courseName);
-          set(id, 0, name, 0);
+          oldSet(id, 0, name, 0);
           sendKey(id,'What would you like to do next?',mainKeyBoard)
         }
       }
-    }else if (mode == 'Add exams Excel'){
+    }else if (mode1 == 'Add exams Excel'){
       var courseRow = 0;
       var idRow = row;
       courseRow = users.getRange(idRow, 4).getValue();
@@ -686,9 +708,9 @@ function doPost(e){
         courses.getRange(courseRow, 4).setValue(text);
         sendText(id, "The Excel is added to " + courseNumber + ' ' + courseName);
       }
-    }else if (mode == "faculty" || otherMode == "הנדסת חשמל" || otherMode == "ChooseElectricProgram" ){
-      facultyGroupHandler(id, text, mode, otherMode);
-    }else if (mode == 'Course'){
+    }else if (mode1 == "faculty" || mode2 == "הנדסת חשמל" || mode2 == "ChooseElectricProgram" ){
+      facultyGroupHandler(id, text, mode1, mode2);
+    }else if (mode1 == 'Course'){
       var list = courses.createTextFinder(text).findAll();
       var len = list.length;
       if (len == 1){
@@ -725,31 +747,27 @@ function doPost(e){
         }
       }
       else{ //len in 0  
-        //set(id, 0, name, 0);
+        //oldSet(id, 0, name, 0);
         sendKey(id, "can't find "+text+". Try typing somthing else or type 'home' to return to main menu.");
       }
-    }else if (mode == "Settings and Preference"){
+    }else if (mode1 == "Settings and Preference"){
       if (text == "Gender"){
         sendKey(id, "Choose the required gender", genderKeyBoard);
-        set(id, mode, name, text);
+        oldSet(id, mode1, name, text);
         return;
       }else if (text == "Faculty" && data == "Settings and Preference"){
         sendKey(id, "Choose the required faculty", coursesKeyBoard);
-        set(id, mode, name, text);
+        oldSet(id, mode1, name, text);
         return;
       }else if (text == "Faculty"){
         sendKey(id, "Choose the required faculty", coursesKeyBoard);
-        set(id, mode, name, text);
+        oldSet(id, mode1, name, text);
         return;
       }else if (text == "Topic"){
         sendKey(id, "Choose the required topic", topicKeyBoard);
-        set(id, mode, name, text);
+        oldSet(id, mode1, name, text);
         return;
       }
-      //getData
-      var app = SpreadsheetApp.openByUrl(helpList);
-      var helpers = app.getSheetByName('helper');
-      var needsHelp = app.getSheetByName('needHelp');
       var rowFinder = needsHelp.createTextFinder(id);
       var currID = rowFinder.findNext();
       var row;
@@ -829,10 +847,10 @@ function doPost(e){
           sendText(id, "There is no helper set yet");
         }
         return;
-      }else if ((text == "Back" || text == 'חזור') && mode == 'Settings and Preference'){
+      }else if ((text == "Back" || text == 'חזור') && mode1 == 'Settings and Preference'){
         sendKey(id, "Choose from the list below", helpKeyBoard);
         return;
-      }else if ((text == "Back" || text == 'חזור') && (otherMode == "Faculty" || otherMode == "Gender" || otherMode == "Topic") ){
+      }else if ((text == "Back" || text == 'חזור') && (mode2 == "Faculty" || mode2 == "Gender" || mode2 == "Topic") ){
         sendKey(id, "Choose from the list below", settingsKeyBoard);
         return;
       }if (text == "Male" || text == "Female"){//gender
@@ -849,7 +867,7 @@ function doPost(e){
         sendKey(id, "Your prefernce has been updated "+text+" faculty", settingsKeyBoard);
         return;
       }
-      //    }else if (mode == "Delete by Course Number"){
+      //    }else if (mode1 == "Delete by Course Number"){
       //      sendText(id, "Test");
       //      //get course row
       //      var courseToDelete = courses.createTextFinder(text).findNext().getRow();
@@ -868,10 +886,7 @@ function doPost(e){
       //        users.getRange(row, index-1).setValue(0);
       //      }
       //      sendText(id, "Course number " + text + " is not on your list anymore");
-    }else if (mode == SFS){
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+    }else if (mode1 == SFS){     
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -879,12 +894,12 @@ function doPost(e){
       var sectionsNum = busi.getRange(6, 2).getValue();
       var topicNum = busi.getRange(7, 2).getValue(); 
       
-      var currBusi = busi.createTextFinder(otherMode).findNext();
+      var currBusi = busi.createTextFinder(mode2).findNext();
       if (currBusi){
         var busiCol = currBusi.getColumn();
         var busiRow = currBusi.getRow();
       }
-      if (otherMode == "Add a Topic \ud83c\udfea"){
+      if (mode2 == "Add a Topic \ud83c\udfea"){
         var isExist = busi.createTextFinder(text).findNext();
         if (isExist) sendText(id, "This topic is already exists. You can add your business by 'Add a Business \ud83c\udfea' button after entering the topic");
         else{
@@ -892,11 +907,11 @@ function doPost(e){
           busi.getRange(2, sectionBase*sectionsNum).setValue(0);
           busi.getRange(6, 2).setValue(sectionsNum+1);
           sendText(id, "Got it! "+text+" topic is initialized");          
-          set(id, "null", name, "null");
+          oldSet(id, "null", name, "null");
         }
         return;
-      }else if (otherMode == "Pass"){//password is inserted in order to delete business
-        var textFinder = busi.createTextFinder(otherMode2);
+      }else if (mode2 == "Pass"){//password is inserted in order to delete business
+        var textFinder = busi.createTextFinder(mode3);
         var next = textFinder.findNext();
         if (next !== null){
           var nextRow = next.getRow();
@@ -914,26 +929,26 @@ function doPost(e){
           }
         }
         return;
-      }else if (otherMode == "PassToEdit"){//password is inserted in order to edit businesss
-        var textFinder = busi.createTextFinder(otherMode2);
+      }else if (mode2 == "PassToEdit"){//password is inserted in order to edit businesss
+        var textFinder = busi.createTextFinder(mode3);
         var next = textFinder.findNext();
         if (next !== null){
           var nextRow = next.getRow();
           var nextCol = next.getColumn();
           if (text == busi.getRange(nextRow, nextCol - 1).getValue()){ //the password is good
             sendKey(id, "What information wuold you like to modify?", busiEditKeyBoard);
-            set(id, SFS, 0, "GoodPass")
+            oldSet(id, SFS, 0, "GoodPass")
           }else{
             sendText(id, "The password is wrong! please try again. You can contanct us in case that you forgot your password.");
           }
         }
         return;
-      }else if(otherMode == "GoodPass"){
-        set(id, "GoodPass", 0, text);//(id, GoodPass, busi name, information to change)
+      }else if(mode2 == "GoodPass"){
+        oldSet(id, "GoodPass", 0, text);//(id, GoodPass, busi name, information to change)
         sendText(id, "please send the new information");
         return;
       }
-      var topic = otherMode2;//in name there is the topic in witch the user wants to insert the information
+      var topic = mode3;//in name there is the topic in witch the user wants to insert the information
       var currTopic = busi.createTextFinder(topic).findNext();
       var topicCol = 0;
       var topicCounter = 0;
@@ -943,7 +958,7 @@ function doPost(e){
         topicCounter = busi.getRange(2, topicCol-1).getValue(); 
       }
       
-      if (otherMode == "Password"){
+      if (mode2 == "Password"){
         //sendText(id,"test");
         var isExist = busi.createTextFinder(text).findNext();
         if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");
@@ -952,51 +967,51 @@ function doPost(e){
           busi.getRange(topicBase+topicCounter+1, topicCol).setValue(text);//set name
           sendText(id, text+" is initialized. Please send a password in order to be able to make changes in the future..");
           busi.getRange(2, topicCol-1).setValue(topicCounter+1);//conter++
-          set(id, mode, 0, "Description");
+          oldSet(id, mode1, 0, "Description");
         }
         return;
-      }else if (otherMode ==  "Description"){//User gets here after sending the password
+      }else if (mode2 ==  "Description"){//User gets here after sending the password
         //sendText(id, "test "+topicBase+" "+topicCounter+" "+topicCol);
         busi.getRange(topicBase+topicCounter, topicCol-1).setValue(text);//set password
         sendText(id, "Your password is "+text+". Please send a description for your business");
-        //set(id, mode, 0, "Location");
-        set(id, mode, 0, "Contact");
+        //oldSet(id, mode1, 0, "Location");
+        oldSet(id, mode1, 0, "Contact");
         return;
       }
-//      else if (otherMode ==  "Location"){//User gets here after sending the description
+//      else if (mode2 ==  "Location"){//User gets here after sending the description
 //        busi.getRange(topicBase+topicCounter, topicCol+1).setValue(text);//set description
 //        sendText(id, "Please send the location details for your business");
-//        set(id, mode, 0, "Contact");
+//        oldSet(id, mode1, 0, "Contact");
 //        return;
 //      }
-      else if (otherMode ==  "Contact"){//User gets here after sending the location
+      else if (mode2 ==  "Contact"){//User gets here after sending the location
         busi.getRange(topicBase+topicCounter, topicCol+1).setValue(text);//set Description
         sendText(id, "We almost done! Please send the contact information for your business");
-        //set(id, mode, 0, "Prices");
-        set(id, mode, 0, "Done");
+        //oldSet(id, mode1, 0, "Prices");
+        oldSet(id, mode1, 0, "Done");
         return;
       }
-//      else if (otherMode ==  "Prices"){//User gets here after sending the contact information
+//      else if (mode2 ==  "Prices"){//User gets here after sending the contact information
 //        busi.getRange(topicBase+topicCounter, topicCol+3).setValue(text);//set contact information
 //        sendText(id, "Got it! The contact information is initialized. Now send the prices for your business");
-//        set(id, mode, 0, "Done");
+//        oldSet(id, mode1, 0, "Done");
 //        return;
 //      }
-      else if (otherMode ==  "Done"){//User gets here after sending the prices
+      else if (mode2 ==  "Done"){//User gets here after sending the prices
         busi.getRange(topicBase+topicCounter, topicCol+3).setValue(text);//set contact info
         sendText(id, "Got it! Your business information is initialized, wish you luck!");
-        set(id, mode, name, "null");
+        oldSet(id, mode1, name, "null");
         return;
-      }else if (otherMode == "Delete My Business \ud83d\udcdb"){
+      }else if (mode2 == "Delete My Business \ud83d\udcdb"){
          var isExist = busi.createTextFinder(text).findNext();
         if (!(isExist)) sendText(id, "There is no business with that name. Please check the name and try again");
         else{
           var businessRow = isExist.getRow();
           sendText(id, "Please insert you password in order to delete your business");
-          set(id, mode, text, "Delete if Password");
+          oldSet(id, mode1, text, "Delete if Password");
         }
         return;
-      }else if (otherMode == "Delete if Password"){
+      }else if (mode2 == "Delete if Password"){
         var busiToDelete = busi.createTextFinder(text).findNext();
         var busiRow = busiToDelete.getRow();
         var busiCol = busiToDelete.getColumn();
@@ -1029,29 +1044,29 @@ function doPost(e){
           sendText(id, textToSend);
         }
       }
-    }else if (mode == "GoodPass"){//helper function of STS: edit business // (id, GoodPass, busi name, information to change)
-      var app = SpreadsheetApp.openByUrl(businessExcel);
-      var busi = app.getSheetByName('info');
-      
+    }else if (mode1 == "GoodPass"){//helper function of STS: edit business // (id, GoodPass, busi name, information to change)      
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
       var sectionBase = busi.getRange(5, 2).getValue();
       var sectionsNum = busi.getRange(6, 2).getValue();
       var topicNum = busi.getRange(7, 2).getValue(); 
-      var currBusi = busi.createTextFinder(otherMode2).findNext();
+      var currBusi = busi.createTextFinder(mode3).findNext();
       var busiRow = currBusi.getRow();
       var busiCol = currBusi.getColumn();
-      //(otherMode == "Business name") busiCol+=0;
-      if (otherMode == "Description") busiCol += 1;
-      else if (otherMode == "Contact Information") busiCol += 3;
-      else if (otherMode == "Password") busiCol -= 1;
+      //(mode2 == "Business name") busiCol+=0;
+      if (mode2 == "Description") busiCol += 1;
+      else if (mode2 == "Contact Information") busiCol += 3;
+      else if (mode2 == "Password") busiCol -= 1;
       busi.getRange(busiRow, busiCol).setValue(text);
-      sendKey(id, "The "+otherMode+" has been updated to "+ text, mainKeyBoard);
+      sendKey(id, "The "+mode2+" has been updated to "+ text, mainKeyBoard);
       return;
+    }else if(text == "Glass Door"){
+      oldSet(id, text, name, 0);
+      sendKey(id, "What do you want to do? ", GDKeyBoard);
     }
     else{
       sendKey(id,"How may I help you?",mainKeyBoard);
     }
-  }
 }
+

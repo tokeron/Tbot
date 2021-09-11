@@ -21,8 +21,8 @@ function deleteNotInUse(){
     var id = users.getRange(userRow, 1).getValue();
     if (today !== userLastUse){
       sendText(431936474, "id: "+id + " " + partnerId + " unconnected");
-      set(id, -1,-1,-1);
-      set(partnerId, -1,-1,-1);
+      oldSet(id, -1,-1,-1);
+      oldSet(partnerId, -1,-1,-1);
       sendText(id, "The conversation is not active for a long time, therefore the conversation is over now.");
       sendText(partnerId, "The conversation is not active for a long time, therefore the conversation is over now.");
     }
