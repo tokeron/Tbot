@@ -741,6 +741,7 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
     users.getRange(1, 4).setValue(++nextRow);
     users.getRange(1, 2).setValue(++numOfUsers);
 
+    // Stats part
     var statUsersAllTime = statistics.getRange(2,2).getValue();
     var statUsersMonthly = statistics.getRange(3,2).getValue();
     var statUsersWeekly = statistics.getRange(4,2).getValue();
@@ -753,7 +754,11 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
     return;
   }
 }
-
+/**
+ * statTrigger:
+ * A function that updates the number of active users in the last day/week/month.
+ * Should be called daily by a trigger.
+ */
 function statTrigger(){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var users = dataBaseEx.getSheetByName("users");
