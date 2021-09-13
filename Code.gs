@@ -1069,4 +1069,3 @@ function doPost(e){
       sendKey(id,"How may I help you?",mainKeyBoard);
     }
 }
-
