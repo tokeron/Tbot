@@ -344,7 +344,8 @@ function doPost(e){
       mode3 = users.getRange(row, 6).getValue();
       mode3 = users.getRange(row, 7).getValue();
       mode3 = users.getRange(row, 8).getValue();
-      var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+      //var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+      var date = new Date();
       users.getRange(row, 3).setValue(date);
     }else{
       set(id, name, mode1, mode2, mode3, mode4, mode5);

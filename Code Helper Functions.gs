@@ -712,6 +712,7 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
   //open spreadsheet
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
   //if (!(users)) sendText(id, "users is not defined");
   userFinder = users.createTextFinder(id);
   user = userFinder.findNext();
@@ -728,6 +729,7 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
   }
   else{ //new user
     var nextRow = users.getRange(1, 4).getValue();
+    var numOfUsers = users.getRange(1, 2).getValue();
     users.getRange(nextRow, 1).setValue(id);
     if (name || name == 0)   users.getRange(nextRow, 2).setValue(name);
     if (mode1 || mode1 == 0) users.getRange(nextRow, 4).setValue(mode1);
@@ -737,8 +739,48 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
     if (mode5 || mode5 == 0) users.getRange(nextRow, 8).setValue(mode5);
 
     users.getRange(1, 4).setValue(++nextRow);
+    users.getRange(1, 2).setValue(++numOfUsers);
+
+    var statUsersAllTime = statistics.getRange(2,2).getValue();
+    var statUsersMonthly = statistics.getRange(3,2).getValue();
+    var statUsersWeekly = statistics.getRange(4,2).getValue();
+    var statUsersDaily = statistics.getRange(5,2).getValue();
+
+    statistics.getRange(2,2).setValue(++statUsersAllTime);
+    statistics.getRange(3,2).setValue(++statUsersMonthly);
+    statistics.getRange(4,2).setValue(++statUsersWeekly);
+    statistics.getRange(5,2).setValue(++statUsersDaily);
     return;
   }
+}
+
+function statTrigger(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+  var today = new Date();
+  var nextFreeRow = users.getRange(1,4).getValue();
+  var statUsersMonthly = 0;
+  var statUsersWeekly = 0;
+  var statUsersDaily = 0;
+  for(let row=3;row<nextFreeRow;row++){
+    var diff = today - users.getRange(row, 3).getValue();
+    if(diff < 30*DAY){
+      statUsersMonthly++;
+      if(diff < 7*DAY){
+        statUsersWeekly++;
+        if(diff < DAY){
+          statUsersDaily++;
+        }
+      }
+    }
+  }
+  statistics.getRange(3,2).setValue(statUsersMonthly);
+  statistics.getRange(4,2).setValue(statUsersWeekly);
+  statistics.getRange(5,2).setValue(statUsersDaily);
+  return;
 }
 
 /**
