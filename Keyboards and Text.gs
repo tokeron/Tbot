@@ -64,7 +64,7 @@ function makeKeyBoard(id, names, numbers){
 //keyBoards
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
-  [{ text: SFS}, { text: help }],
+  [{ text: SFS}/*, {text: "Glass Door"}*/,{ text: help }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
   [{ text: usefulLink}], //{text: add}],
   [{ text: feedback}],
@@ -136,7 +136,7 @@ var printKeyBoard = [
   [{ text: mainMenu }]
   ]
 
-/*
+
 var coursesKeyBoardEn = [
   [{ text: "Computer Science" }, { text: 'Electrical Engineering' }, { text: 'Mechanical Engineering' }],
   [{ text: 'Civil and Environmental Engineering' }, { text: 'Industrial Engineering and Management' }, { text: 'Biomedical Engineering' }],
@@ -146,7 +146,7 @@ var coursesKeyBoardEn = [
   [{ text: "עברית" }],
   [{ text: mainMenu }]
 ]
-*/
+
 
 var coursesKeyBoard = [
   [{text: "סטודנטים בטכניון" }],
@@ -446,3 +446,11 @@ var funKeyBoard = [
   [{ text : "פיתוח פרויקטים"}],
   [{ text: mainMenu }]
 ]
+
+var GDKeyBoard = [
+  [{ text : "הכנס את המשכורת שלך"}],
+  [{ text : "ברר משכורות"}],
+  [{ text: mainMenu }]
+]
+
+
