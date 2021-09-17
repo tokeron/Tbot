@@ -7,29 +7,22 @@ var PRINT_SERVICE = {
   mailQuery: "from:print.bws@campus.technion.ac.il is:unread"
 }
 
-
+/**
+ * handles print message.
+ * @param {TelegramMessage} msg Message that contains a file.
+ */
 function handlePrint(msg){
   var file;
   if (msg.photo){
-    var id = msg.from.id;
-    sendText(id, "got an image..");
-    file = downloadFile(msg.photo[msg.photo.length - 1].file_id, "photo.jpg", id);
+    file = downloadFile(msg.photo[msg.photo.length - 1].file_id, "photo.jpg");
   }
   if (msg.document){
-    var id = msg.from.id;
-    sendText(id, "got an doc..");
-    var fileid = msg.document.file_id;
-    sendText(id, "got an doc.2.");
-    var fileName = msg.document.file_name;
-    sendText(id, "got an doc.1.");
-    file = downloadFile(fileid, fileName, id);
-    sendText(id, "got an doc.3.");
+    file = downloadFile(msg.document.file_id, msg.document.file_name, id);
   } 
   if(file){
     var studentId = "123456789";   // studentId
     var printType = "bws";         // avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
     sendEmail([file],msg.chat.id,studentId, printType );
-    return;
   }
 }
 

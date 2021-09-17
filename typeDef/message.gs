@@ -66,41 +66,6 @@
  * 
 */
 
-/** @typedef {Object} TelegramUser
- * 
- * @property {Number} id Unique identifier for this user or bot.
- * @property {Boolean} is_bot True, if this user is a bot.
- * @property {String} first_name User's or bot's first name.
- * @property {String} [last_name] Optional. User's or bot's last name.
- * @property {String} [username] Optional. User's or bot's username.
- * @property {String} [language_code] Optional. IETF language tag of the user's language.
- * @property {Boolean} [can_join_groups] Optional. True, if the bot can be invited to groups. Returned only in getMe.
- * @property {Boolean} [can_read_all_group_messages] Optional. True, if privacy mode is disabled for the bot. Returned only in getMe.
- * @property {Boolean} [supports_inline_queries] Optional. True, if the bot supports inline queries. Returned only in getMe.
-*/
-
-/** @typedef {Object} TelegramChat
- * 
- * @property {Number} id Unique identifier for this chat.
- * @property {String} type Type of chat, can be either “private”, “group”, “supergroup” or “channel”.
- * @property {String} [title] Optional. Title, for supergroups, channels and group chats.
- * @property {String} [first_name] Optional. First name of the other party in a private chat.
- * @property {String} [last_name] Optional. Last name of the other party in a private chat
- * @property {String} [username] Optional. Username, for private chats, supergroups and channels if available.
- * @property {TelegramChatPhoto} [photo] Optional. Chat photo. Returned only in getChat.
- * @property {String} [bio] Optional. Bio of the other party in a private chat. Returned only in getChat.
- * @property {String} [description] Optional. Description, for groups, supergroups and channel chats. Returned only in getChat.
- * @property {String} [invite_link] Optional. Primary invite link, for groups, supergroups and channel chats. Returned only in getChat.
- * @property {TelegramMessage} [pinned_message] Optional. The most recent pinned message (by sending date). Returned only in getChat.
- * @property {TelegramChatPermissions} [permissions] Optional. Default chat member permissions, for groups and supergroups. Returned only in getChat.
- * @property {Number} [slow_mode_delay] Optional. For supergroups, the minimum allowed delay between consecutive messages sent by each unpriviledged user. Returned only in getChat.
- * @property {Number} [message_auto_delete_time] Optional. The time after which all messages sent to the chat will be automatically deleted; in seconds. Returned only in getChat.
- * @property {String} [sticker_set_name] Optional. For supergroups, name of group sticker set. Returned only in getChat.
- * @property {Boolean} [can_set_sticker_set] Optional. True, if the bot can change the group sticker set. Returned only in getChat.
- * @property {Number} [linked_chat_id] Optional. Unique identifier for the linked chat, i.e. the discussion group identifier for a channel and vice versa; for supergroups and channel chats. This identifier may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier. Returned only in getChat.
- * @property {TelegramChatLocation} [location] Optional. For supergroups, the location to which the supergroup is connected. Returned only in getChat.
-*/
-
 /** @typedef {Object} TelegramChatPhoto
  * 
  * @property {String} small_file_id 	File identifier of small (160x160) chat photo. This file_id can be used only for photo download and only for as long as the photo is not changed.
