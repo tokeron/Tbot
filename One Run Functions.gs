@@ -35,136 +35,120 @@ function deleteNotInUse(){
 //functions that runs once a day and updates the courses acording to ug updates
 function getCourses(){
   var urlCourses = "https://raw.githubusercontent.com/michael-maltsev/cheese-fork/gh-pages/courses/courses_";
-  var year = "2020";
-  var semesterNum = "02";
-  var response = UrlFetchApp.fetch(urlCourses+year+semesterNum+".min.js");
+  var year = new Date().getFullYear();
+  var month = new Date().getMonth()
+  var semesterNum;
+  switch(month){
+    case(8):
+    case(9):
+    case(10):
+    case(11):
+      semesterNum = "01"
+      break
+    case(0):
+    case(1):
+      year = year - 1 
+      semesterNum = "01"
+      break
+    case(2):
+    case(3):
+    case(4):
+    case(5):
+      year = year - 1 
+      semesterNum = "02"
+      break
+    case(6):
+    case(7):
+      year = year - 1  
+      semesterNum = "03"
+      break
+  }
+  var year = year.toFixed()
+  var url = urlCourses+year+semesterNum+".js"
+  Logger.log(url)
+  var response = UrlFetchApp.fetch(url);
   var response  = response.getContentText();
-  //response = '"'+response.slice(0,25)+'"'+response.slice(26);
-  //console.log(response);
-  //var coursesJSON = JSON.parse(response);
-  return response;
+  eval(response)
+  return courses_from_rishum;
 }
 
+/**
+ * This function uses the json from cheese&fork git in order to fetch courses info from
+ * To update the information just run this function 
+ */
 function updateCourses(){
-  var str = getCourses();
-  var crs = SpreadsheetApp.openByUrl(courseExcel).getActiveSheet();
-  //var crs = ss.getSheetByName('Courses');
-  while (str.indexOf("general") !== -1){
-    str = str.slice(str.indexOf("general"));
-    str = str.slice(str.indexOf("פקולטה"));
-    str = str.slice(str.indexOf(":"));
-    str = str.slice(2);
-    var crsFaculty = str.slice(0, str.indexOf('"'));
-    str = str.slice(str.indexOf("שם מקצוע"));
-    str = str.slice(str.indexOf(":"));
-    str = str.slice(2);
-    var crsName = str.slice(0, str.indexOf('"'));
-    str = str.slice(str.indexOf("מספר מקצוע"));
-    str = str.slice(str.indexOf(":"));
-    str = str.slice(2);
-    var crsNum = str.slice(0, str.indexOf('"'));
-    var silIndex = str.indexOf("סילבוס");
-    if (silIndex !== -1){
-      str = str.slice(str.indexOf("סילבוס"));
-      str = str.slice(str.indexOf(":"));
-      str = str.slice(2);
-      var crsSil = str.slice(0, str.indexOf('"'));
+  var courses_from_rishum  = getCourses();
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var courses = dataBaseEx.getSheetByName("courses");
+
+  nextRow = courses.getRange(1,1).getValue()
+  courses_from_rishum.forEach((course) => {
+    faculty = course.general[fieldNamesGeneral.faculty]
+    courseName = course.general[fieldNamesGeneral.courseName]
+    courseNumber = course.general[fieldNamesGeneral.courseNumber]
+    nakaz = course.general[fieldNamesGeneral.nakaz]
+    lecture = course.general[fieldNamesGeneral.lecture]
+    tutorial= course.general[fieldNamesGeneral.tutorial]
+    lab = course.general[fieldNamesGeneral.lab]
+    seminar = course.general[fieldNamesGeneral.seminar]
+    silabus = course.general[fieldNamesGeneral.silabus]
+    kdam = course.general[fieldNamesGeneral.kdam]
+    lead = course.general[fieldNamesGeneral.lead]
+    examA = course.general[fieldNamesGeneral.examA]
+    examB = course.general[fieldNamesGeneral.examB]
+    
+    //course is already in the list. only update the information 
+    var textFinder = courses.createTextFinder(courseNumber);
+    nextCourse = textFinder.findNext()
+    while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) nextCourse = textFinder.findNext()
+    if (nextCourse){ //The course already in the table
+
+    }else{  //course is not in the list yet
+      //if information exists, update the spreadsheets
+      if (faculty) courses.getRange(nextRow,fieldCourses.faculty).setValue(faculty)
+      if (courseName) courses.getRange(nextRow,fieldCourses.courseName).setValue(courseName)
+      if (courseNumber) courses.getRange(nextRow,fieldCourses.courseNumber).setValue(courseNumber)
+      if (nakaz) courses.getRange(nextRow,fieldCourses.nakaz).setValue(nakaz)
+      if (lecture) courses.getRange(nextRow,fieldCourses.lecture).setValue(lecture)
+      if (tutorial) courses.getRange(nextRow,fieldCourses.tutorial).setValue(tutorial)
+      if (lab) courses.getRange(nextRow,fieldCourses.lab).setValue(lab)
+      if (seminar) courses.getRange(nextRow,fieldCourses.seminar).setValue(seminar)
+      if (kdam) courses.getRange(nextRow,fieldCourses.kdam).setValue(kdam)
+      if (silabus) courses.getRange(nextRow,fieldCourses.silabus).setValue(silabus)
+      if (lead) courses.getRange(nextRow,fieldCourses.lead).setValue(lead)
+      if (examA) courses.getRange(nextRow,fieldCourses.examA).setValue(examA)
+      if (examB) courses.getRange(nextRow,fieldCourses.examB).setValue(examB)
+      //update the counter 
+      courses.getRange(1,1).setValue(++nextRow)
     }
-    var kdamIndex = str.indexOf("מקצועות קדם")
-    if (kdamIndex !== -1){
-      str = str.slice(str.indexOf("מקצועות קדם"));
-      str = str.slice(str.indexOf(":"));
-      str = str.slice(2);
-      var crsKdam = str.slice(0, str.indexOf('"'));
-    }
-    var profIndex = str.indexOf("אחראים");
-    if (profIndex !== -1){
-      str = str.slice(str.indexOf("אחראים"));
-      str = str.slice(str.indexOf(":"));
-      str = str.slice(2);
-      var crsProf = str.slice(0, str.indexOf('"'));
-    }
-    var AIndex = str.indexOf("מועד א");
-    if (AIndex !== -1){
-      str = str.slice(str.indexOf("מועד א"));
-      str = str.slice(str.indexOf(":"));
-      str = str.slice(2);
-      var crsA = str.slice(0, str.indexOf('"'));
-    }
-    var BIndex = str.indexOf("מועד ב");
-    if (BIndex){
-      str = str.slice(str.indexOf("מועד ב"));
-      str = str.slice(str.indexOf(":"));
-      str = str.slice(2);
-      var crsB = str.slice(0, str.indexOf('"'));
-    }
-    var courseFinder = crs.createTextFinder(crsNum);    
-    var cell = courseFinder.findNext();
-    if (!(cell)){
-      var nextFreeRow = crs.getRange(1292, 1).getValue();
-      crs.getRange(1292, 1).setValue(nextFreeRow+1);
-      crs.getRange(nextFreeRow, 5).setValue(crsFaculty);
-      crs.getRange(nextFreeRow, 2).setValue(crsName);
-      crs.getRange(nextFreeRow, 1).setValue(crsNum);
-      if (silIndex) crs.getRange(nextFreeRow, 7).setValue(crsSil);
-      if (kdamIndex) crs.getRange(nextFreeRow, 8).setValue(crsKdam);
-      if (profIndex) crs.getRange(nextFreeRow, 9).setValue(crsProf);
-      if (AIndex) crs.getRange(nextFreeRow, 10).setValue(crsA);
-      if (BIndex) crs.getRange(nextFreeRow, 11).setValue(crsB);
-      crs.getRange(1292, 1).setValue(++nextFreeRow);
-    }
-      else{
-      nextFreeRow = cell.getRow();
-      crs.getRange(nextFreeRow, 5).setValue(crsFaculty);
-      //crs.getRange(nextFreeRow, 2).setValue(crsName);
-      //crs.getRange(nextFreeRow, 1).setValue(crsNum);
-      if (silIndex) crs.getRange(nextFreeRow, 7).setValue(crsSil);
-      if (kdamIndex) crs.getRange(nextFreeRow, 8).setValue(crsKdam);
-      if (profIndex) crs.getRange(nextFreeRow, 9).setValue(crsProf);
-      if (AIndex) crs.getRange(nextFreeRow, 10).setValue(crsA);
-      if (BIndex) crs.getRange(nextFreeRow, 11).setValue(crsB);
-    }
-     console.log(crsNum);
-  }
+  });
+  Logger.log("done")
 }
 
-
+/**
+ * This function fetches the links from old dataset to the new dataset
+ */
 function getLinks(){
-  var coursesExcelNew = "https://docs.google.com/spreadsheets/d/1hkWNJhWBHJfsVWV-0DcMRphsJXE79JvuJAXhvlnC7OY/edit#gid=0";
-  var newCrs = SpreadsheetApp.openByUrl(coursesExcelNew);
-  var crs = newCrs.getSheetByName('Courses');
-  var old = SpreadsheetApp.openByUrl(courseExcel).getActiveSheet();
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var courses = dataBaseEx.getSheetByName("courses");
   
-  var row = 966;
-  var courseNumber = old.getRange(row, 1).getValue();
-  while(courseNumber !== -1){
-    var crsName = old.getRange(row, 2).getValue()
-    var telegramLink = old.getRange(row, 3).getValue();
-    var excelLink = old.getRange(row, 4).getValue();
-    var teamsLink = old.getRange(row, 6).getValue();
-    if (courseNumber == null || courseNumber == "" || courseNumber == 0) {
-      
-    }else{
-      var courseFinder = crs.createTextFinder(courseNumber);
-      var nextCourse = courseFinder.findNext();
-      while (nextCourse !== null && nextCourse.getColumn() !== 1){
-        var nextCourse = courseFinder.findNext();
-      }
-      if (nextCourse){
-        var courseRow = nextCourse.getRow();
-        crs.getRange(courseRow, 3).setValue(telegramLink);
-        crs.getRange(courseRow, 4).setValue(excelLink);
-        crs.getRange(courseRow, 6).setValue(teamsLink);
-      }else{//add course
-        var nextFreeRow = crs.getRange(1, 2).getValue();
-        crs.getRange(nextFreeRow, 2).setValue(crsName);
-        crs.getRange(nextFreeRow, 1).setValue(courseNumber);
-        crs.getRange(nextFreeRow, 3).setValue(telegramLink);
-        crs.getRange(nextFreeRow, 4).setValue(excelLink);
-        crs.getRange(nextFreeRow, 6).setValue(teamsLink);
-        crs.getRange(1, 2).setValue(++nextFreeRow);
-      }
+  var old = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1X0hW9bVrshckxj8ft0whEgRnTiquoKfzoHSr5Ji2n5E/edit#gid=0").getActiveSheet();
+  
+  nextRow = courses.getRange(1,1).getValue()
+
+  for (i = 3; i < nextRow; ++i){
+    currCourse = courses.getRange(i, fieldCourses.courseNumber).getValue();
+    courseFinder = old.createTextFinder(currCourse);
+    nexrCell = courseFinder.findNext();
+    while(nexrCell !== null && nexrCell.getColumn() !== 1) nexrCell = courseFinder.findNext();
+    if (nexrCell){
+      telegram = old.getRange(nexrCell.getRow(), 3).getValue()
+      teams = old.getRange(nexrCell.getRow(), 6).getValue()
+      spreadsheet = old.getRange(nexrCell.getRow(), 4).getValue()
+      if (telegram) courses.getRange(i, fieldCourses.telegram).setValue(telegram)
+      if (teams) courses.getRange(i, fieldCourses.teams).setValue(teams)
+      if (spreadsheet) courses.getRange(i, fieldCourses.spreadsheet).setValue(spreadsheet)
     }
-    courseNumber = old.getRange(++row, 1).getValue();
   }
+  Logger.log("done")
 }

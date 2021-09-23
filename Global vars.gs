@@ -14,3 +14,11 @@ var webAppUrl = "https://script.google.com/macros/s/AKfycbxUjUOvSjsYf6-ZTfWHPhVB
 //var facultyRidesExcel = "https://docs.google.com/spreadsheets/d/142VV2vT6ZjthsN8QqwofKwOHmHVH8Qkm4R531hF91sk/edit?usp=sharing";
 //var businessExcel = "https://docs.google.com/spreadsheets/d/1S0_4OcTn_woYIOcORr3fmdZxcid4uwdBSMfFeLztawo/edit?usp=sharing";
 var dataBase = "https://docs.google.com/spreadsheets/d/163jIcDGTpAfskMZlsUolzjhcnB2q-s3e6iOSJt0pv_0/edit?usp=sharing"; //new excel - contain all previous excel
+
+//Drive url
+var csDriveUrl = "https://drive.google.com/drive/folders/0B1ne4XyZXorvYmNFN19odjZGaEk?resourcekey=0-pbwZbH-RFt1_Ar9ztS-lzA"
+var taonDriveUrl = "https://drive.google.com/drive/folders/1JRFsxGmagk4pO81XBSx9EKWNduld-jet"
+var electricalDriveUrl = "https://drive.google.com/drive/folders/16g08YIerCR2YX-NcgI8bzy7sRA3xIi7t"
+var mechanicalDriveUrl = "https://drive.google.com/drive/folders/1KYwpHXvyewWaXC5YIvSnamSW5YD7nlBR"
+var physicsDriveUrl = "https://drive.google.com/drive/folders/1g5687tI9s-fwjgbp4C28qpOQerYVEQVp"
+var aeroDriveUrl = "https://drive.google.com/drive/folders/1gWBhTQwzvHyxR-oNLKxSI51TZYxxj3rM"

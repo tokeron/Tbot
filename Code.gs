@@ -83,11 +83,12 @@ function handleCallback(contents){
   //get registers
   var cell = findUser(id, users);
   var row = cell.getRow(); 
-  reg1 = users.getRange(row, 4).getValue();
-  reg2 = users.getRange(row, 5).getValue();
-  reg3 = users.getRange(row, 6).getValue();
-  reg4 = users.getRange(row, 7).getValue();
-  reg5 = users.getRange(row, 8).getValue();
+  reg1 = users.getRange(row, fieldUsers.reg1).getValue();
+  reg2 = users.getRange(row, fieldUsers.reg2).getValue();
+  reg3 = users.getRange(row, fieldUsers.reg3).getValue();
+  reg4 = users.getRange(row, fieldUsers.reg4).getValue();
+  reg5 = users.getRange(row, fieldUsers.reg5).getValue();
+
   switch(reg1){
     case("help by number"): // helper is getting in contact with a student
       connectHelper(id, data, helpers, needsHelp)
@@ -98,16 +99,22 @@ function handleCallback(contents){
     case(SFS): //students fo students
       SFSHandler(id, name, busi, data, reg1)
       return
+    case("Course"):
+      //Searching a course
+      var courseFinder = courses.createTextFinder(data);
+      var currCourse = courseFinder.findNext();
+      while(currCourse !== null && currCourse.getColumn() !== fieldCourses.courseNumber){
+        currCourse = courseFinder.findNext();
+      }
+      if (currCourse){
+        sendOpt(id, name, courses, currCourse.getRow());
+      }
+      return
   }
-  //Searching a course
-  var courseFinder = courses.createTextFinder(data);
-  var currCourse = courseFinder.findNext();
-  while(currCourse !== null && currCourse.getColumn() !== 1){
-    currCourse = courseFinder.findNext();
-  }
-  if (currCourse){
-    sendOpt(id, name, courses, currCourse.getRow());
-  }
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
+  sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
+  reset(id)
+  return;
 }
   
 /**
@@ -135,14 +142,14 @@ function handleMessage(contents){
   //find user and load his registers
   var user = findUser(id, users)
   var row = user.getRow(); 
-  reg1 = users.getRange(row, 4).getValue();
-  reg2 = users.getRange(row, 5).getValue();
-  reg3 = users.getRange(row, 6).getValue();
-  reg4 = users.getRange(row, 7).getValue();
-  reg5 = users.getRange(row, 8).getValue();
+  reg1 = users.getRange(row, fieldUsers.reg1).getValue();
+  reg2 = users.getRange(row, fieldUsers.reg2).getValue();
+  reg3 = users.getRange(row, fieldUsers.reg3).getValue();
+  reg4 = users.getRange(row, fieldUsers.reg4).getValue();
+  reg5 = users.getRange(row, fieldUsers.reg5).getValue();
 
   //Boolean - true only if the user is authorized with the Technion email
-  var authorized = users.getRange(row, 10).getValue();
+  var authorized = users.getRange(row, fieldUsers.authorized).getValue();
 
   //save the timestamp
   var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
@@ -168,7 +175,7 @@ function handleMessage(contents){
       reset(id)
       return;
     case(drive):
-    case(courseGroup):
+    case(telegramGroup):
     case(reviews):
     case('Get all'):
     case(facebook):
@@ -255,7 +262,7 @@ function handleMessage(contents){
       return
     case("faculty"): 
       facultyGroupHandler(id, text, reg1, reg2);
-    case('Course'):
+    case("Course"):
       findCourse(id, name, text, courses)
       return
     case("Settings and Preference"):
@@ -300,31 +307,11 @@ function handleMessage(contents){
           sendText(id, "please send the new information");
           return;
         case("Password"):
-          sendText(id, "reg2: "+ reg2)
-          var topic = reg3;
-          var currTopic = busi.createTextFinder(topic).findNext();
-          var topicCol = 0;
-          var topicCounter = 0;
-          //sendText(id, "curr topic: "+topic+" "+currTopic);
-          if (currTopic){
-           topicCol = currTopic.getColumn();
-           topicCounter = busi.getRange(2, topicCol-1).getValue(); 
-          }
-          var isExist = busi.createTextFinder(text).findNext();
-          if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");
-          else if (isExist) sendText(id, "This name is already taken. Please choose another name for your business");
-          else{
-            busi.getRange(topicBase+topicCounter+1, topicCol).setValue(text);//set name
-            sendText(id, text+" is initialized. Please send a password in order to be able to make changes in the future..");
-            busi.getRange(2, topicCol-1).setValue(topicCounter+1);//conter++
-            oldSet(id, reg1, 0, "Description");
-          }
+          createBusi(id, text, reg1, reg3, busi)
           return;
         case("Description"):    //User gets here after sending the password
-          //sendText(id, "test "+topicBase+" "+topicCounter+" "+topicCol);
           busi.getRange(topicBase+topicCounter, topicCol-1).setValue(text);//set password
           sendText(id, "Your password is "+text+". Please send a description for your business");
-          //oldSet(id, reg1, 0, "Location");
           oldSet(id, reg1, 0, "Contact");
           return;
 //    case("Location"){//User gets here after sending the description
@@ -333,7 +320,7 @@ function handleMessage(contents){
 //       oldSet(id, reg1, 0, "Contact");
 //       return;
 //     }
-//     else if (reg2 ==  "Prices"){//User gets here after sending the contact information
+//     case("Prices"){//User gets here after sending the contact information
 //       busi.getRange(topicBase+topicCounter, topicCol+3).setValue(text);//set contact information
 //       sendText(id, "Got it! The contact information is initialized. Now send the prices for your business");
 //       oldSet(id, reg1, 0, "Done");
@@ -342,7 +329,6 @@ function handleMessage(contents){
         case("Contact"):    //User gets here after sending the location
           busi.getRange(topicBase+topicCounter, topicCol+1).setValue(text);//set Description
           sendText(id, "We almost done! Please send the contact information for your business");
-          //oldSet(id, reg1, 0, "Prices");
           oldSet(id, reg1, 0, "Done");
           return;
         case("Done"):   //User gets here after sending the prices
@@ -360,19 +346,7 @@ function handleMessage(contents){
           }
           return;
         case("Delete if Password"):
-          var busiToDelete = busi.createTextFinder(text).findNext();
-          var busiRow = busiToDelete.getRow();
-          var busiCol = busiToDelete.getColumn();
-          var afteLastInCol = busi.getRange(1, busiCol).getValue();
-          var lastInCol = busi.getRange(afteLastInCol-1, busiCol).getValue();
-          var lastInColPass = busi.getRange(afteLastInCol-1, busiCol-1).getValue();
-          var lastInColDes = busi.getRange(afteLastInCol-1, busiCol+1).getValue();
-          var lastInColContact = busi.getRange(afteLastInCol-1, busiCol+3).getValue();
-          busi.getRange(busiRow, busiCol).setValue(lastInCol);
-          busi.getRange(busiRow-1, busiCol).setValue(lastInColPass);
-          busi.getRange(busiRow+1, busiCol).setValue(lastInColDes);
-          busi.getRange(busiRow+3, busiCol).setValue(lastInColContact);
-          busi.getRange(1, busiCol).setValue(afteLastInCol-1);
+          deleteIfPass(text, busi)
           return
         default:
           if (text == "Location"){
