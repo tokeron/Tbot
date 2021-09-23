@@ -88,6 +88,7 @@ function handleCallback(contents){
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
   reg4 = users.getRange(row, fieldUsers.reg4).getValue();
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
+
   switch(reg1){
     case("help by number"): // helper is getting in contact with a student
       connectHelper(id, data, helpers, needsHelp)
@@ -114,16 +115,6 @@ function handleCallback(contents){
   sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
   reset(id)
   return;
-  }
-  //Searching a course
-  var courseFinder = courses.createTextFinder(data);
-  var currCourse = courseFinder.findNext();
-  while(currCourse !== null && currCourse.getColumn() !== 1){
-    currCourse = courseFinder.findNext();
-  }
-  if (currCourse){
-    sendOpt(id, name, courses, currCourse.getRow());
-  }
 }
   
 /**
@@ -147,7 +138,7 @@ function handleMessage(contents){
   
   // clean quotation marks in case it separated to parts - for example חדו"א    
   text = cleanQuotationMarks(text)
-  
+
   //find user and load his registers
   var user = findUser(id, users)
   var row = user.getRow(); 
@@ -162,7 +153,7 @@ function handleMessage(contents){
 
   //save the timestamp
   var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
-  users.getRange(row, fieldUsers.lastSeen).setValue(date);
+  users.getRange(row, 3).setValue(date);
   
   //if simple command: execute
   var isDone = simpleText(id, name, text);
@@ -321,24 +312,7 @@ function handleMessage(contents){
         case("Description"):    //User gets here after sending the password
           busi.getRange(topicBase+topicCounter, topicCol-1).setValue(text);//set password
           sendText(id, "Your password is "+text+". Please send a description for your business");
-          var topic = reg3;
-          var currTopic = busi.createTextFinder(topic).findNext();
-          var topicCol = 0;
-          var topicCounter = 0;
-          //sendText(id, "curr topic: "+topic+" "+currTopic);
-          if (currTopic){
-           topicCol = currTopic.getColumn();
-           topicCounter = busi.getRange(2, topicCol-1).getValue(); 
-          }
-          var isExist = busi.createTextFinder(text).findNext();
-          if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");
-          else if (isExist) sendText(id, "This name is already taken. Please choose another name for your business");
-          else{
-            busi.getRange(topicBase+topicCounter+1, topicCol).setValue(text);//set name
-            sendText(id, text+" is initialized. Please send a password in order to be able to make changes in the future..");
-            busi.getRange(2, topicCol-1).setValue(topicCounter+1);//conter++
-            oldSet(id, reg1, 0, "Description");
-          }
+          oldSet(id, reg1, 0, "Contact");
           return;
 //    case("Location"){//User gets here after sending the description
 //       busi.getRange(topicBase+topicCounter, topicCol+1).setValue(text);//set description
@@ -373,19 +347,6 @@ function handleMessage(contents){
           return;
         case("Delete if Password"):
           deleteIfPass(text, busi)
-          var busiToDelete = busi.createTextFinder(text).findNext();
-          var busiRow = busiToDelete.getRow();
-          var busiCol = busiToDelete.getColumn();
-          var afteLastInCol = busi.getRange(1, busiCol).getValue();
-          var lastInCol = busi.getRange(afteLastInCol-1, busiCol).getValue();
-          var lastInColPass = busi.getRange(afteLastInCol-1, busiCol-1).getValue();
-          var lastInColDes = busi.getRange(afteLastInCol-1, busiCol+1).getValue();
-          var lastInColContact = busi.getRange(afteLastInCol-1, busiCol+3).getValue();
-          busi.getRange(busiRow, busiCol).setValue(lastInCol);
-          busi.getRange(busiRow-1, busiCol).setValue(lastInColPass);
-          busi.getRange(busiRow+1, busiCol).setValue(lastInColDes);
-          busi.getRange(busiRow+3, busiCol).setValue(lastInColContact);
-          busi.getRange(1, busiCol).setValue(afteLastInCol-1);
           return
         default:
           if (text == "Location"){

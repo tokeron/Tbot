@@ -272,7 +272,7 @@ function getDone(id, name, reg2, command, users, courses){
     var teams = courses.getRange(courseRow, fieldCourses.teams).getValue();
     var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
     var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
-    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue()
+    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue();
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
@@ -1393,6 +1393,7 @@ function findCourse(id, name, text, courses){
       while (count < len){
         var courseCol = list[count].getColumn();
         if (courseCol == 1 || courseCol == 2){
+          var courseRow = list[count].getRow();
           var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
           var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
           //if (!(courseNumbers.includes(courseNumber))){
@@ -1549,6 +1550,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
  * 
  */
 function deleteByNumber(id, name, users, courses){
+  //sendText(id, "Test");
   //get course row
   var courseToDelete = courses.createTextFinder(text).findNext().getRow();
   sendText(id, courseToDelete);//test
@@ -1668,3 +1670,4 @@ function createBusi(id, text, reg1, reg3, busi){
     oldSet(id, reg1, 0, "Description");
   }
 }
+
