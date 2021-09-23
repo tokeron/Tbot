@@ -150,5 +150,4 @@ function getLinks(){
       if (spreadsheet) courses.getRange(i, fieldCourses.spreadsheet).setValue(spreadsheet)
     }
   }
-  Logger.log("done")
 }

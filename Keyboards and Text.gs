@@ -76,6 +76,7 @@ var mainKeyBoard = [
   [{ text: ride}, { text: fun} ,{ text: faculty}],
   [{ text: usefulLink}], //{text: add}],
   [{ text: feedback}],
+  [{ text: "Statistics"}],
   [{ text: About}]
 ]
 
@@ -265,3 +266,9 @@ var GDKeyBoard = [
   [{ text : "ברר משכורות"}],
   [{ text: mainMenu }]
 ]
+
+var statsKeyboard = [
+  [{ text: "Users"}],
+  [{ text: mainMenu}]
+]
+

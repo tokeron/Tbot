@@ -687,6 +687,7 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
   //open spreadsheet
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
   //if (!(users)) sendText(id, "users is not defined");
   userFinder = users.createTextFinder(id);
   user = userFinder.findNext();
@@ -712,8 +713,80 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     if (reg5 || reg5 == 0) users.getRange(nextRow, fieldUsers.reg5).setValue(reg5);
 
     users.getRange(1, 4).setValue(++nextRow);
+    users.getRange(1, 2).setValue(++numOfUsers);
+
+    // Stats part
+    var statUsersAllTime = statistics.getRange(2,2).getValue();
+    var statUsersMonthly = statistics.getRange(3,2).getValue();
+    var statUsersWeekly = statistics.getRange(4,2).getValue();
+    var statUsersDaily = statistics.getRange(5,2).getValue();
+
+    statistics.getRange(2,2).setValue(++statUsersAllTime);
+    statistics.getRange(3,2).setValue(++statUsersMonthly);
+    statistics.getRange(4,2).setValue(++statUsersWeekly);
+    statistics.getRange(5,2).setValue(++statUsersDaily);
     return;
   }
+}
+/**
+ * function updateUserStats
+ * updates the user statistics when a known user is using the bot again.
+ * @param {row} the row of the user that logged-in in the users spreadsheet.
+ */
+function updateUserStats(row){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+
+  var lastSeen = users.getRange(row, 3).getValue();
+  var now = new Date();
+  var diff = now - lastSeen;
+
+  if(diff > DAY){
+    statistics.getRange(5,2).setValue(statistics.getRange(5,2).getValue() + 1);
+    if(diff > 7*DAY){
+      statistics.getRange(4,2).setValue(statistics.getRange(4,2).getValue() + 1);
+      if(diff > 30*DAY){
+        statistics.getRange(3,2).setValue(statistics.getRange(3,2).getValue() + 1);
+        }
+      }
+    }
+  return;
+}
+/**
+ * statTrigger:
+ * A function that updates the number of active users in the last day/week/month.
+ * Should be called daily by a trigger.
+ */
+function statTrigger(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+  var today = new Date();
+  var nextFreeRow = users.getRange(1,4).getValue();
+  var statUsersMonthly = 0;
+  var statUsersWeekly = 0;
+  var statUsersDaily = 0;
+  for(let row=3;row<nextFreeRow;row++){
+    var diff = today - users.getRange(row, 3).getValue();
+    if(diff < 30*DAY){
+      statUsersMonthly++;
+      if(diff < 7*DAY){
+        statUsersWeekly++;
+        if(diff < DAY){
+          statUsersDaily++;
+        }
+      }
+    }
+  }
+  statistics.getRange(3,2).setValue(statUsersMonthly);
+  statistics.getRange(4,2).setValue(statUsersWeekly);
+  statistics.getRange(5,2).setValue(statUsersDaily);
+  return;
 }
 
 function reset(id){

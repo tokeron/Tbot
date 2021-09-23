@@ -239,6 +239,19 @@ function handleMessage(contents){
     case(SFS):
       sendSFS(id, name, text, busi)
       return
+    case("Statistics"):
+      sendKey(id,"Which statistics do you want to see?", statsKeyboard);
+      return
+    case("Users"): //from stats
+      var allTime = statistics.getRange(2,2).getValue();
+      var monthly = statistics.getRange(3,2).getValue();
+      var weekly = statistics.getRange(4,2).getValue();
+      var daily = statistics.getRange(5,2).getValue();
+      sendText(id, "Users Statistics:\nAll Time Users: "+ allTime +
+                    "\nLast Month: "+ monthly + 
+                    "\nLast Week: " + weekly +
+                    "\nLast Day: " + daily);
+      return
   }
 
   switch(reg1){
@@ -406,6 +419,6 @@ function handleMessage(contents){
           }
       }
   }
+  
   sendKey(id,"How may I help you?",mainKeyBoard);
 }
-
