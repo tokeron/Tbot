@@ -725,6 +725,8 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
     if (mode3 || mode3 == 0) users.getRange(row, 6).setValue(mode3);
     if (mode4 || mode4 == 0) users.getRange(row, 7).setValue(mode4);
     if (mode5 || mode5 == 0) users.getRange(row, 8).setValue(mode5);
+
+    updateUserStats(row);
     return;
   }
   else{ //new user
@@ -753,6 +755,33 @@ function set(id, name, mode1, mode2, mode3, mode4, mode5){
     statistics.getRange(5,2).setValue(++statUsersDaily);
     return;
   }
+}
+/**
+ * function updateUserStats
+ * updates the user statistics when a known user is using the bot again.
+ * @param {row} the row of the user that logged-in in the users spreadsheet.
+ */
+function updateUserStats(row){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+
+  var lastSeen = users.getRange(row, 3).getValue();
+  var now = new Date();
+  var diff = now - lastSeen;
+
+  if(diff > DAY){
+    statistics.getRange(5,2).setValue(statistics.getRange(5,2).getValue() + 1);
+    if(diff > 7*DAY){
+      statistics.getRange(4,2).setValue(statistics.getRange(4,2).getValue() + 1);
+      if(diff > 30*DAY){
+        statistics.getRange(3,2).setValue(statistics.getRange(3,2).getValue() + 1);
+        }
+      }
+    }
+  return;
 }
 /**
  * statTrigger:

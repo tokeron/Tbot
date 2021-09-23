@@ -1066,6 +1066,19 @@ function doPost(e){
       oldSet(id, text, name, 0);
       sendKey(id, "What do you want to do? ", GDKeyBoard);
     }
+    else if(text == "Statistics"){
+      sendKey(id,"Which statistics do you want to see?", statsKeyboard);
+    }
+    else if(text == "Users"){ //from stats
+      var allTime = statistics.getRange(2,2).getValue();
+      var monthly = statistics.getRange(3,2).getValue();
+      var weekly = statistics.getRange(4,2).getValue();
+      var daily = statistics.getRange(5,2).getValue();
+      sendText(id, "Users Statistics:\nAll Time Users: "+ allTime +
+                    "\nLast Month: "+ monthly + 
+                    "\nLast Week: " + weekly +
+                    "\nLast Day: " + daily);
+    } 
     else{
       sendKey(id,"How may I help you?",mainKeyBoard);
     }
