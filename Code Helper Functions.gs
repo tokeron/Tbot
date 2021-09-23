@@ -91,126 +91,163 @@ function findHelper(id){
 
 // most of it can be replaced be single Object.
 function simpleText(id, name, text){
-  if(text == About){
-    sendText(id, "Hi! My name is Michael Toker and I am a student at the Computer Science department at the Technion");
-    sendText(id, "I developed this bot as an open-source project for the use of Technion students, I hope that you find it useful!");
-    sendKey(id, "You are more than welcome to contact me with any issue..", contactKeyBoard);
-  }else if(text == ContactFacebook){
-    sendText(id, "https://www.facebook.com/michael.toker");
-  } else if(text == ContactEmail){
-    sendText(id, "dontokeron@gmail.com");
-  }else if(text == ContactLinkdIn){
-    sendText(id, "https://www.linkedin.com/in/michael-toker-52814b153");
-  }else if (text == usefulLink){
-    sendKey(id,"Here are some useful links for you" ,usefulKeyBoard);   
-  } else if (text == 'Copiers and printers'){
-    sendText(id, 'General info - http://www.asat.org.il/academic/contents/print/צילום_והדפסה');
-    sendText(id, 'in order to send a file to print start a new mail, type your ID in the SUBJECT.')
-    sendText(id, 'Attach your files (Office documents, pictures and pdf files)');
-    sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard)
-  }else if (text == "A4 B&W single sided"){
-    sendText(id, 'A4 B&W single sided – print.bws@campus.technion.ac.il');
-  }else if (text == "A4 B&W two sided"){
-    sendText(id, 'A4 B&W two sided – print.bwd@campus.technion.ac.il');
-  } else if (text == "A4 Color single sided"){
-    sendText(id, 'A4 Color single sided – print.color@campus.technion.ac.il');
-  } else if (text == "A3 B&W single sided"){
-    sendText(id, 'A3 B&W single sided – print.A3bws@campus.technion.ac.il')
-  }else if (text == "A3 B&W two sided"){
-    sendText(id, 'A3 B&W two sided – print.A3bwd@campus.technion.ac.il')
-  } else if (text == "A3 Color single sided"){
-    sendText(id, 'A3 Color single sided – print.A3color@campus.technion.ac.il')
-  }else if (text == "B&W 2 slides per page, single sided"){
-    sendText(id, 'B&W 2 slides per page, single sided – print.2pbws@campus.technion.ac.il')
-  }else if(text == "B&W 2 slides per page, two sided"){
-    sendText(id, 'B&W 2 slides per page, two sided – print.2pbwd@campus.technion.ac.il')
-  }else if (text == "B&W 4 slides per page, single sided"){
-    sendText(id, 'B&W 4 slides per page, single sided – print.4pbws@campus.technion.ac.il')
-  }else if(text == "B&W 4 slides per page, two sided"){
-    sendText(id, 'B&W 4 slides per page, two sided – print.4pbwd@campus.technion.ac.il')
-  }else if (text == calendar){
-    sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);   
-  }else if (text == "אזור תל אביב-יפו והמרכז" || text == "אזור ירושליים" || text == "אזור חיפה והצפון" 
-            || text == "אזור השפלה והדרום" || text == "אזור השרון" ){
-    switch(text){
-      case ("אזור תל אביב-יפו והמרכז"):
-        sendKey(id, "Choose a city from the list below:", teKeyBoard);
-        break;
-      case ("אזור ירושליים"):
-        sendKey(id, "Choose a city from the list below:", jeKeyBoard);
-        break;
-      case ("אזור חיפה והצפון"):
-        sendKey(id, "Choose a city from the list below:", heKeyBoard);
-        break;
-      case ("אזור השפלה והדרום"):
-        sendKey(id, "Choose a city from the list below:", soKeyBoard);
-        break;
-      case ("אזור השרון"):
-        sendKey(id, "Choose a city from the list below:", shKeyBoard);
-        break;
+  switch(text){
+    case(About):
+      sendText(id, "Hi! My name is Michael Toker and I am a student at the Computer Science department at the Technion");
+      sendText(id, "I developed this bot as an open-source project for the use of Technion students, I hope that you find it useful!");
+      sendKey(id, "You are more than welcome to contact me with any issue..", contactKeyBoard);
+      return true
+    case(ContactFacebook):
+      sendText(id, "https://www.facebook.com/michael.toker")
+      return true
+    case(ContactEmail):
+      sendText(id, "dontokeron@gmail.com")
+      return true
+    case(ContactLinkdIn):
+      sendText(id, "https://www.linkedin.com/in/michael-toker-52814b153")
+      return true
+    case(usefulLink):
+      sendKey(id,"Here are some useful links for you" ,usefulKeyBoard)
+      return true
+    case('Copiers and printers'):
+      sendText(id, 'General info - http://www.asat.org.il/academic/contents/print/צילום_והדפסה');
+      sendText(id, 'in order to send a file to print start a new mail, type your ID in the SUBJECT.')
+      sendText(id, 'Attach your files (Office documents, pictures and pdf files)');
+      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard)
+      return true
+    case("A4 B&W single sided"):
+      sendText(id, 'A4 B&W single sided – print.bws@campus.technion.ac.il');
+      return true
+    case("A4 B&W two sided"):
+      sendText(id, 'A4 B&W two sided – print.bwd@campus.technion.ac.il');
+      return true
+    case("A4 Color single sided"):
+      sendText(id, 'A4 Color single sided – print.color@campus.technion.ac.il');
+      return true
+    case("A3 B&W single sided"):
+      sendText(id, 'A3 B&W single sided – print.A3bws@campus.technion.ac.il')
+      return true
+    case("A3 B&W two sided"):
+      sendText(id, 'A3 B&W two sided – print.A3bwd@campus.technion.ac.il')
+      return true
+    case("A3 Color single sided"):
+      sendText(id, 'A3 Color single sided – print.A3color@campus.technion.ac.il')
+      return true
+    case("B&W 2 slides per page, single sided"):
+      sendText(id, 'B&W 2 slides per page, single sided – print.2pbws@campus.technion.ac.il')
+      return true
+    case("B&W 2 slides per page, two sided"):
+      sendText(id, 'B&W 2 slides per page, two sided – print.2pbwd@campus.technion.ac.il')
+      return true
+    case("B&W 4 slides per page, single sided"):
+      sendText(id, 'B&W 4 slides per page, single sided – print.4pbws@campus.technion.ac.il')
+      return true
+    case("B&W 4 slides per page, two sided"):
+      sendText(id, 'B&W 4 slides per page, two sided – print.4pbwd@campus.technion.ac.il')
+      return true
+    case(calendar):
+      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);   
+      return true
+    case("אזור תל אביב-יפו והמרכז"):
+      sendKey(id, "Choose a city from the list below:", teKeyBoard);
+      return true
+    case ("אזור ירושליים"):
+      sendKey(id, "Choose a city from the list below:", jeKeyBoard);
+      return true
+    case ("אזור חיפה והצפון"):
+      sendKey(id, "Choose a city from the list below:", heKeyBoard);
+      return true
+    case ("אזור השפלה והדרום"):
+      sendKey(id, "Choose a city from the list below:", soKeyBoard);
+      return true
+    case ("אזור השרון"):
+      sendKey(id, "Choose a city from the list below:", shKeyBoard);
+      return true
+    case("טרמפים בפייסבוק"):
+      sendText(id, "https://www.facebook.com/groups/301410316636087/"+" - "+"טרמפים יוצאים מהטכניון");
+      sendText(id, "https://www.facebook.com/groups/135704829788347/"+ " - " + "טרמפים נכנסים לטכניון");
+      sendKey(id, "מה תרצה לעשות כעת?",  ridesKeyBoard);
+      return true
+    case("scans - cf"):
+      sendText(id, "https://tscans.cf/");
+      return true
+    case('MyDegree'):
+      sendText(id, "https://www.mydegree.co.il/");
+      return true
+    case('Technion Students FAQ (doc)'):
+      sendText(id,"https://docs.google.com/document/d/1XGWWns6IZy9QpsAhWZu_WxIQTXYbRVeAV3XGr6pcMpc/edit?fbclid=IwAR1bBn5g3NBdxf2JFPbeWinOmQ3F0qa2KxlQGlMZ5wPyr31l0yRfo7ESPLc");
+      return true
+    case('useful links from facebook (doc)'):
+      sendText(id,"https://docs.google.com/document/d/1tR8X8YawbK_h2VwQU1k1Fz4q12B0nWxOMSqxE_hV2sw/"+
+               "edit?fbclid=IwAR1cQkxt1PG-gFwF_QWPG80u9ZNYuVwwBlWwmCes5MLst1ERmAIGijH8BRM");
+      return true
+    case('cheese&fork'):
+      sendKey(id,"https://cheesefork.cf/",usefulKeyBoard);
+      return true
+    case('testock'):
+      sendKey(id,"https://testock.tk/courses",usefulKeyBoard);
+      return true
+    case('ug '+ugSy):
+      sendKey(id, 'https://ug3.technion.ac.il/rishum/search',usefulKeyBoard );
+      return true
+    case('moodle '+moodleSy):
+      sendKey(id, 'https://moodle.technion.ac.il/',usefulKeyBoard );
+      return true
+    case("Git"):
+      sendText(id, 'https://github.com/tokeron/Tbot');
+      return true
+    case('אסט'):
+      sendKey(id,"http://www.asat.org.il/",usefulKeyBoard);
+      return true
+    case('ASA'):
+      sendKey(id,"https://www.asatechnion.co.il/",usefulKeyBoard);
+      return true
+    case(Korona):
+      sendText(id, "https://t.me/asat_technion");
+      return true
+    //}else if (text == 'חזור'){
+    //  sendKey(id, "Choose from the list below", helpKeyBoard);
+    case(help):
+      sendKey(id, "This feature allows you to talk to a student at the Technion anonymously. You can talk about issues that are bothering you (topics such as mental distress, difficulty in studies or any other topic you would be happy to talk about with someone who can not judge you)", helpKeyBoard);
+      return true
+    case(fun):
+      sendKey(id, "Choose your prefered type of activity and meet with new people!", funKeyBoard);
+      return true
+    case("ספורט"):
+      sendText(id, "https://t.me/joinchat/dQxFxMyugo5lMjI0");
+      return true
+    case("טיולים"):
+      sendText(id, "https://t.me/joinchat/z5np_mDyuQ4xMjBk");
+      return true
+    case("משחקים"):
+      sendText(id, "https://t.me/joinchat/0qbzGTf5jLVhNmFk");
+      return true
+    case("פיתוח פרויקטים"):
+      sendText(id, "https://t.me/joinchat/Amx7SinEWJBjNGM0");
+      return true
+    case(ride):
+    case('רשימת אזורים'):
+      sendKey(id, "Send the required city name or choose your region from the list below " + downSy, rideKeyBoard);
+      oldSet(id, "Ride");
+      return true
+    case(course):
+    case('Search For Another Course'):
+      removeKey(id, "Please insert the course number or course name in hebrew");
+      set(id, name, "Course", 0)
+      return true
+    case(faculty): 
+    case("Department Groups \ud83c\udfeb"):
+      sendKey(id, "Choose your faculty from the list below ", coursesKeyBoard);
+      oldSet(id, 'faculty');
+      return true
+    case(feedback):
+    case("/feedback"):
+      removeKey(id, "You can send your feedback now");
+      oldSet(id, 'feedback');
+      return true
+    default:
+      return false;
     }
-  }else if (text == "טרמפים בפייסבוק"){
-    sendText(id, "https://www.facebook.com/groups/301410316636087/"+" - "+"טרמפים יוצאים מהטכניון");
-    sendText(id, "https://www.facebook.com/groups/135704829788347/"+ " - " + "טרמפים נכנסים לטכניון");
-    sendKey(id, "מה תרצה לעשות כעת?",  ridesKeyBoard);
-  }else if (text == "scans - cf"){
-    sendText(id, "https://tscans.cf/");
-  }else if (text == 'MyDegree'){
-    sendText(id, "https://www.mydegree.co.il/");
-  }else if (text == 'Technion Students FAQ (doc)'){
-    sendText(id,"https://docs.google.com/document/d/1XGWWns6IZy9QpsAhWZu_WxIQTXYbRVeAV3XGr6pcMpc/edit?fbclid=IwAR1bBn5g3NBdxf2JFPbeWinOmQ3F0qa2KxlQGlMZ5wPyr31l0yRfo7ESPLc");
-  }else if (text == 'useful links from facebook (doc)'){
-    sendText(id,"https://docs.google.com/document/d/1tR8X8YawbK_h2VwQU1k1Fz4q12B0nWxOMSqxE_hV2sw/"+
-             "edit?fbclid=IwAR1cQkxt1PG-gFwF_QWPG80u9ZNYuVwwBlWwmCes5MLst1ERmAIGijH8BRM");
-  }else if (text == 'cheese&fork'){
-    sendKey(id,"https://cheesefork.cf/",usefulKeyBoard);
-  }else if (text == 'testock'){
-    sendKey(id,"https://testock.tk/courses",usefulKeyBoard);
-  }else if (text == 'ug '+ugSy) {
-    sendKey(id, 'https://ug3.technion.ac.il/rishum/search',usefulKeyBoard );
-  }else if (text == 'moodle '+moodleSy){
-    sendKey(id, 'https://moodle.technion.ac.il/',usefulKeyBoard );
-  }else if (text == "Git"){
-    sendText(id, 'https://github.com/tokeron/Tbot');
-  }else if (text == 'אסט'){
-    sendKey(id,"http://www.asat.org.il/",usefulKeyBoard);
-  }else if (text == 'ASA'){
-    sendKey(id,"https://www.asatechnion.co.il/",usefulKeyBoard);
-  }else if (text == 'ניב סקרביאנסקי'){
-    sendKey(id, 'https://drive.google.com/file/d/11-zadZjM-0qDwc0qrWXHVygLN7aKkqna/view?usp=drivesdk', mainKeyBoard) ;
-  }else if (text == Korona){
-    sendText(id, "https://t.me/asat_technion");
-  //}else if (text == 'חזור'){
-  //  sendKey(id, "Choose from the list below", helpKeyBoard);
-  }else if (text == help){
-    sendKey(id, "This feature allows you to talk to a student at the Technion anonymously. You can talk about issues that are bothering you (topics such as mental distress, difficulty in studies or any other topic you would be happy to talk about with someone who can not judge you)", helpKeyBoard);
-  }else if (text == fun){
-    sendKey(id, "Choose your prefered type of activity and meet with new people!", funKeyBoard);
-  }else if (text == "ספורט"){
-    sendText(id, "https://t.me/joinchat/dQxFxMyugo5lMjI0");
-  }else if (text == "טיולים"){
-    sendText(id, "https://t.me/joinchat/z5np_mDyuQ4xMjBk");
-  }else if (text == "משחקים"){
-    sendText(id, "https://t.me/joinchat/0qbzGTf5jLVhNmFk");
-  }else if (text == "פיתוח פרויקטים"){
-    sendText(id, "https://t.me/joinchat/Amx7SinEWJBjNGM0");
-  }else if (text == ride || text == 'רשימת אזורים'){
-    sendKey(id, "Send the required city name or choose your region from the list below " + downSy, rideKeyBoard);
-    oldSet(id, "Ride");
-  }else if (text == course || text == 'Search For Another Course'){
-    removeKey(id, "Please insert the course number or course name in hebrew");
-    oldSet(id, "Course", name, 0);
-  } else if (text == faculty || text == "Department Groups \ud83c\udfeb"){
-    sendKey(id, "Choose your faculty from the list below ", coursesKeyBoard);
-    oldSet(id, 'faculty');
-  }else if (text == feedback || text == "/feedback"){
-    removeKey(id, "You can send your feedback now");
-    oldSet(id, 'feedback');
-  } 
-  else{
-    return false;
-  }
-  return true;
 }
 
 
@@ -218,88 +255,24 @@ function sendOpt(id, name, courses, courseRow){
   var excel = false;
   var cs = false;
   var teams = false;
-  oldSet(id, 'Course', name, courseRow);
-  var courseNumber = courses.getRange(courseRow, 1).getValue();
-  var courseName = courses.getRange(courseRow, 2).getValue();
-  var mode = courses.getRange(courseRow, 5).getValue();
-  var link = courses.getRange(courseRow, 3).getValue();
-  if (mode == 1){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (courses.getRange(courseRow, 6).getValue()) teams = true;
-    if (link && teams){
-      sendKey(id, "choose the required information", tgmalagKeyBoard);
-    }
-    else if (link){
-      sendKey(id, "choose the required information", gmalagKeyBoard);
-    }
-    else if (teams){
-      sendKey(id, "choose the required information", tmalagKeyBoard);
-    }
-    else sendKey(id, "choose the required information", malagKeyBoard);
-    return;
-  }
-  else if (mode == 2){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gsportKeyBoard);
-    else sendKey(id, "choose the required information", sportKeyBoard);
-    return;
-  }
-  if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
-    cs = true;
-  }
-  if (courses.getRange(courseRow, 4).getValue()) excel = true;
-  if (courses.getRange(courseRow, 6).getValue()) teams = true;
-  if (excel && cs && teams){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", tgexcelCsKeyBoard);
-    else sendKey(id, "choose the required information", texcelCsKeyBoard);
-  }
-  else if (excel && cs){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gexcelCsKeyBoard);
-    else sendKey(id, "choose the required information", excelCsKeyBoard);
-  }
-  else if (cs && teams){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", tgcsKeyBoard);
-    else sendKey(id, "choose the required information", tcsKeyBoard)
-      }
-  else if (excel && teams){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", tgexcelKeyBoard);
-    else sendKey(id, "choose the required information", texcelKeyBoard)
-      }
-  else if (teams){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", tgallKeyBoard);
-    else sendKey(id, "choose the required information", tallKeyBoard);
-  }
-  else if (cs){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gcsKeyBoard);
-    else sendKey(id, "choose the required information", csKeyBoard)
-      }
-  else if (excel){
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gexcelKeyBoard);
-    else sendKey(id, "choose the required information", excelKeyBoard)
-      }
-  else{
-    sendText(id, courseName + " - "+ courseNumber );
-    if (link) sendKey(id, "choose the required information", gallKeyBoard);
-    else sendKey(id, "choose the required information", allKeyBoard)
-  }
+  set(id, null, 'Course', courseRow);
+  var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+  var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  sendKey(id, "Choose the required information",allKeyBoard)
+  return
 }
 
 
 function getDone(id, name, reg2, command, users, courses){
   var courseRow = reg2
   if (courseRow){
-    var courseNumber = courses.getRange(courseRow, 3).getValue();
-    var courseName = courses.getRange(courseRow, 2).getValue();
-    var group = courses.getRange(courseRow, 9).getValue();
-    var teams = courses.getRange(courseRow, 10).getValue();
-    var excel = courses.getRange(courseRow, 12).getValue();
+    var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+    var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+    var group = courses.getRange(courseRow, fieldCourses.telegram).getValue();
+    var teams = courses.getRange(courseRow, fieldCourses.teams).getValue();
+    var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
+    var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
+    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue()
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
@@ -308,75 +281,75 @@ function getDone(id, name, reg2, command, users, courses){
       case drive:
         sendText(id, "Looking for a link to the drive "+ driveSy);
         driveHandler(id, courseNumber, courseName);
-        var currentCounter = users.getRange(2, 9).getValue();
+        //var currentCounter = users.getRange(2, 9).getValue();
         //users.getRange(2, 9).setValue(++currentCounter);
-        break;
-      case courseGroup:
+        return;
+      case telegramGroup:
         sendText(id, "Looking for telegram group" + groupSy);
         if (group) sendText(id, group);
         else sendText(id, "There is no telegram group for this course yet. you can open and add a groupby using 'Add group'");
         //var currentCounter = users.getRange(2, 8).getValue();
         //users.getRange(2, 8).setValue(++currentCounter);
-        break;
+        return;
       case "Teams Group \ud83d\udc6a":
         sendText(id, "Looking for Teams Group \ud83d\udc6a" + groupSy);
         if (teams) sendText(id, teams);
         else sendText(id, "There is no Teams Group \ud83d\udc6a for this course yet. you can open and add a groupby using 'Add group'")
         //var currentCounter = users.getRange(2, 8).getValue();
         //users.getRange(2, 8).setValue(++currentCounter);
-        break;
+        return;
       case testock:
         sendText(id, "Looking for a link to the test scans " + scansSy);
         scansHandler(id, courseNumber);
         //var currentCounter = users.getRange(2, 11).getValue();
         //users.getRange(2, 11).setValue(++currentCounter);
-        break;
+        return;
       case 'All tests - excel':
         sendText(id, "Looking for a link to the tests excel " + groupSy);
         sendText(id, excel);
         //var currentCounter = users.getRange(2, 11).getValue();
         //users.getRange(2, 11).setValue(++currentCounter);
-        break;
+        return;
       case reviews:
         reviewsHandler(id, courseRow, courses, 0);
         //var currentCounter = users.getRange(2, 10).getValue();
         //users.getRange(2, 10).setValue(++currentCounter);
-        break;
+        return;
       case facebook:
         facebookHandler(id, courseNumber, courseName);
         //var currentCounter = users.getRange(2, 7).getValue();
         //users.getRange(2, 7).setValue(++currentCounter);
-        break;
+        return;
       case youTube:
         youtubeHandler(id, courseNumber, courseName)
         //var currentCounter = users.getRange(2, 7).getValue();
         //users.getRange(2, 7).setValue(++currentCounter);
-        break;
+        return;
       case ug:
         sendText(id, "Looking for ug link " + ugSy);
         sendText(id, "https://ug3.technion.ac.il/rishum/course/"+courseNumber);
         //var currentCounter = users.getRange(2, 6).getValue();
         //users.getRange(2, 6).setValue(++currentCounter);
-        break;
+        return;
       case cs:
         sendText(id, "Looking for computer science link " + csSy);
         sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
         //var currentCounter = users.getRange(2, 6).getValue();
         //users.getRange(2, 6).setValue(++currentCounter);
-        break;
+        return;
       case moodle:
         sendText(id, "Looking for moodle link " + moodleSy);
         sendText(id, "https://moodle.technion.ac.il/course/search.php?search="+courseNumber);
         //var currentCounter = users.getRange(2, 6).getValue();
         //users.getRange(2, 6).setValue(++currentCounter);
-        break;
+        return;
       case  "Course info":
         sendText(id, "Looking for info link ");
         sendText(id, "https://asatechnion.co.il/courses/syllabus"+courses.getRange(courseRow, 4).getValue()+".pdf");
-        break;
+        return;
       case "Panopto":
         panoptoHandler(id, courseNumber);
-        break;
+        return;
       case 'Get all':
         if (group){
           sendText(id, "Looking for a link to the telegram group " + groupSy);
@@ -401,9 +374,9 @@ function getDone(id, name, reg2, command, users, courses){
         sendText(id, "Looking for moodle link " + moodleSy);
         sendText(id, "https://moodle.technion.ac.il/course/search.php?search="+courseNumber);
         driveHandler(id, courseNumber, courseName);
-        oldSet(id, 0, name, 0)
-        sendKey(id, "What would you like to do next?", mainKeyBoard);
-        break;
+        //oldSet(id, 0, name, 0)
+        //sendKey(id, "What would you like to do next?", mainKeyBoard);
+        return;
     }
   }
 }
@@ -502,7 +475,7 @@ function driveHandler(id, courseNumber, courseName){
       found = true;
       sendText(id, currFolderName);
       sendText(id, subFolder.getUrl());
-      return;
+      break;
     }
   }
   var scienceItr = folder.getFoldersByName("קורסים מדעיים");
@@ -515,7 +488,7 @@ function driveHandler(id, courseNumber, courseName){
       found = true;
       sendText(id, currFolderName);
       sendText(id, s.getUrl());
-      return;
+      break;
     }
   }
   var folderItr = dApp.getFoldersByName("Technion CS");
@@ -530,7 +503,7 @@ function driveHandler(id, courseNumber, courseName){
       found = true;
       sendText(id, currFolderName);
       sendText(id, h.getUrl());
-      return;
+      break;
     }
   }
   sendText(id, "Searching in Industrial Engineering and Management..");
@@ -544,7 +517,7 @@ function driveHandler(id, courseNumber, courseName){
       found = true;
       sendText(id, currFolderName);
       sendText(id, subFolder.getUrl());
-      return;
+      break;
     }
   }
   sendText(id, "Searching in Electrical Engineering..");
@@ -557,7 +530,7 @@ function driveHandler(id, courseNumber, courseName){
     if (currFolderName.indexOf(courseNumber) !== -1){
       sendText(id, currFolderName);
       sendText(id, subFolder.getUrl());
-      return;
+      break;
     }
   }
   sendText(id, "Searching in Mechanical engineering..");
@@ -574,7 +547,7 @@ function driveHandler(id, courseNumber, courseName){
         found = true;
         sendText(id, currFolderName);
         sendText(id, subFolder.getUrl());
-        return;
+        break;
       }
     }
   }
@@ -608,7 +581,7 @@ function driveHandler(id, courseNumber, courseName){
       found = true;
       sendText(id, currFolderName);
       sendText(id, subFolder.getUrl());
-      return;
+      break;
     }
   }
   sendText(id, "Searching in Aerospace Engineering..");
@@ -625,23 +598,23 @@ function driveHandler(id, courseNumber, courseName){
         found = true;
         sendText(id, currFolderName);
         sendText(id, subFolder.getUrl());
-        return;
+        break;
       }
       else if(currFolderName.indexOf(courseNumber) !== -1){
         found = true;
         sendText(id, currFolderName);
         sendText(id, subFolder.getUrl());
-        return;
+        break;
       }
     }
   }
   if (!(found)){
     sendText(id, "sorry \u2639, can't find the drive for this course...");
-    return;
   }
   else{
     sendText(id, 'Done');
   }
+  return
 }
 
 //adds a course to the list. Can be deleted after automation
@@ -668,18 +641,21 @@ function courseAdd(id ,courseNumber, courseName, link, courses){
   }
 }
   
-//not so usefull feature, probably goes down
+/**
+ * not so usefull feature, probably goes down
+ * 
+ * */
 function reviewsHandler(id, i, courses, isAll){
-  sendText(id, "Looking for reviews " + reviewsSy);
-  var j = 7;
-  while (courses.getRange(i,j).getValue()){
-    sendText(id, courses.getRange(i,j).getValue());
-    j++;
-  }
-  if (j==7){
-    if (!(isAll)) sendText(id, "sorry \u2639 there is no reviews for this course yet");
-    return;
-  }
+  // sendText(id, "Looking for reviews " + reviewsSy);
+  // var j = 7;
+  // while (courses.getRange(i,j).getValue()){
+  //   sendText(id, courses.getRange(i,j).getValue());
+  //   j++;
+  // }
+  // if (j==7){
+  //   if (!(isAll)) sendText(id, "sorry \u2639 there is no reviews for this course yet");
+  //   return;
+  // }
 }
 
 //important function oldSet(id, data, name, num)
@@ -717,23 +693,23 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
   while (user !== null && user.getColumn() !== 1) user = userFinder.findNext(); //seach the row with the id in the first row
   if (user !== null){
     row = user.getRow();
-    if (name || name == 0)   users.getRange(row, 2).setValue(name);
-    if (reg1 || reg1 == 0) users.getRange(row, 4).setValue(reg1);
-    if (reg2 || reg2 == 0) users.getRange(row, 5).setValue(reg2);
-    if (reg3 || reg3 == 0) users.getRange(row, 6).setValue(reg3);
-    if (reg4 || reg4 == 0) users.getRange(row, 7).setValue(reg4);
-    if (reg5 || reg5 == 0) users.getRange(row, 8).setValue(reg5);
+    if ((name || name == 0) && (name !== 'null')) users.getRange(row, fieldUsers.name).setValue(name);
+    if ((reg1 || reg1 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg1).setValue(reg1);
+    if ((reg2 || reg2 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg2).setValue(reg2);
+    if ((reg3 || reg3 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg3).setValue(reg3);
+    if ((reg4 || reg4 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg4).setValue(reg4);
+    if ((reg5 || reg5 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg5).setValue(reg5);
     return;
   }
   else{ //new user
     var nextRow = users.getRange(1, 4).getValue();
-    users.getRange(nextRow, 1).setValue(id);
-    if (name || name == 0)   users.getRange(nextRow, 2).setValue(name);
-    if (reg1 || reg1 == 0) users.getRange(nextRow, 4).setValue(reg1);
-    if (reg2 || reg2 == 0) users.getRange(nextRow, 5).setValue(reg2);
-    if (reg3 || reg3 == 0) users.getRange(nextRow, 6).setValue(reg3);
-    if (reg4 || reg4 == 0) users.getRange(nextRow, 7).setValue(reg4);
-    if (reg5 || reg5 == 0) users.getRange(nextRow, 8).setValue(reg5);
+    users.getRange(nextRow, fieldUsers.id).setValue(id);
+    if (name || name == 0) users.getRange(nextRow, fieldUsers.name).setValue(name);
+    if (reg1 || reg1 == 0) users.getRange(nextRow, fieldUsers.reg1).setValue(reg1);
+    if (reg2 || reg2 == 0) users.getRange(nextRow, fieldUsers.reg2).setValue(reg2);
+    if (reg3 || reg3 == 0) users.getRange(nextRow, fieldUsers.reg3).setValue(reg3);
+    if (reg4 || reg4 == 0) users.getRange(nextRow, fieldUsers.reg4).setValue(reg4);
+    if (reg5 || reg5 == 0) users.getRange(nextRow, fieldUsers.reg5).setValue(reg5);
 
     users.getRange(1, 4).setValue(++nextRow);
     return;
@@ -1025,7 +1001,7 @@ function registrationToHelp(id, helpers){
     oldSet(id, "help by number",0,helperRow);
   }else{
     sendText(id, "על מנת להיכנס למאגר העוזרים עלייך למלא את הטופס הבא וניצור איתך קשר בהקדם");
-    sendText(id, "בשדה id בשאלוון הכנס בבקשה את המספר הבא: "+ id);
+    sendText(id, "בשדה id בשאלון הכנס בבקשה את המספר הבא: "+ id);
     sendText(id, "https://forms.gle/ECq5NxEvJAMD9pTn8");
   }
 }
@@ -1075,16 +1051,16 @@ function loadCourses(id, row, users, courses){
     var currCol = 14;
     var courseList = [];
     var numberList = [];
-    while (currCol <= 26){
+    while (currCol <= 28){
       var courseRow = users.getRange(idRow, currCol).getValue();
       if (courseRow){
-        var courseNumber = courses.getRange(courseRow, 1).getValue();
-        var courseName = courses.getRange(courseRow, 2).getValue();
+        var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+        var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
         numberList.push(courseNumber);
         courseList.push(courseName+" - "+courseNumber);
         currCol++;
       }else{
-        currCol = 27;
+        currCol = 29;
       }
     }
     if (numberList.length > 0){
@@ -1094,7 +1070,7 @@ function loadCourses(id, row, users, courses){
       numberList.push("Clean My List");
       courseList.push("Search For Another Course");
       numberList.push("Search For Another Course");
-      oldSet(id, "Course", name, 0);
+      set(id, null, "Course", 0);
       makeKeyBoard(id, courseList, numberList);
     }
     else{
@@ -1417,9 +1393,8 @@ function findCourse(id, name, text, courses){
       while (count < len){
         var courseCol = list[count].getColumn();
         if (courseCol == 1 || courseCol == 2){
-          var courseRow = list[count].getRow();
-          var courseName = courses.getRange(courseRow, 2).getValue();
-          var courseNumber = courses.getRange(courseRow, 1).getValue();
+          var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+          var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
           //if (!(courseNumbers.includes(courseNumber))){
           courseNames.push(courseName+" - "+courseNumber);
           courseNumbers.push(courseNumber)
@@ -1574,7 +1549,6 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
  * 
  */
 function deleteByNumber(id, name, users, courses){
-  sendText(id, "Test");
   //get course row
   var courseToDelete = courses.createTextFinder(text).findNext().getRow();
   sendText(id, courseToDelete);//test
@@ -1637,6 +1611,25 @@ function deleteBusi(id, reg3, busi){
 /**
  * 
  */
+function deleteIfPass(text, busi){
+  var busiToDelete = busi.createTextFinder(text).findNext();
+  var busiRow = busiToDelete.getRow();
+  var busiCol = busiToDelete.getColumn();
+  var afteLastInCol = busi.getRange(1, busiCol).getValue();
+  var lastInCol = busi.getRange(afteLastInCol-1, busiCol).getValue();
+  var lastInColPass = busi.getRange(afteLastInCol-1, busiCol-1).getValue();
+  var lastInColDes = busi.getRange(afteLastInCol-1, busiCol+1).getValue();
+  var lastInColContact = busi.getRange(afteLastInCol-1, busiCol+3).getValue();
+  busi.getRange(busiRow, busiCol).setValue(lastInCol);
+  busi.getRange(busiRow-1, busiCol).setValue(lastInColPass);
+  busi.getRange(busiRow+1, busiCol).setValue(lastInColDes);
+  busi.getRange(busiRow+3, busiCol).setValue(lastInColContact);
+  busi.getRange(1, busiCol).setValue(afteLastInCol-1);
+}
+
+/**
+ * 
+ */
 function editBusi(id, text, busi){
   var textFinder = busi.createTextFinder(reg3);
   var next = textFinder.findNext();
@@ -1651,4 +1644,27 @@ function editBusi(id, text, busi){
     }
   }
   return;
+}
+
+/**
+ * 
+ */
+function createBusi(id, text, reg1, reg3, busi){
+  var topic = reg3;
+  var currTopic = busi.createTextFinder(topic).findNext();
+  var topicCol = 0;
+  var topicCounter = 0;
+  if (currTopic){
+   topicCol = currTopic.getColumn();
+   topicCounter = busi.getRange(2, topicCol-1).getValue(); 
+  }
+  var isExist = busi.createTextFinder(text).findNext();
+  if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");
+  else if (isExist) sendText(id, "This name is already taken. Please choose another name for your business");
+  else{
+    busi.getRange(topicBase+topicCounter+1, topicCol).setValue(text);//set name
+    sendText(id, text+" is initialized. Please send a password in order to be able to make changes in the future..");
+    busi.getRange(2, topicCol-1).setValue(topicCounter+1);//conter++
+    oldSet(id, reg1, 0, "Description");
+  }
 }

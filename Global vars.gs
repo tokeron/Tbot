@@ -1,13 +1,13 @@
 var numberOfCourses = 2000; 
 var numberOfReviews = 2*26; 
 
-var token = "1294202090:AAE9FLey8O__F_t36StXWM_5oU1kah1Hn38";
+var token = "";
 var url = "https://api.telegram.org/bot" + token;
 
-var webAppUrl = "https://script.google.com/macros/s/AKfycbxUjUOvSjsYf6-ZTfWHPhVBKcQyvjLZ8CFOQhY8b5FDWRcDxWATrAk64QgmrEXz3vP3/exec";
+var webAppUrl = "";
 
-//Spreadsheet
-var dataBase = "https://docs.google.com/spreadsheets/d/163jIcDGTpAfskMZlsUolzjhcnB2q-s3e6iOSJt0pv_0/edit?usp=sharing"; //contains all previous spreadsheets
+
+var dataBase = ""; //contains all previous spreadsheets
 
 //Drive url
 var csDriveUrl = "https://drive.google.com/drive/folders/0B1ne4XyZXorvYmNFN19odjZGaEk?resourcekey=0-pbwZbH-RFt1_Ar9ztS-lzA"
