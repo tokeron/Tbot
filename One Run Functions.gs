@@ -38,6 +38,7 @@ function getCourses(){
   var year = new Date().getFullYear();
   var month = new Date().getMonth()
   var semesterNum;
+  year = year - 1
   switch(month){
     case(8):
     case(9):
@@ -102,7 +103,7 @@ function updateCourses(){
     nextCourse = textFinder.findNext()
     while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) nextCourse = textFinder.findNext()
     if (nextCourse){ //The course already in the table
-
+      
     }else{  //course is not in the list yet
       //if information exists, update the spreadsheets
       if (faculty) courses.getRange(nextRow,fieldCourses.faculty).setValue(faculty)

@@ -23,7 +23,7 @@ function doGet(e) {
 function doPost(e){
   var contents = JSON.parse(e.postData.contents);
   var file;
-
+  
   //internal keyboard command - different from regular text
   if (contents.callback_query){
     handleCallback(contents);
