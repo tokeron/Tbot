@@ -1,4 +1,4 @@
-// test 1
+// test 2
 function findHelper(id){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var helpers = dataBaseEx.getSheetByName("helpers");
