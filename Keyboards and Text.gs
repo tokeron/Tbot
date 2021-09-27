@@ -1,11 +1,7 @@
-/**
- * Macros
- */
+//Macros
 var TESTMODE = false;
 
-/**
- * symbols
- */
+//Symbols
 var groupSy = "\ud83d\udc6b"; 
 var driveSy = "\ud83d\udcc1";
 var csSy = "\ud83d\udcbb";
@@ -33,8 +29,7 @@ var feedback = "feedback \ud83d\udcdd";
 var calendar = "Calendar \ud83d\udcc5";
 
 var drive = "Drive "+driveSy;
-var telegramGroup = "Telegram group "+groupSy;
-var whatsappGroup = "whatsapp group "+groupSy;
+var courseGroup = "Telegram group "+groupSy;
 var testock = "Scans - testock "+scansSy;
 var facebook = "Facebook "+facebookSy;
 var youTube = "YouTube " +YouTubeSy;
@@ -50,9 +45,7 @@ var ContactLinkdIn = "linkedin";
 var WantToTalk = "Anonymous talk with a student";
 var SFS = "Students Business "+	"\ud83d\udcb8";
 
-/**
- * function that makes an internal keyboard from the numbers in the spreadsheet. 
- */
+//function that makes an internal keyboard from the numbers in the spreadsheet. 
 function makeKeyBoard(id, names, numbers){
   var num = names.length;
   var newKeyBoard = [];
@@ -65,18 +58,65 @@ function makeKeyBoard(id, names, numbers){
 }
   
 
+//sendText(chatId, text, keyBoard)
+//Description: sends text to chatId with(optional) exeternal keyboared.
+//input: chat id, string and(optional) the name of the exeternal keyboared.
+function sendText(chatId, text, keyBoard) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify({
+        "inline_keyboard": keyBoard,
+      })
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
 
+//sendKey(chatId, text, keyBoard)
+//Description: sends text to chatId with internal keyboared(optional).
+//input: chat id, string and the name of the internal keyboared(optional).
+function sendKey(chatId, text, keyBoard) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      parse_mode: "Markdown",
+      reply_markup: JSON.stringify({
+        "keyboard": keyBoard,
+      })
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
 
-/**
- * keyBoards
- */ 
+function removeKey(chatId, text) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      reply_markup: JSON.stringify({
+        remove_keyboard: true })
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
+
+//keyBoards
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
   [{ text: SFS}/*, {text: "Glass Door"}*/,{ text: help }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
   [{ text: usefulLink}], //{text: add}],
   [{ text: feedback}],
-  [{ text: "Statistics"}],
   [{ text: About}]
 ]
 
@@ -193,9 +233,204 @@ var ridesBackKeyBoard = [
 var allKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
-  [{ text: drive }, { text: ug }, { text: moodle }, { text: cs }],
-  [{ text: whatsappGroup }, { text: telegramGroup }, { text: 'Teams Group \ud83d\udc6a' }],
-  [{ text: testock }, { text: facebook }, { text: 'Panopto' }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: testock }],
+  [{ text: facebook }],
+  [{ text: "Add telegram group" } ],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var gallKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: courseGroup }, { text: testock }],
+  [{ text: facebook }, { text: 'Panopto' } ],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tgallKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: courseGroup }, { text: testock }],
+  [{ text: facebook }, { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+
+var tallKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: testock }],
+  [{ text: facebook },  { text: 'Panopto' }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var csKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }, { text: testock }],
+  [{ text: facebook },  { text: 'Panopto' }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tcsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive },  { text: testock }],
+  [{ text: facebook },  { text: 'Panopto' }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var gcsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }, { text: courseGroup }, { text: testock }],
+  [{ text: facebook }, { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tgcsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }, { text: courseGroup },   { text: testock }],
+  [{ text: facebook }, { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var excelKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook },  { text: 'Panopto' },    ],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var texcelKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: 'Teams Group \ud83d\udc6a'}],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook }, { text: 'Panopto' }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var gexcelKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: courseGroup }],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook },   { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tgexcelKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }],
+  [{ text: drive }, { text: courseGroup }, { text: 'Teams Group \ud83d\udc6a'}],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook },   { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var excelCsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook },   { text: 'Panopto' }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var texcelCsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }], 
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }, { text: 'Teams Group \ud83d\udc6a'}],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook }, { text: 'Panopto' }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var gexcelCsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }, { text: courseGroup }],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook },   { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tgexcelCsKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: "Get all" }],
+  [{ text: ug }, { text: moodle }, { text: cs }],
+  [{ text: drive }, { text: courseGroup }, { text: 'Teams Group \ud83d\udc6a'}],
+  [{ text: testock }, { text: "All tests - excel" }],
+  [{ text: facebook },  { text: 'Panopto' }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var malagKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: ug }, { text: moodle }],
+  [{ text: facebook }],
+  [{ text: "Add telegram group" }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var gmalagKeyBoard = [
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: ug }, { text: moodle }],
+  [ { text: courseGroup }, { text: facebook }],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tmalagKeyBoard = [
+  [{ text: ug }, { text: moodle }],
+  [ { text: courseGroup }, { text: facebook }],
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var tgmalagKeyBoard = [
+  [{ text: ug }, { text: moodle }],
+  [ { text: courseGroup },  { text: facebook }],
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var sportKeyBoard = [
+  [{ text: "Course info"}],
+  [{ text: "Add telegram group" }],
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
+  [{ text: mainMenu }, { text: "Search For Another Course" }]
+]
+
+var gsportKeyBoard = [
+  [{ text: courseGroup }],
+  [{ text: "Course info"}],
+  [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
   
@@ -267,8 +502,4 @@ var GDKeyBoard = [
   [{ text: mainMenu }]
 ]
 
-var statsKeyboard = [
-  [{ text: "Users"}],
-  [{ text: mainMenu}]
-]
 
