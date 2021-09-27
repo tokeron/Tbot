@@ -4,7 +4,7 @@
 // The bot is running on the google script platform and using google sheets to store the information to operate.
 // The bot can handle multiple requests, analyze commands, and execute them.drive
 // The bot is in constant testing and improvement. 
-
+//test
 //Macros
 var TESTMODE = false;
 
