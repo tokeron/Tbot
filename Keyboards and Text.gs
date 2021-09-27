@@ -271,4 +271,3 @@ var statsKeyboard = [
   [{ text: "Users"}],
   [{ text: mainMenu}]
 ]
-
