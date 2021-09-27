@@ -355,3 +355,4 @@
  * 
  * @property {TelegramUser[]} [users] Optional. New members that were invited to the voice chat.
 */
+
