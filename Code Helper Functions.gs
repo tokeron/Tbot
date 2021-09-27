@@ -1465,6 +1465,7 @@ function findCourse(id, name, text, courses){
       var count = 0;
       while (count < len){
         var courseCol = list[count].getColumn();
+        courseRow = list[count].getRow();
         if (courseCol == 1 || courseCol == 2){
           var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
           var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
