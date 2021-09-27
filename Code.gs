@@ -82,6 +82,7 @@ function handleCallback(contents){
 
   //get registers
   var cell = findUser(id, users);
+  if (cell == null) set(id, name);
   var row = cell.getRow(); 
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
@@ -148,7 +149,8 @@ function handleMessage(contents){
   text = cleanQuotationMarks(text)
   
   //find user and load his registers
-  var user = findUser(id, users)
+  var user = findUser(id, users);
+  if (user == null) set(id, name);
   var row = user.getRow(); 
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
