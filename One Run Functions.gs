@@ -36,9 +36,9 @@ function deleteNotInUse(){
 function getCourses(){
   var urlCourses = "https://raw.githubusercontent.com/michael-maltsev/cheese-fork/gh-pages/courses/courses_";
   var year = new Date().getFullYear();
+  year = year - 1 //the year in the script is minus one from the current year 
   var month = new Date().getMonth()
   var semesterNum;
-  year = year - 1
   switch(month){
     case(8):
     case(9):
@@ -103,7 +103,7 @@ function updateCourses(){
     nextCourse = textFinder.findNext()
     while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) nextCourse = textFinder.findNext()
     if (nextCourse){ //The course already in the table
-      
+
     }else{  //course is not in the list yet
       //if information exists, update the spreadsheets
       if (faculty) courses.getRange(nextRow,fieldCourses.faculty).setValue(faculty)
@@ -151,5 +151,4 @@ function getLinks(){
       if (spreadsheet) courses.getRange(i, fieldCourses.spreadsheet).setValue(spreadsheet)
     }
   }
-  Logger.log("done")
 }
