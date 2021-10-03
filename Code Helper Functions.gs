@@ -700,10 +700,13 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     if ((reg3 || reg3 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg3).setValue(reg3);
     if ((reg4 || reg4 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg4).setValue(reg4);
     if ((reg5 || reg5 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg5).setValue(reg5);
+    updateUserStats(row);
     return;
   }
   else{ //new user
+
     var nextRow = users.getRange(1, 4).getValue();
+    var numOfUsers = users.getRange(1, 2).getValue();
     users.getRange(nextRow, fieldUsers.id).setValue(id);
     if (name || name == 0) users.getRange(nextRow, fieldUsers.name).setValue(name);
     if (reg1 || reg1 == 0) users.getRange(nextRow, fieldUsers.reg1).setValue(reg1);
@@ -725,6 +728,7 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     statistics.getRange(3,2).setValue(++statUsersMonthly);
     statistics.getRange(4,2).setValue(++statUsersWeekly);
     statistics.getRange(5,2).setValue(++statUsersDaily);
+    statistics.getRange(statistics.getRange(2,3).getValue(),5).setValue(statistics.getRange(statistics.getRange(2,3).getValue(),5).getValue() + 1);
     return;
   }
 }
@@ -746,6 +750,8 @@ function updateUserStats(row){
 
   if(diff > DAY){
     statistics.getRange(5,2).setValue(statistics.getRange(5,2).getValue() + 1);
+    statistics.getRange(3,1).setValue(1);
+    statistics.getRange(statistics.getRange(2,3).getValue(),5).setValue(statistics.getRange(statistics.getRange(2,3).getValue(),5).getValue() + 1);
     if(diff > 7*DAY){
       statistics.getRange(4,2).setValue(statistics.getRange(4,2).getValue() + 1);
       if(diff > 30*DAY){
@@ -786,6 +792,10 @@ function statTrigger(){
   statistics.getRange(3,2).setValue(statUsersMonthly);
   statistics.getRange(4,2).setValue(statUsersWeekly);
   statistics.getRange(5,2).setValue(statUsersDaily);
+
+  var row = Math.floor((today - new Date(2021,9,3))/DAY + 2.1);
+  statistics.getRange(2,3).setValue(row);
+  statistics.getRange(row,5).setValue(0);
   return;
 }
 

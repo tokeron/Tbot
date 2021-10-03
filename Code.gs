@@ -162,7 +162,8 @@ function handleMessage(contents){
   var authorized = users.getRange(row, fieldUsers.authorized).getValue();
 
   //save the timestamp
-  var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+  //var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+  var date = new Date();
   users.getRange(row, fieldUsers.lastSeen).setValue(date);
   
   //if simple command: execute
@@ -243,7 +244,7 @@ function handleMessage(contents){
     case("Statistics"):
       sendKey(id,"Which statistics do you want to see?", statsKeyboard);
       return
-    case("Users"): //from stats
+    case("Users"+groupSy): //from stats
       var allTime = statistics.getRange(2,2).getValue();
       var monthly = statistics.getRange(3,2).getValue();
       var weekly = statistics.getRange(4,2).getValue();
