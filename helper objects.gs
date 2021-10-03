@@ -101,7 +101,8 @@ const stats = {
     row: 2,
     col: 3
   },
-  numOfUsers: 5,
+  numOfUsersCol: 5,
+  clicksCol: 6,
   test: {
     row: 6,
     col: 1

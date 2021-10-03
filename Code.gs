@@ -23,6 +23,8 @@ function doGet(e) {
 function doPost(e){
   var contents = JSON.parse(e.postData.contents);
   var file;
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
 
   //internal keyboard command - different from regular text
   if (contents.callback_query){
@@ -32,6 +34,10 @@ function doPost(e){
   else if (contents.message){
     handleMessage(contents);
   }
+
+  //stats update
+  var todaysRow = statistics.getRange(stats.todaysRow.row,stats.todaysRow.col);
+  statistics.getRange(todaysRow, stats.clicksCol).setValue(statistics.getRange(todaysRow, stats.clicksCol).getValue() + 1);
 }
 
 
@@ -122,7 +128,7 @@ function handleCallback(contents){
   }
   sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
   sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-  reset(id)
+  reset(id, name)
   return;
 }
   
@@ -176,14 +182,14 @@ function handleMessage(contents){
     case("/start"):
       sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-      reset(id)
+      reset(id, name)
       return;
     case('תפריט ראשי'):
     case('Main Menu'):
     case(mainMenu):
     case('home'):
       sendKey(id, "How may I help you?", mainKeyBoard);
-      reset(id)
+      reset(id, name)
       return;
     case(drive):
     case(telegramGroup):

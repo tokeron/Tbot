@@ -728,7 +728,7 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(++statUsersMonthly);
     statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(++statUsersWeekly);
     statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(++statUsersDaily);
-    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).getValue() + 1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     return;
   }
 }
@@ -751,7 +751,7 @@ function updateUserStats(row){
   if(diff > DAY){
     statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statistics.getRange(stats.users.day.row,stats.users.day.col).getValue() + 1);
     statistics.getRange(stats.test.row,stats.test.col).setValue(1);
-    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).getValue() + 1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     if(diff > 7*DAY){
       statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statistics.getRange(stats.users.week.row,stats.users.week.col).getValue() + 1);
       if(diff > 30*DAY){
@@ -795,12 +795,12 @@ function statTrigger(){
 
   var row = Math.floor((today - new Date(2021,9,3))/DAY + 2.1);
   statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row);
-  statistics.getRange(row,stats.numOfUsers).setValue(0);
+  statistics.getRange(row,stats.numOfUsersCol).setValue(0);
   return;
 }
 
-function reset(id){
-  set(id, 0, 0, 0, 0, 0, 0)
+function reset(id, name){
+  set(id, name, 0, 0, 0, 0, 0)
 }
 
 
