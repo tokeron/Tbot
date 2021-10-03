@@ -268,6 +268,6 @@ var GDKeyBoard = [
 ]
 
 var statsKeyboard = [
-  [{ text: "Users"}],
+  [{ text: "Users" + groupSy}],
   [{ text: mainMenu}]
 ]
