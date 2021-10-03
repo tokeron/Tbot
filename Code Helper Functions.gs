@@ -719,16 +719,16 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     users.getRange(1, 2).setValue(++numOfUsers);
 
     // Stats part
-    var statUsersAllTime = statistics.getRange(2,2).getValue();
-    var statUsersMonthly = statistics.getRange(3,2).getValue();
-    var statUsersWeekly = statistics.getRange(4,2).getValue();
-    var statUsersDaily = statistics.getRange(5,2).getValue();
+    var statUsersAllTime = statistics.getRange(stats.users.allTime.row,stats.users.allTime.col).getValue();
+    var statUsersMonthly = statistics.getRange(stats.users.month.row,stats.users.month.col).getValue();
+    var statUsersWeekly = statistics.getRange(stats.users.week.row,stats.users.week.col).getValue();
+    var statUsersDaily = statistics.getRange(stats.users.day.row,stats.users.day.col).getValue();
 
-    statistics.getRange(2,2).setValue(++statUsersAllTime);
-    statistics.getRange(3,2).setValue(++statUsersMonthly);
-    statistics.getRange(4,2).setValue(++statUsersWeekly);
-    statistics.getRange(5,2).setValue(++statUsersDaily);
-    statistics.getRange(statistics.getRange(2,3).getValue(),5).setValue(statistics.getRange(statistics.getRange(2,3).getValue(),5).getValue() + 1);
+    statistics.getRange(stats.users.allTime.row,stats.users.allTime.col).setValue(++statUsersAllTime);
+    statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(++statUsersMonthly);
+    statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(++statUsersWeekly);
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(++statUsersDaily);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).getValue() + 1);
     return;
   }
 }
@@ -744,18 +744,18 @@ function updateUserStats(row){
 
   const DAY = 1000 * 60 * 60 * 24; // ms per day
 
-  var lastSeen = users.getRange(row, 3).getValue();
+  var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
   var now = new Date();
   var diff = now - lastSeen;
 
   if(diff > DAY){
-    statistics.getRange(5,2).setValue(statistics.getRange(5,2).getValue() + 1);
-    statistics.getRange(3,1).setValue(1);
-    statistics.getRange(statistics.getRange(2,3).getValue(),5).setValue(statistics.getRange(statistics.getRange(2,3).getValue(),5).getValue() + 1);
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statistics.getRange(stats.users.day.row,stats.users.day.col).getValue() + 1);
+    statistics.getRange(stats.test.row,stats.test.col).setValue(1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsers).getValue() + 1);
     if(diff > 7*DAY){
-      statistics.getRange(4,2).setValue(statistics.getRange(4,2).getValue() + 1);
+      statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statistics.getRange(stats.users.week.row,stats.users.week.col).getValue() + 1);
       if(diff > 30*DAY){
-        statistics.getRange(3,2).setValue(statistics.getRange(3,2).getValue() + 1);
+        statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statistics.getRange(stats.users.month.row,stats.users.month.col).getValue() + 1);
         }
       }
     }
@@ -773,12 +773,12 @@ function statTrigger(){
 
   const DAY = 1000 * 60 * 60 * 24; // ms per day
   var today = new Date();
-  var nextFreeRow = users.getRange(1,4).getValue();
+  var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
   var statUsersMonthly = 0;
   var statUsersWeekly = 0;
   var statUsersDaily = 0;
   for(let row=3;row<nextFreeRow;row++){
-    var diff = today - users.getRange(row, 3).getValue();
+    var diff = today - users.getRange(row, fieldUsers.lastSeen).getValue();
     if(diff < 30*DAY){
       statUsersMonthly++;
       if(diff < 7*DAY){
@@ -789,13 +789,13 @@ function statTrigger(){
       }
     }
   }
-  statistics.getRange(3,2).setValue(statUsersMonthly);
-  statistics.getRange(4,2).setValue(statUsersWeekly);
-  statistics.getRange(5,2).setValue(statUsersDaily);
+  statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statUsersMonthly);
+  statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
+  statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
 
   var row = Math.floor((today - new Date(2021,9,3))/DAY + 2.1);
-  statistics.getRange(2,3).setValue(row);
-  statistics.getRange(row,5).setValue(0);
+  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row);
+  statistics.getRange(row,stats.numOfUsers).setValue(0);
   return;
 }
 

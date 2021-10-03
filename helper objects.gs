@@ -10,7 +10,11 @@ const fieldUsers = {
   reg3: 6,
   reg4: 7,
   reg5: 8,
-  authorized: 10
+  authorized: 10,
+  nextFreeRow: {
+    row: 1,
+    col: 4
+  }
 }
 
 /**
@@ -68,4 +72,38 @@ const fieldCourses = {
   teams: 16,
   whatsApp: 17,
   spreadsheet: 18
+}
+
+/**
+ * object that saves stats constants
+ */
+
+const stats = {
+  users: {
+    allTime: {
+      row: 2,
+      col: 2
+    },
+    month: {
+      row: 3,
+      col: 2
+    },
+    week: {
+      row: 4,
+      col: 2
+    },
+    day: {
+      row: 5,
+      col: 2
+    }
+  },
+  todaysRow: {
+    row: 2,
+    col: 3
+  },
+  numOfUsers: 5,
+  test: {
+    row: 6,
+    col: 1
+  }
 }
