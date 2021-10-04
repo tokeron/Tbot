@@ -129,7 +129,7 @@ var shKeyBoard = [
 ]
 var usefulKeyBoard = [
   [{ text: "Technion Students FAQ (doc)" }, { text: "useful links from facebook (doc)" }],
-  [{ text: "cheese&fork" }, { text: "scans - cf"}, { text: "testock" }],
+  [{ text: "cheese&fork" }, { text: "scans - cf"}],
   [{ text: "moodle "+moodleSy }, {text: "ug "+ugSy }, { text: calendar}],
   [{ text: "ASA" }, { text: "אסט" }, { text: "Copiers and printers" }], 
   [{text: "MyDegree"}, { text: Korona }],

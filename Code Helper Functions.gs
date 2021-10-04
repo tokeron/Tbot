@@ -191,10 +191,6 @@ function simpleText(id, name, text){
       sendKey(id,"https://cheesefork.cf/",usefulKeyBoard);
       updateClickOnLinksStats();
       return true
-    case('testock'):
-      sendKey(id,"https://testock.tk/courses",usefulKeyBoard);
-      updateClickOnLinksStats();
-      return true
     case('ug '+ugSy):
       sendKey(id, 'https://ug3.technion.ac.il/rishum/search',usefulKeyBoard );
       updateClickOnLinksStats();
@@ -1344,7 +1340,7 @@ function sendFeedback(id, name, text){
 }
 
 /**
- * 
+ * sends 
  */
 function sendRideLink(id, telegramLinks, text){
   var list = telegramLinks.createTextFinder(text).findAll();

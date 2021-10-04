@@ -201,7 +201,6 @@ function handleMessage(contents){
     case(cs):
     case('All tests - Excel'):
     case(moodle):
-    case(testock):
     case("Panopto"):
     case("Course info"):
     case('Teams Group \ud83d\udc6a'):
