@@ -140,7 +140,7 @@ function handleMessage(contents){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var courses = dataBaseEx.getSheetByName("courses");
   var statistics = dataBaseEx.getSheetByName("statistics");
-  var telegramLinks = dataBaseEx.getSheetByName("telegram");
+  var telegramLinks = dataBaseEx.getSheetByName("telegramLinks");
   var busi= dataBaseEx.getSheetByName("busi");
   var users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
@@ -274,7 +274,7 @@ function handleMessage(contents){
       sendFeedback(id, name, text)
       return
     case('Ride'):
-      sendRideLink(id, telegramLinks)
+      sendRideLink(id, telegramLinks, text)
       return
     case('Add course'):
       addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses) 

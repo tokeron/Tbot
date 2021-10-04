@@ -1346,7 +1346,7 @@ function sendFeedback(id, name, text){
 /**
  * 
  */
-function sendRideLink(id, telegramLinks){
+function sendRideLink(id, telegramLinks, text){
   var list = telegramLinks.createTextFinder(text).findAll();
   if (list.length > 0){
     var row = list[0].getRow();
