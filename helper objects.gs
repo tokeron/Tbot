@@ -103,6 +103,7 @@ const stats = {
   },
   numOfUsersCol: 5,
   clicksCol: 6,
+  clicksOnLinksCol: 7,
   test: {
     row: 6,
     col: 1

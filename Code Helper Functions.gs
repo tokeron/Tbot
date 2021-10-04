@@ -113,7 +113,8 @@ function simpleText(id, name, text){
       sendText(id, 'General info - http://www.asat.org.il/academic/contents/print/צילום_והדפסה');
       sendText(id, 'in order to send a file to print start a new mail, type your ID in the SUBJECT.')
       sendText(id, 'Attach your files (Office documents, pictures and pdf files)');
-      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard)
+      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard);
+      updateClickOnLinksStats();
       return true
     case("A4 B&W single sided"):
       sendText(id, 'A4 B&W single sided – print.bws@campus.technion.ac.il');
@@ -146,7 +147,8 @@ function simpleText(id, name, text){
       sendText(id, 'B&W 4 slides per page, two sided – print.4pbwd@campus.technion.ac.il')
       return true
     case(calendar):
-      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);   
+      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);
+      updateClickOnLinksStats();   
       return true
     case("אזור תל אביב-יפו והמרכז"):
       sendKey(id, "Choose a city from the list below:", teKeyBoard);
@@ -170,40 +172,51 @@ function simpleText(id, name, text){
       return true
     case("scans - cf"):
       sendText(id, "https://tscans.cf/");
+      updateClickOnLinksStats();
       return true
     case('MyDegree'):
       sendText(id, "https://www.mydegree.co.il/");
+      updateClickOnLinksStats();
       return true
     case('Technion Students FAQ (doc)'):
       sendText(id,"https://docs.google.com/document/d/1XGWWns6IZy9QpsAhWZu_WxIQTXYbRVeAV3XGr6pcMpc/edit?fbclid=IwAR1bBn5g3NBdxf2JFPbeWinOmQ3F0qa2KxlQGlMZ5wPyr31l0yRfo7ESPLc");
+      updateClickOnLinksStats();
       return true
     case('useful links from facebook (doc)'):
       sendText(id,"https://docs.google.com/document/d/1tR8X8YawbK_h2VwQU1k1Fz4q12B0nWxOMSqxE_hV2sw/"+
                "edit?fbclid=IwAR1cQkxt1PG-gFwF_QWPG80u9ZNYuVwwBlWwmCes5MLst1ERmAIGijH8BRM");
+      updateClickOnLinksStats();
       return true
     case('cheese&fork'):
       sendKey(id,"https://cheesefork.cf/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('testock'):
       sendKey(id,"https://testock.tk/courses",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('ug '+ugSy):
       sendKey(id, 'https://ug3.technion.ac.il/rishum/search',usefulKeyBoard );
+      updateClickOnLinksStats();
       return true
     case('moodle '+moodleSy):
       sendKey(id, 'https://moodle.technion.ac.il/',usefulKeyBoard );
+      updateClickOnLinksStats();
       return true
     case("Git"):
       sendText(id, 'https://github.com/tokeron/Tbot');
       return true
     case('אסט'):
       sendKey(id,"http://www.asat.org.il/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('ASA'):
       sendKey(id,"https://www.asatechnion.co.il/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case(Korona):
       sendText(id, "https://t.me/asat_technion");
+      updateClickOnLinksStats();
       return true
     //}else if (text == 'חזור'){
     //  sendKey(id, "Choose from the list below", helpKeyBoard);
@@ -248,6 +261,13 @@ function simpleText(id, name, text){
     default:
       return false;
     }
+}
+
+function updateClickOnLinksStats(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  statistics.getRange(todaysRow,stats.clicksOnLinksCol).setValue(statistics.getRange(todaysRow,stats.clicksOnLinksCol).getValue() + 1);
 }
 
 
@@ -793,9 +813,11 @@ function statTrigger(){
   statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
   statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
 
-  var row = Math.floor((today - new Date(2021,9,3))/DAY + 2.1);
+  var row = Math.floor((today - new Date(2021,9,3))/DAY + 2.1); //row of the day that comes after tommorow
   statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row);
   statistics.getRange(row,stats.numOfUsersCol).setValue(0);
+  statistics.getRange(row,stats.clicksCol).setValue(0);
+  statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
   return;
 }
 

@@ -36,7 +36,7 @@ function doPost(e){
   }
 
   //stats update
-  var todaysRow = statistics.getRange(stats.todaysRow.row,stats.todaysRow.col);
+  var todaysRow = statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue();
   statistics.getRange(todaysRow, stats.clicksCol).setValue(statistics.getRange(todaysRow, stats.clicksCol).getValue() + 1);
 }
 
