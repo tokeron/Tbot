@@ -10,7 +10,11 @@ const fieldUsers = {
   reg3: 6,
   reg4: 7,
   reg5: 8,
-  authorized: 10
+  authorized: 10,
+  nextFreeRow: {
+    row: 1,
+    col: 4
+  }
 }
 
 /**
@@ -68,4 +72,58 @@ const fieldCourses = {
   teams: 16,
   whatsApp: 17,
   spreadsheet: 18
+}
+
+/**
+ * object that saves stats constants
+ */
+
+const stats = {
+  users: {
+    allTime: {
+      row: 2,
+      col: 2
+    },
+    month: {
+      row: 3,
+      col: 2
+    },
+    week: {
+      row: 4,
+      col: 2
+    },
+    day: {
+      row: 5,
+      col: 2
+    }
+  },
+  todaysRow: {
+    row: 2,
+    col: 3
+  },
+  numOfUsersCol: 5,
+  clicksCol: 6,
+  clicksOnLinksCol: 7,
+  rideClicksCol: 8,
+  rideIdsListStart: {
+    row: 8,
+    col: 1
+  },
+  rideIdsNextRow: {
+    row: 4,
+    col: 3
+  },
+  talkClicksCol: 9,
+  talkIdsListStart: {
+    row: 8,
+    col: 2
+  },
+  talkIdsNextRow: {
+    row: 6,
+    col: 3
+  },
+  test: {
+    row: 6,
+    col: 2
+  }
 }
