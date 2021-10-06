@@ -104,6 +104,15 @@ const stats = {
   numOfUsersCol: 5,
   clicksCol: 6,
   clicksOnLinksCol: 7,
+  rideClicksCol: 8,
+  rideIdsListStart: {
+    row: 8,
+    col: 1
+  },
+  rideIdsNextRow: {
+    row: 4,
+    col: 3
+  },
   test: {
     row: 6,
     col: 1

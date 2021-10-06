@@ -235,6 +235,7 @@ function simpleText(id, name, text){
       sendText(id, "https://t.me/joinchat/Amx7SinEWJBjNGM0");
       return true
     case(ride):
+      incRideStats(id);
     case('רשימת אזורים'):
       sendKey(id, "Send the required city name or choose your region from the list below " + downSy, rideKeyBoard);
       oldSet(id, "Ride");
@@ -257,6 +258,18 @@ function simpleText(id, name, text){
     default:
       return false;
     }
+}
+function incRideStats(id){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  for(var i = stats.rideIdsListStart.row; i < statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).getValue(); i++){
+    if(statistics.getRange(i,stats.rideIdsListStart.col).getValue() == id) return;
+  }
+  var rideIdsNextRow =  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).getValue();
+  statistics.getRange(todaysRow,stats.rideClicksCol).setValue(statistics.getRange(todaysRow,stats.rideClicksCol).getValue() + 1);
+  statistics.getRange(rideIdsNextRow,stats.rideIdsListStart.col).setValue(id);
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(rideIdsNextRow + 1);
 }
 
 function updateClickOnLinksStats(){
@@ -809,11 +822,14 @@ function statTrigger(){
   statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
   statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
 
-  var row = Math.floor((today - new Date(2021,9,3))/DAY + 2.1); //row of the day that comes after tommorow
-  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row);
+  var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
+  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
   statistics.getRange(row,stats.numOfUsersCol).setValue(0);
   statistics.getRange(row,stats.clicksCol).setValue(0);
   statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
+  statistics.getRange(row,stats.rideClicksCol).setValue(0);
+
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
   return;
 }
 
