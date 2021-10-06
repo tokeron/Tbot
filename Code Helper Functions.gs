@@ -259,6 +259,20 @@ function simpleText(id, name, text){
       return false;
     }
 }
+
+function incTalkStats(id){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  for(var i = stats.talkIdsListStart.row; i < statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).getValue(); i++){
+    if(statistics.getRange(i,stats.talkIdsListStart.col).getValue() == id) return;
+  }
+  var talkIdsNextRow =  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).getValue();
+  statistics.getRange(todaysRow,stats.talkClicksCol).setValue(statistics.getRange(todaysRow,stats.talkClicksCol).getValue() + 1);
+  statistics.getRange(talkIdsNextRow,stats.talkIdsListStart.col).setValue(id);
+  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).setValue(talkIdsNextRow + 1);
+}
+
 function incRideStats(id){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var statistics = dataBaseEx.getSheetByName("statistics");
@@ -828,6 +842,7 @@ function statTrigger(){
   statistics.getRange(row,stats.clicksCol).setValue(0);
   statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
   statistics.getRange(row,stats.rideClicksCol).setValue(0);
+  statistics.getRange(row,stats.talkClicksCol).setValue(0);
 
   statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
   return;

@@ -238,6 +238,7 @@ function handleMessage(contents){
       cleanList(id, users);
       return
     case(WantToTalk): //set an anonymous talk
+      incTalkStats(id);
       setAnonymousTalk(id, users, helpers)
       return
     case("Settings and Preference"):

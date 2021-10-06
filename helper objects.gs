@@ -113,8 +113,17 @@ const stats = {
     row: 4,
     col: 3
   },
+  talkClicksCol: 9,
+  talkIdsListStart: {
+    row: 8,
+    col: 2
+  },
+  talkIdsNextRow: {
+    row: 6,
+    col: 3
+  },
   test: {
     row: 6,
-    col: 1
+    col: 2
   }
 }
