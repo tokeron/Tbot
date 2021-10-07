@@ -845,6 +845,7 @@ function statTrigger(){
   statistics.getRange(row,stats.talkClicksCol).setValue(0);
 
   statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
+  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).setValue(stats.talkIdsListStart.row);
   return;
 }
 
