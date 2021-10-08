@@ -814,7 +814,6 @@ function statTrigger(){
   var users = dataBaseEx.getSheetByName("users");
   var statistics =  dataBaseEx.getSheetByName("statistics");
 
-  const DAY = 1000 * 60 * 60 * 24; // ms per day
   var today = new Date();
   var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
   var statUsersMonthly = 0;
@@ -838,6 +837,7 @@ function statTrigger(){
 
   var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
   statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
+  statistics.getRange(row - 1, stats.datesCol).setValue(today.getDate() + "/" + (today.getMonth()+1) + "/" +today.getFullYear());
   statistics.getRange(row,stats.numOfUsersCol).setValue(0);
   statistics.getRange(row,stats.clicksCol).setValue(0);
   statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
@@ -847,6 +847,24 @@ function statTrigger(){
   statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
   statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).setValue(stats.talkIdsListStart.row);
   return;
+}
+
+function getRelevantStatNumber(fromDate, toDate, col){
+  /*var fromDate = new Date(2021, 9, 2);
+  var toDate = new Date(2021,9,7);
+  var col = stats.clicksCol;
+  */
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  var fromRow = Math.floor((fromDate - new Date(2021, 9, 2))/DAY + 2.1);
+  var toRow = Math.floor((toDate - new Date(2021, 9, 2))/DAY + 2.1);
+  var res = 0;
+  for(var row = fromRow; row <= toRow; row++){
+    res += statistics.getRange(row, col).getValue();
+  }
+  statistics.getRange(stats.test.row, stats.test.col).setValue(res);
+  return res;
 }
 
 function reset(id, name){
