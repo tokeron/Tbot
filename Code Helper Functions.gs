@@ -113,7 +113,8 @@ function simpleText(id, name, text){
       sendText(id, 'General info - http://www.asat.org.il/academic/contents/print/צילום_והדפסה');
       sendText(id, 'in order to send a file to print start a new mail, type your ID in the SUBJECT.')
       sendText(id, 'Attach your files (Office documents, pictures and pdf files)');
-      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard)
+      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard);
+      updateClickOnLinksStats();
       return true
     case("A4 B&W single sided"):
       sendText(id, 'A4 B&W single sided – print.bws@campus.technion.ac.il');
@@ -146,7 +147,8 @@ function simpleText(id, name, text){
       sendText(id, 'B&W 4 slides per page, two sided – print.4pbwd@campus.technion.ac.il')
       return true
     case(calendar):
-      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);   
+      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);
+      updateClickOnLinksStats();   
       return true
     case("אזור תל אביב-יפו והמרכז"):
       sendKey(id, "Choose a city from the list below:", teKeyBoard);
@@ -170,40 +172,47 @@ function simpleText(id, name, text){
       return true
     case("scans - cf"):
       sendText(id, "https://tscans.cf/");
+      updateClickOnLinksStats();
       return true
     case('MyDegree'):
       sendText(id, "https://www.mydegree.co.il/");
+      updateClickOnLinksStats();
       return true
     case('Technion Students FAQ (doc)'):
       sendText(id,"https://docs.google.com/document/d/1XGWWns6IZy9QpsAhWZu_WxIQTXYbRVeAV3XGr6pcMpc/edit?fbclid=IwAR1bBn5g3NBdxf2JFPbeWinOmQ3F0qa2KxlQGlMZ5wPyr31l0yRfo7ESPLc");
+      updateClickOnLinksStats();
       return true
     case('useful links from facebook (doc)'):
       sendText(id,"https://docs.google.com/document/d/1tR8X8YawbK_h2VwQU1k1Fz4q12B0nWxOMSqxE_hV2sw/"+
                "edit?fbclid=IwAR1cQkxt1PG-gFwF_QWPG80u9ZNYuVwwBlWwmCes5MLst1ERmAIGijH8BRM");
+      updateClickOnLinksStats();
       return true
     case('cheese&fork'):
       sendKey(id,"https://cheesefork.cf/",usefulKeyBoard);
-      return true
-    case('testock'):
-      sendKey(id,"https://testock.tk/courses",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('ug '+ugSy):
       sendKey(id, 'https://ug3.technion.ac.il/rishum/search',usefulKeyBoard );
+      updateClickOnLinksStats();
       return true
     case('moodle '+moodleSy):
       sendKey(id, 'https://moodle.technion.ac.il/',usefulKeyBoard );
+      updateClickOnLinksStats();
       return true
     case("Git"):
       sendText(id, 'https://github.com/tokeron/Tbot');
       return true
     case('אסט'):
       sendKey(id,"http://www.asat.org.il/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('ASA'):
       sendKey(id,"https://www.asatechnion.co.il/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case(Korona):
       sendText(id, "https://t.me/asat_technion");
+      updateClickOnLinksStats();
       return true
     //}else if (text == 'חזור'){
     //  sendKey(id, "Choose from the list below", helpKeyBoard);
@@ -226,6 +235,7 @@ function simpleText(id, name, text){
       sendText(id, "https://t.me/joinchat/Amx7SinEWJBjNGM0");
       return true
     case(ride):
+      incRideStats(id);
     case('רשימת אזורים'):
       sendKey(id, "Send the required city name or choose your region from the list below " + downSy, rideKeyBoard);
       oldSet(id, "Ride");
@@ -248,6 +258,39 @@ function simpleText(id, name, text){
     default:
       return false;
     }
+}
+
+function incTalkStats(id){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  for(var i = stats.talkIdsListStart.row; i < statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).getValue(); i++){
+    if(statistics.getRange(i,stats.talkIdsListStart.col).getValue() == id) return;
+  }
+  var talkIdsNextRow =  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).getValue();
+  statistics.getRange(todaysRow,stats.talkClicksCol).setValue(statistics.getRange(todaysRow,stats.talkClicksCol).getValue() + 1);
+  statistics.getRange(talkIdsNextRow,stats.talkIdsListStart.col).setValue(id);
+  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).setValue(talkIdsNextRow + 1);
+}
+
+function incRideStats(id){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  for(var i = stats.rideIdsListStart.row; i < statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).getValue(); i++){
+    if(statistics.getRange(i,stats.rideIdsListStart.col).getValue() == id) return;
+  }
+  var rideIdsNextRow =  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).getValue();
+  statistics.getRange(todaysRow,stats.rideClicksCol).setValue(statistics.getRange(todaysRow,stats.rideClicksCol).getValue() + 1);
+  statistics.getRange(rideIdsNextRow,stats.rideIdsListStart.col).setValue(id);
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(rideIdsNextRow + 1);
+}
+
+function updateClickOnLinksStats(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  statistics.getRange(todaysRow,stats.clicksOnLinksCol).setValue(statistics.getRange(todaysRow,stats.clicksOnLinksCol).getValue() + 1);
 }
 
 
@@ -700,10 +743,13 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     if ((reg3 || reg3 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg3).setValue(reg3);
     if ((reg4 || reg4 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg4).setValue(reg4);
     if ((reg5 || reg5 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg5).setValue(reg5);
+    updateUserStats(row);
     return;
   }
   else{ //new user
+
     var nextRow = users.getRange(1, 4).getValue();
+    var numOfUsers = users.getRange(1, 2).getValue();
     users.getRange(nextRow, fieldUsers.id).setValue(id);
     if (name || name == 0) users.getRange(nextRow, fieldUsers.name).setValue(name);
     if (reg1 || reg1 == 0) users.getRange(nextRow, fieldUsers.reg1).setValue(reg1);
@@ -716,15 +762,16 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     users.getRange(1, 2).setValue(++numOfUsers);
 
     // Stats part
-    var statUsersAllTime = statistics.getRange(2,2).getValue();
-    var statUsersMonthly = statistics.getRange(3,2).getValue();
-    var statUsersWeekly = statistics.getRange(4,2).getValue();
-    var statUsersDaily = statistics.getRange(5,2).getValue();
+    var statUsersAllTime = statistics.getRange(stats.users.allTime.row,stats.users.allTime.col).getValue();
+    var statUsersMonthly = statistics.getRange(stats.users.month.row,stats.users.month.col).getValue();
+    var statUsersWeekly = statistics.getRange(stats.users.week.row,stats.users.week.col).getValue();
+    var statUsersDaily = statistics.getRange(stats.users.day.row,stats.users.day.col).getValue();
 
-    statistics.getRange(2,2).setValue(++statUsersAllTime);
-    statistics.getRange(3,2).setValue(++statUsersMonthly);
-    statistics.getRange(4,2).setValue(++statUsersWeekly);
-    statistics.getRange(5,2).setValue(++statUsersDaily);
+    statistics.getRange(stats.users.allTime.row,stats.users.allTime.col).setValue(++statUsersAllTime);
+    statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(++statUsersMonthly);
+    statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(++statUsersWeekly);
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(++statUsersDaily);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     return;
   }
 }
@@ -740,16 +787,18 @@ function updateUserStats(row){
 
   const DAY = 1000 * 60 * 60 * 24; // ms per day
 
-  var lastSeen = users.getRange(row, 3).getValue();
+  var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
   var now = new Date();
   var diff = now - lastSeen;
 
   if(diff > DAY){
-    statistics.getRange(5,2).setValue(statistics.getRange(5,2).getValue() + 1);
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statistics.getRange(stats.users.day.row,stats.users.day.col).getValue() + 1);
+    statistics.getRange(stats.test.row,stats.test.col).setValue(1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     if(diff > 7*DAY){
-      statistics.getRange(4,2).setValue(statistics.getRange(4,2).getValue() + 1);
+      statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statistics.getRange(stats.users.week.row,stats.users.week.col).getValue() + 1);
       if(diff > 30*DAY){
-        statistics.getRange(3,2).setValue(statistics.getRange(3,2).getValue() + 1);
+        statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statistics.getRange(stats.users.month.row,stats.users.month.col).getValue() + 1);
         }
       }
     }
@@ -767,12 +816,12 @@ function statTrigger(){
 
   const DAY = 1000 * 60 * 60 * 24; // ms per day
   var today = new Date();
-  var nextFreeRow = users.getRange(1,4).getValue();
+  var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
   var statUsersMonthly = 0;
   var statUsersWeekly = 0;
   var statUsersDaily = 0;
   for(let row=3;row<nextFreeRow;row++){
-    var diff = today - users.getRange(row, 3).getValue();
+    var diff = today - users.getRange(row, fieldUsers.lastSeen).getValue();
     if(diff < 30*DAY){
       statUsersMonthly++;
       if(diff < 7*DAY){
@@ -783,14 +832,24 @@ function statTrigger(){
       }
     }
   }
-  statistics.getRange(3,2).setValue(statUsersMonthly);
-  statistics.getRange(4,2).setValue(statUsersWeekly);
-  statistics.getRange(5,2).setValue(statUsersDaily);
+  statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statUsersMonthly);
+  statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
+  statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
+
+  var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
+  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
+  statistics.getRange(row,stats.numOfUsersCol).setValue(0);
+  statistics.getRange(row,stats.clicksCol).setValue(0);
+  statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
+  statistics.getRange(row,stats.rideClicksCol).setValue(0);
+  statistics.getRange(row,stats.talkClicksCol).setValue(0);
+
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
   return;
 }
 
-function reset(id){
-  set(id, 0, 0, 0, 0, 0, 0)
+function reset(id, name){
+  set(id, name, 0, 0, 0, 0, 0)
 }
 
 
@@ -1312,9 +1371,9 @@ function sendFeedback(id, name, text){
 }
 
 /**
- * 
+ * sends 
  */
-function sendRideLink(id, telegramLinks){
+function sendRideLink(id, telegramLinks, text){
   var list = telegramLinks.createTextFinder(text).findAll();
   if (list.length > 0){
     var row = list[0].getRow();

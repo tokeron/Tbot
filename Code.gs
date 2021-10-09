@@ -23,6 +23,8 @@ function doGet(e) {
 function doPost(e){
   var contents = JSON.parse(e.postData.contents);
   var file;
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
 
   //internal keyboard command - different from regular text
   if (contents.callback_query){
@@ -32,6 +34,10 @@ function doPost(e){
   else if (contents.message){
     handleMessage(contents);
   }
+
+  //stats update
+  var todaysRow = statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue();
+  statistics.getRange(todaysRow, stats.clicksCol).setValue(statistics.getRange(todaysRow, stats.clicksCol).getValue() + 1);
 }
 
 
@@ -134,7 +140,7 @@ function handleMessage(contents){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var courses = dataBaseEx.getSheetByName("courses");
   var statistics = dataBaseEx.getSheetByName("statistics");
-  var telegramLinks = dataBaseEx.getSheetByName("telegram");
+  var telegramLinks = dataBaseEx.getSheetByName("telegramLinks");
   var busi= dataBaseEx.getSheetByName("busi");
   var users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
@@ -162,7 +168,8 @@ function handleMessage(contents){
   var authorized = users.getRange(row, fieldUsers.authorized).getValue();
 
   //save the timestamp
-  var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+  //var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+  var date = new Date();
   users.getRange(row, fieldUsers.lastSeen).setValue(date);
   
   //if simple command: execute
@@ -175,14 +182,14 @@ function handleMessage(contents){
     case("/start"):
       sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-      reset(id)
+      reset(id, name)
       return;
     case('תפריט ראשי'):
     case('Main Menu'):
     case(mainMenu):
     case('home'):
       sendKey(id, "How may I help you?", mainKeyBoard);
-      reset(id)
+      reset(id, name)
       return;
     case(drive):
     case(telegramGroup):
@@ -194,7 +201,6 @@ function handleMessage(contents){
     case(cs):
     case('All tests - Excel'):
     case(moodle):
-    case(testock):
     case("Panopto"):
     case("Course info"):
     case('Teams Group \ud83d\udc6a'):
@@ -232,6 +238,7 @@ function handleMessage(contents){
       cleanList(id, users);
       return
     case(WantToTalk): //set an anonymous talk
+      incTalkStats(id);
       setAnonymousTalk(id, users, helpers)
       return
     case("Settings and Preference"):
@@ -243,7 +250,7 @@ function handleMessage(contents){
     case("Statistics"):
       sendKey(id,"Which statistics do you want to see?", statsKeyboard);
       return
-    case("Users"): //from stats
+    case("Users"+groupSy): //from stats
       var allTime = statistics.getRange(2,2).getValue();
       var monthly = statistics.getRange(3,2).getValue();
       var weekly = statistics.getRange(4,2).getValue();
@@ -267,7 +274,7 @@ function handleMessage(contents){
       sendFeedback(id, name, text)
       return
     case('Ride'):
-      sendRideLink(id, telegramLinks)
+      sendRideLink(id, telegramLinks, text)
       return
     case('Add course'):
       addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses) 
