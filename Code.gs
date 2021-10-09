@@ -128,7 +128,7 @@ function handleCallback(contents){
   }
   sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
   sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-  reset(id, name)
+  reset(id)
   return;
 }
   
