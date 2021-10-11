@@ -17,6 +17,13 @@
         "version": "v4",
         "serviceId": "sheets"
       }
+    ],
+    "libraries": [
+      {
+        "userSymbol": "cDbAbstraction",
+        "version": "48",
+        "libraryId": "1Ddsb4Y-QDUqcw9Fa-rJKM3EhG2caosS9Nhch7vnQWXP7qkaMmb1wjmTl"
+      }
     ]
   },
   "webapp": {

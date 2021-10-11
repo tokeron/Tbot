@@ -23,6 +23,8 @@ function doGet(e) {
 function doPost(e){
   var contents = JSON.parse(e.postData.contents);
   var file;
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
 
   //internal keyboard command - different from regular text
   if (contents.callback_query){
@@ -32,6 +34,10 @@ function doPost(e){
   else if (contents.message){
     handleMessage(contents);
   }
+
+  //stats update
+  var todaysRow = statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue();
+  statistics.getRange(todaysRow, stats.clicksCol).setValue(statistics.getRange(todaysRow, stats.clicksCol).getValue() + 1);
 }
 
 
@@ -82,12 +88,13 @@ function handleCallback(contents){
 
   //get registers
   var cell = findUser(id, users);
+  if (cell == null) set(id, name);
   var row = cell.getRow(); 
-  reg1 = users.getRange(row, 4).getValue();
-  reg2 = users.getRange(row, 5).getValue();
-  reg3 = users.getRange(row, 6).getValue();
-  reg4 = users.getRange(row, 7).getValue();
-  reg5 = users.getRange(row, 8).getValue();
+  reg1 = users.getRange(row, fieldUsers.reg1).getValue();
+  reg2 = users.getRange(row, fieldUsers.reg2).getValue();
+  reg3 = users.getRange(row, fieldUsers.reg3).getValue();
+  reg4 = users.getRange(row, fieldUsers.reg4).getValue();
+  reg5 = users.getRange(row, fieldUsers.reg5).getValue();
   switch(reg1){
     case("help by number"): // helper is getting in contact with a student
       connectHelper(id, data, helpers, needsHelp)
@@ -97,6 +104,17 @@ function handleCallback(contents){
       return
     case(SFS): //students fo students
       SFSHandler(id, name, busi, data, reg1)
+      return
+    case("Course"):
+      //Searching a course
+      var courseFinder = courses.createTextFinder(data);
+      var currCourse = courseFinder.findNext();
+      while(currCourse !== null && currCourse.getColumn() !== fieldCourses.courseNumber){
+        currCourse = courseFinder.findNext();
+      }
+      if (currCourse){
+        sendOpt(id, name, courses, currCourse.getRow());
+      }
       return
   }
   //Searching a course
@@ -108,6 +126,10 @@ function handleCallback(contents){
   if (currCourse){
     sendOpt(id, name, courses, currCourse.getRow());
   }
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
+  sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
+  reset(id)
+  return;
 }
   
 /**
@@ -118,7 +140,7 @@ function handleMessage(contents){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var courses = dataBaseEx.getSheetByName("courses");
   var statistics = dataBaseEx.getSheetByName("statistics");
-  var telegramLinks = dataBaseEx.getSheetByName("telegram");
+  var telegramLinks = dataBaseEx.getSheetByName("telegramLinks");
   var busi= dataBaseEx.getSheetByName("busi");
   var users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
@@ -131,22 +153,24 @@ function handleMessage(contents){
   
   // clean quotation marks in case it separated to parts - for example חדו"א    
   text = cleanQuotationMarks(text)
-
+  
   //find user and load his registers
-  var user = findUser(id, users)
+  var user = findUser(id, users);
+  if (user == null) set(id, name);
   var row = user.getRow(); 
-  reg1 = users.getRange(row, 4).getValue();
-  reg2 = users.getRange(row, 5).getValue();
-  reg3 = users.getRange(row, 6).getValue();
-  reg4 = users.getRange(row, 7).getValue();
-  reg5 = users.getRange(row, 8).getValue();
+  reg1 = users.getRange(row, fieldUsers.reg1).getValue();
+  reg2 = users.getRange(row, fieldUsers.reg2).getValue();
+  reg3 = users.getRange(row, fieldUsers.reg3).getValue();
+  reg4 = users.getRange(row, fieldUsers.reg4).getValue();
+  reg5 = users.getRange(row, fieldUsers.reg5).getValue();
 
   //Boolean - true only if the user is authorized with the Technion email
-  var authorized = users.getRange(row, 10).getValue();
+  var authorized = users.getRange(row, fieldUsers.authorized).getValue();
 
   //save the timestamp
-  var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
-  users.getRange(row, 3).setValue(date);
+  //var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
+  var date = new Date();
+  users.getRange(row, fieldUsers.lastSeen).setValue(date);
   
   //if simple command: execute
   var isDone = simpleText(id, name, text);
@@ -158,17 +182,17 @@ function handleMessage(contents){
     case("/start"):
       sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
       sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-      reset(id)
+      reset(id, name)
       return;
     case('תפריט ראשי'):
     case('Main Menu'):
     case(mainMenu):
     case('home'):
       sendKey(id, "How may I help you?", mainKeyBoard);
-      reset(id)
+      reset(id, name)
       return;
     case(drive):
-    case(courseGroup):
+    case(telegramGroup):
     case(reviews):
     case('Get all'):
     case(facebook):
@@ -177,7 +201,6 @@ function handleMessage(contents){
     case(cs):
     case('All tests - Excel'):
     case(moodle):
-    case(testock):
     case("Panopto"):
     case("Course info"):
     case('Teams Group \ud83d\udc6a'):
@@ -215,6 +238,7 @@ function handleMessage(contents){
       cleanList(id, users);
       return
     case(WantToTalk): //set an anonymous talk
+      incTalkStats(id);
       setAnonymousTalk(id, users, helpers)
       return
     case("Settings and Preference"):
@@ -222,6 +246,19 @@ function handleMessage(contents){
       return
     case(SFS):
       sendSFS(id, name, text, busi)
+      return
+    case("Statistics"):
+      sendKey(id,"Which statistics do you want to see?", statsKeyboard);
+      return
+    case("Users"+groupSy): //from stats
+      var allTime = statistics.getRange(2,2).getValue();
+      var monthly = statistics.getRange(3,2).getValue();
+      var weekly = statistics.getRange(4,2).getValue();
+      var daily = statistics.getRange(5,2).getValue();
+      sendText(id, "Users Statistics:\nAll Time Users: "+ allTime +
+                    "\nLast Month: "+ monthly + 
+                    "\nLast Week: " + weekly +
+                    "\nLast Day: " + daily);
       return
   }
 
@@ -237,7 +274,7 @@ function handleMessage(contents){
       sendFeedback(id, name, text)
       return
     case('Ride'):
-      sendRideLink(id, telegramLinks)
+      sendRideLink(id, telegramLinks, text)
       return
     case('Add course'):
       addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses) 
@@ -255,7 +292,7 @@ function handleMessage(contents){
       return
     case("faculty"): 
       facultyGroupHandler(id, text, reg1, reg2);
-    case('Course'):
+    case("Course"):
       findCourse(id, name, text, courses)
       return
     case("Settings and Preference"):
@@ -300,7 +337,11 @@ function handleMessage(contents){
           sendText(id, "please send the new information");
           return;
         case("Password"):
-          sendText(id, "reg2: "+ reg2)
+          createBusi(id, text, reg1, reg3, busi)
+          return;
+        case("Description"):    //User gets here after sending the password
+          busi.getRange(topicBase+topicCounter, topicCol-1).setValue(text);//set password
+          sendText(id, "Your password is "+text+". Please send a description for your business");
           var topic = reg3;
           var currTopic = busi.createTextFinder(topic).findNext();
           var topicCol = 0;
@@ -320,20 +361,13 @@ function handleMessage(contents){
             oldSet(id, reg1, 0, "Description");
           }
           return;
-        case("Description"):    //User gets here after sending the password
-          //sendText(id, "test "+topicBase+" "+topicCounter+" "+topicCol);
-          busi.getRange(topicBase+topicCounter, topicCol-1).setValue(text);//set password
-          sendText(id, "Your password is "+text+". Please send a description for your business");
-          //oldSet(id, reg1, 0, "Location");
-          oldSet(id, reg1, 0, "Contact");
-          return;
 //    case("Location"){//User gets here after sending the description
 //       busi.getRange(topicBase+topicCounter, topicCol+1).setValue(text);//set description
 //       sendText(id, "Please send the location details for your business");
 //       oldSet(id, reg1, 0, "Contact");
 //       return;
 //     }
-//     else if (reg2 ==  "Prices"){//User gets here after sending the contact information
+//     case("Prices"){//User gets here after sending the contact information
 //       busi.getRange(topicBase+topicCounter, topicCol+3).setValue(text);//set contact information
 //       sendText(id, "Got it! The contact information is initialized. Now send the prices for your business");
 //       oldSet(id, reg1, 0, "Done");
@@ -342,7 +376,6 @@ function handleMessage(contents){
         case("Contact"):    //User gets here after sending the location
           busi.getRange(topicBase+topicCounter, topicCol+1).setValue(text);//set Description
           sendText(id, "We almost done! Please send the contact information for your business");
-          //oldSet(id, reg1, 0, "Prices");
           oldSet(id, reg1, 0, "Done");
           return;
         case("Done"):   //User gets here after sending the prices
@@ -360,6 +393,7 @@ function handleMessage(contents){
           }
           return;
         case("Delete if Password"):
+          deleteIfPass(text, busi)
           var busiToDelete = busi.createTextFinder(text).findNext();
           var busiRow = busiToDelete.getRow();
           var busiCol = busiToDelete.getColumn();
@@ -393,6 +427,6 @@ function handleMessage(contents){
           }
       }
   }
+  
   sendKey(id,"How may I help you?",mainKeyBoard);
 }
-
