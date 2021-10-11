@@ -127,3 +127,13 @@ const stats = {
     col: 2
   }
 }
+
+/**
+ * Const values for print service.
+ */
+const PRINT_SERVICE = {
+  counter: "printerCounter",
+  responseFunc: "readPrinterEmailResponse",
+  mailQuery: "from:print.bws@campus.technion.ac.il is:unread",
+  symbol: "print 🖨"
+}

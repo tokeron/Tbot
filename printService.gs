@@ -1,13 +1,3 @@
-/**
- * Const values for print service.
- */
-var PRINT_SERVICE = {
-  counter: "printerCounter",
-  responseFunc: "readPrinterEmailResponse",
-  mailQuery: "from:print.bws@campus.technion.ac.il is:unread"
-}
-
-
 function handlePrint(msg){
   var file;
   if (msg.photo){
