@@ -1,3 +1,4 @@
+"use strict";
 /**
  * This is a bot that was developed for the use of Technion students.
  * The bot is running on the google script platform and google sheets.
@@ -150,13 +151,19 @@ function handleMessage(contents){
   var id = contents.message.from.id;
   var name = contents.message.from.first_name;
   var text = contents.message.text;
-  
+  if(!text){
+    handlePrint(contents.message);
+    return;
+  }
   // clean quotation marks in case it separated to parts - for example חדו"א    
   text = cleanQuotationMarks(text)
   
   //find user and load his registers
   var user = findUser(id, users);
-  if (user == null) set(id, name);
+  if (user == null) {
+    set(id, name); //first use, may be "set" should return the user.
+    user = findUser(id, users);
+  }
   var row = user.getRow(); 
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
