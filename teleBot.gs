@@ -39,6 +39,7 @@ function getUpdates() {
  * @param {(String|Number)} chatId Identifier of the chat to send the text to.
  * @param {String} text The text to send.
  * @param {TelegramInlineKeyboard} keyboard The inline keyboard to send.
+ * @return {TelegramMessage} the sent message.
  */
 //sendText(chatId, text, keyboard)
 //Description: sends text to chatId with(optional) exeternal keyboard.
@@ -56,7 +57,7 @@ function sendText(chatId, text, keyboard) {
       })
     }
   };
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+  return JSON.parse(UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data).getContentText()).result;
 }
 
 /**
@@ -99,5 +100,27 @@ function removeKey(chatId, text) {
         remove_keyboard: true })
     }
   };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
+
+/**
+ * Use this method to edit text and game messages. On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+ * 
+ * @param {Number} chatId
+ * @param {Number} msgId
+ * @param {String} text
+ * @param {TelegramInlineKeyboard} keyboard
+ */
+function editMessageText(chatId, msgId, text, keyboard){
+  var data = {
+    method: "post",
+    payload: {
+      method: "editMessageText",
+      chat_id: String(chatId),
+      text: text,
+      message_id: msgId,
+    }
+  };
+  if(keyboard)data.payload.reply_markup = JSON.stringify({inline_keyboard: keyboard});
   UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
 }

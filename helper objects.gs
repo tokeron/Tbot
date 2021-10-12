@@ -134,6 +134,20 @@ const stats = {
 const PRINT_SERVICE = {
   counter: "printerCounter",
   responseFunc: "readPrinterEmailResponse",
-  mailQuery: "from:print.bws@campus.technion.ac.il is:unread",
-  symbol: "print 🖨"
+  mailQuery: "is:unread ",
+  symbol: "print 🖨",
+  types:["bws", "bwd", "A3bws", "A3bwd", "color", "A3color", "2pbws", "2pbwd", "4pbws", "4pbwd"],
+  typeNames:["שחור-לבן", 'שחור-לבן דו"צ', 'A3 שחור-לבן', 'A3 שחור-לבן דו"צ', 'צבעוני', 'A3 צבעוני',"2pbws", "2pbwd", "4pbws", "4pbwd"],
+  messageBase:"הדפסת מסמכים בטכניון.\nאלה המסמכים שהתקבלו:",
+  cb:{send:"send", chengeType:"chengeType", chengeID:"chengeID", cancel:"cancel"},
+  defaultKeyboard:null
 }
+/** @type TelegramInlineKeyboard */
+PRINT_SERVICE.defaultKeyboard = [
+  [{text:"שלח להדפסה", callback_data:PRINT_SERVICE.cb.send}],
+  [{text:PRINT_SERVICE.typeNames[0], callback_data:PRINT_SERVICE.cb.chengeType}, {text:"הגדר מספר זהות", callback_data:PRINT_SERVICE.cb.chengeID}],
+  [{text:"ביטול", callback_data:PRINT_SERVICE.cb.cancel}]
+]
+PRINT_SERVICE.mailQuery += PRINT_SERVICE.types.reduce((s,t)=>{s+=`from:print.${t}@campus.technion.ac.il `;return s;},"{")+"}";
+/**global vars */
+var user,reg1,reg2,reg3,reg4,reg5;

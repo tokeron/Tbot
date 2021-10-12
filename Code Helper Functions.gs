@@ -775,6 +775,22 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     return;
   }
 }
+
+/**
+ * save the user state.
+ * @param {Object} user
+ * @param {String} user.id
+ * @param [user.name]
+ * @param [user.reg1]
+ * @param [user.reg2]
+ * @param [user.reg3]
+ * @param [user.reg4]
+ * @param [user.reg5]
+ */
+function saveUser(user){
+  set(user.id, user.name, user.reg1, user.reg2, user.reg3, user.reg4, user.reg5);
+}
+
 /**
  * function updateUserStats
  * updates the user statistics when a known user is using the bot again.

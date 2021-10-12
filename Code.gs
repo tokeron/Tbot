@@ -98,14 +98,14 @@ function handleCallback(contents){
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
   switch(reg1){
     case("help by number"): // helper is getting in contact with a student
-      connectHelper(id, data, helpers, needsHelp)
-      return
+      connectHelper(id, data, helpers, needsHelp);
+      return;
     case("Delete A Course From My List"):
-      deleteCourse(id, name, data, users, courses)
-      return
+      deleteCourse(id, name, data, users, courses);
+      return;
     case(SFS): //students fo students
-      SFSHandler(id, name, busi, data, reg1)
-      return
+      SFSHandler(id, name, busi, data, reg1);
+      return;
     case("Course"):
       //Searching a course
       var courseFinder = courses.createTextFinder(data);
@@ -116,7 +116,13 @@ function handleCallback(contents){
       if (currCourse){
         sendOpt(id, name, courses, currCourse.getRow());
       }
-      return
+      return;
+    case(PRINT_SERVICE.symbol):
+      if(reg2 == 0)
+        PRINT_CB_HANDLERS[data](contents.callback_query);
+      else
+        PRINT_EDIT[reg2](contents.callback_query);
+      return;
   }
   //Searching a course
   var courseFinder = courses.createTextFinder(data);
@@ -151,15 +157,9 @@ function handleMessage(contents){
   var id = contents.message.from.id;
   var name = contents.message.from.first_name;
   var text = contents.message.text;
-  if(!text){
-    handlePrint(contents.message);
-    return;
-  }
-  // clean quotation marks in case it separated to parts - for example חדו"א    
-  text = cleanQuotationMarks(text)
   
   //find user and load his registers
-  var user = findUser(id, users);
+  user = findUser(id, users);
   if (user == null) {
     set(id, name); //first use, may be "set" should return the user.
     user = findUser(id, users);
@@ -170,6 +170,13 @@ function handleMessage(contents){
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
   reg4 = users.getRange(row, fieldUsers.reg4).getValue();
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
+  
+  if(!text){
+    handlePrint(contents.message);
+    return;
+  }
+  // clean quotation marks in case it separated to parts - for example חדו"א    
+  text = cleanQuotationMarks(text)
 
   //Boolean - true only if the user is authorized with the Technion email
   var authorized = users.getRange(row, fieldUsers.authorized).getValue();
@@ -414,7 +421,7 @@ function handleMessage(contents){
           busi.getRange(busiRow+1, busiCol).setValue(lastInColDes);
           busi.getRange(busiRow+3, busiCol).setValue(lastInColContact);
           busi.getRange(1, busiCol).setValue(afteLastInCol-1);
-          return
+          return;
         default:
           if (text == "Location"){
             if (currBusi){
@@ -433,6 +440,9 @@ function handleMessage(contents){
             }
           }
       }
+      case(PRINT_SERVICE.symbol):
+        if(reg2 != 0)PRINT_EDIT[reg2](contents.message);
+        return;
   }
   
   sendKey(id,"How may I help you?",mainKeyBoard);

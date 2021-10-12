@@ -1,25 +1,32 @@
+/**
+ * handles print message.
+ * @param {TelegramMessage} msg Message that contains a file.
+ */
 function handlePrint(msg){
-  var file;
+  var id = msg.from.id;
+  var data = {type:0, files:[]};
+  if(reg1==PRINT_SERVICE.symbol)data = JSON.parse(reg3);
+  else saveUser({id:id, reg1:PRINT_SERVICE.symbol, reg2:0, reg3:0, reg4:0, reg5:0});
+  var file = null;
   if (msg.photo){
-    var id = msg.from.id;
-    sendText(id, "got an image..");
-    file = downloadFile(msg.photo[msg.photo.length - 1].file_id, "photo.jpg", id);
+    // file = downloadFile(msg.photo[msg.photo.length - 1].file_id, "photo.jpg");
+    var id = msg.photo[msg.photo.length - 1].file_id;
+    file = {id, name:id+".jpg"};
   }
   if (msg.document){
-    var id = msg.from.id;
-    sendText(id, "got an doc..");
-    var fileid = msg.document.file_id;
-    sendText(id, "got an doc.2.");
-    var fileName = msg.document.file_name;
-    sendText(id, "got an doc.1.");
-    file = downloadFile(fileid, fileName, id);
-    sendText(id, "got an doc.3.");
+    // file = downloadFile(msg.document.file_id, msg.document.file_name);
+    file = {id:msg.document.file_id, name:msg.document.file_name};
   } 
   if(file){
-    var studentId = "123456789";   // studentId
-    var printType = "bws";         // avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
-    sendEmail([file],msg.chat.id,studentId, printType );
-    return;
+    data.files.push(file);
+    if(reg1!=PRINT_SERVICE.symbol){
+      let text = PRINT_SERVICE.messageBase+`\n1. ${file.name}`;
+      data.message = sendText(id, text, PRINT_SERVICE.defaultKeyboard);
+    }else{
+      data.message.text += `\n${data.files.length}. ${file.name}`;
+      editMessageText(id, data.message.message_id, data.message.text, data.message.reply_markup.inline_keyboard);
+    }
+    saveUser({id:id, reg3:JSON.stringify(data)})
   }
 }
 
@@ -32,7 +39,6 @@ function handlePrint(msg){
  *              avilable types: bws, bwd, A3bws, A3bwd, color,A3color ,2pbws (2 slides per page), 2pbwd, 4pbws, 4pbwd
  */
 function sendEmail(files,chatId, studentId,printType){
-  sendText(chatId, "sending..");
   //GmailApp.sendEmail('dontokeron@gmail.com', studentId,"hello", {
   GmailApp.sendEmail('Print.' + printType + '@campus.technion.ac.il', studentId,"print for me please", {
     attachments: files,
@@ -43,7 +49,6 @@ function sendEmail(files,chatId, studentId,printType){
   ScriptApp.newTrigger(PRINT_SERVICE.responseFunc).timeBased()
   .everyMinutes(1).create();
   }
-  sendText(chatId, "done..");
 }
 
 /**
@@ -81,3 +86,70 @@ function resetPrinterCounter(){
   ScriptProperties.setProperty(PRINT_SERVICE.counter,0);
   // Logger.log(ScriptProperties.getProperty(PRINT_SERVICE.counter))
 }
+
+
+const PRINT_CB_HANDLERS = {};
+
+PRINT_CB_HANDLERS[PRINT_SERVICE.cb.cancel] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+  let id = cb.from.id;
+  let message = JSON.parse(reg3).message;
+  editMessageText(id, message.message_id, "הפעולה בוטלה", []);
+  reset(id);
+};
+
+
+PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+  let id = cb.from.id;
+  saveUser({id, reg2:PRINT_SERVICE.cb.chengeID})
+  sendText(id,"מה התז שלך?")
+}
+
+PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+  let id = cb.from.id;
+  let message = cb.message;
+  editMessageText(id, message.message_id, "בחר שיטת הדפסה", PRINT_SERVICE.typeNames.reduce((k,t, i)=>{k.push([{text:t, callback_data:i}]);return k;}, []));
+  saveUser({id, reg2:PRINT_SERVICE.cb.chengeType});
+}
+
+PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+  let id = cb.from.id;
+  let data = JSON.parse(reg3);
+  sendEmail(data.files.reduce((fs,f)=>{fs.push(downloadFile(f.id, f.name));return fs;}, []),id,data.id||id, PRINT_SERVICE.types[data.type]);
+  editMessageText(id, data.message.message_id, "נשלח להדפסה.\nבעוד מספר רגעים תקבל אישור קליטה.", []);
+  reset(id);
+}
+
+const PRINT_EDIT = {};
+
+PRINT_EDIT[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramMessage} msg */function(msg){
+  let id = msg.from.id;
+  let data = JSON.parse(reg3);
+  data.id = msg.text;
+  editMessageText(id, data.message.message_id, data.message.text, []);
+  let kb = data.message.reply_markup.inline_keyboard;
+  kb[1][1].text = msg.text;
+  data.message = sendText(id, data.message.text, kb);
+  saveUser({id, reg2:0, reg3:JSON.stringify(data)});
+}
+
+PRINT_EDIT[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb */function(cb){
+  let id = cb.from.id;
+  let data = JSON.parse(reg3);
+  data.type = cb.data;
+  let kb = data.message.reply_markup.inline_keyboard;
+  kb[1][0].text = PRINT_SERVICE.typeNames[cb.data];
+  editMessageText(id, data.message.message_id, data.message.text, kb);
+  saveUser({id, reg2:0, reg3:JSON.stringify(data)});
+}
+
+
+
+
+
+
+
+
+
+
+
+
