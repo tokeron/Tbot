@@ -1146,7 +1146,8 @@ function sendVerificationCode(id, name, data, users){
       users.getRange(userCell.getRow(), fieldUsers.email).setValue(email);
       users.getRange(userCell.getRow(), fieldUsers.verificationPassword).setValue(pass);
       sendText(id, "Please insert the verification code that we sent to your email.")
-      sendText(id, "If you didn't get any email, type 'send again' and I will send you another verification code.")
+      sendText(id, "Please check the spam email!")
+      sendText(id, "If you didn't get any email, type 'send again'.")
       set(id, name, "insertPass")
     }else{
       welcomeUser(id, name);
