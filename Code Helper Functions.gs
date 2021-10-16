@@ -305,6 +305,22 @@ function sendOpt(id, name, courses, courseRow){
   return
 }
 
+function askVerification(id, name){
+  set(id, name, "sendEmail");
+  removeKey(id, "In order to use this feature we need to verify that you are a technion student.");
+  sendText(id, "Please insert your Technion email.");
+  return;
+}
+
+function isAuthorized(id, users){
+  var userCell = getUserCell(id, users);
+  if (userCell){
+    return users.getRange(userCell.getRow(), fieldUsers.authorized).getValue();
+  }else{
+    welcomeUser(id);
+  }
+}
+
 
 function getDone(id, name, reg2, command, users, courses){
   var courseRow = reg2
@@ -315,7 +331,8 @@ function getDone(id, name, reg2, command, users, courses){
     var teams = courses.getRange(courseRow, fieldCourses.teams).getValue();
     var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
     var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
-    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue()
+    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue();
+    var authorized = isAuthorized(id, users);
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
@@ -328,6 +345,11 @@ function getDone(id, name, reg2, command, users, courses){
         //users.getRange(2, 9).setValue(++currentCounter);
         return;
       case telegramGroup:
+        if (authorized !== 'true')
+        {
+          askVerification(id, name);
+          return;
+        }
         sendText(id, "Looking for telegram group" + groupSy);
         if (group) sendText(id, group);
         else sendText(id, "There is no telegram group for this course yet. you can open and add a groupby using 'Add group'");
@@ -784,9 +806,7 @@ function updateUserStats(row){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var users = dataBaseEx.getSheetByName("users");
   var statistics =  dataBaseEx.getSheetByName("statistics");
-
   const DAY = 1000 * 60 * 60 * 24; // ms per day
-
   var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
   var now = new Date();
   var diff = now - lastSeen;
@@ -848,6 +868,9 @@ function statTrigger(){
   return;
 }
 
+/**
+ * set all reg to zero
+ */
 function reset(id, name){
   set(id, name, 0, 0, 0, 0, 0)
 }
@@ -888,7 +911,7 @@ function cleanList(id, users){
   }
   if (cell){
     var idRow = cell.getRow();
-    for (var currCol = 14;currCol <=29; currCol++){
+    for (var currCol = fieldUsers.firstCourse;currCol <=fieldUsers.lastCourse; currCol++){
       users.getRange(idRow, currCol).setValue(0);
     }
     sendText(id, "Your list is clean");
@@ -1011,7 +1034,14 @@ function deleteCourse(id, name, data, users, courses){
   var flag = false;
   var courseCol = 0;
   var lastInCol;
-  var index = 5;
+  var index = fieldUsers.firstCourse;
+  var userCell = getUserCell(id, users);
+  if (userCell){
+    row = userCell.getRow();
+  }else{
+    welcomeUser(id);
+    return;
+  }
   var currCourseRow = users.getRange(row, index).getValue();
   var currCourse;
   while (currCourseRow){//while there is courses in the list
@@ -1061,53 +1091,141 @@ function cleanQuotationMarks(text){
 }
 
 /**
+ * Get the user cell if exists
+ */
+function getUserCell(id, users)
+{
+  var textFinder = users.createTextFinder(id);
+  var userCell = textFinder.findNext();
+  while (userCell && userCell.getColumn() !== 1)
+  {
+    userCell = textFinder.findNext();
+  }
+  return userCell;
+}
+
+/**
  * 
  */
-function isAuthorized(id, users){
-      ///////////////////////////////////////////////password - not in use for now
-    /*
-    var app = SpreadsheetApp.openByUrl(userExcel);
-    var ss = app.getActiveSheet();
-    var rows = ss.createTextFinder(id).findAll();
-    if (rows.length == 0){
-      sendText(id, "Hi " + name + " \ud83d\udc4b, welcome to Tbot \ud83d\udcd6");   
-      sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
-      var next = ss.getRange(2, 4).getValue();
-      ss.getRange(next, 1).setValue(id);
-      ss.getRange(next, 2).setValue("need to be verified");
-      if (name) ss.getRange(next, 3).setValue(name);
-      ss.getRange(2, 4).setValue(++next);
-      return;
-    }else{
-      var row = rows[0].getRow();
-      if (ss.getRange(row, 2).getValue() == "need to be verified"){
-        if (text.includes(fisrtLogInPassword)){
-          oldSet(id, 0, name, 0);
-          sendKey(id, "How may I help you?", mainKeyBoard);
-          sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-        }else if (text.includes("technion.ac.il")){
-          sendText(id, "The passwors is sent to "+ text+ " please insert the password now");
-          // Fetch the email address
-          var emailAddress = text;
-              // Send Alert Email.
-              var message = text; 
-              var subject = 'Tbot first log-in password';
-          MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
-          //TODO sent email
-        }else{
-          sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
-        }
-        return;
-      }
-    }*/
-    /*
-    else if (text == 'Re 404'){
-      sendText( , 'Hi, thank you for your feedback');
-      sendText( ,'You are right, I have not yet added a button that deletes a specific course. In the meantime, you can clear the list and build a new one. Hope to add an option to remove a specific course soon ..');
-      sendText(id, 'Your massage sent');
-    }*/
-  return true;
+function welcomeUser(id, name)
+{
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
+  reset(id, name)
+  return;
 }
+
+/**
+ * 
+ */
+function generateRandomNumber(){
+  var randomNumber = Math.floor(Math.random() * 10000);
+  var randomNumberAsString = randomNumber.toString();
+  return randomNumberAsString;
+}
+
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} data
+ * @param {spreadsheet} users users spreadsheet
+ */
+function sendVerificationCode(id, name, data, users){
+  var email = data;
+  if (email.indexOf("technion.ac.il") == -1)
+  {
+    sendText(id, "Your is not recognizes at a technion email in my system. Please send a valid technion email address.")
+    return;
+  }
+  else // it's a valid technion email address
+  {
+    var userCell = getUserCell(id, users);
+    if (userCell){
+      var pass = generateRandomNumber();
+      var subject = "Tbot verification code"
+      MailApp.sendEmail(email, subject, "Your verification code is: "+pass);
+      users.getRange(userCell.getRow(), fieldUsers.email).setValue(email);
+      users.getRange(userCell.getRow(), fieldUsers.verificationPassword).setValue(pass);
+      sendText(id, "Please insert the verification code that we sent to your email.")
+      sendText(id, "If you didn't get any email, type 'send again' and I will send you another verification code.")
+      set(id, name, "insertPass")
+    }else{
+      welcomeUser(id, name);
+    }
+    return;
+  }
+
+}
+
+
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} text
+ * @param {spreadsheet} users users spreadsheet
+ */
+function checkIfPass(id, name, text, users){
+  var userCell = getUserCell(id, users);
+  if (text == "send again" && userCell){
+    email = users.getRange(userCell.getRow(), fieldUsers.email).getValue();
+    sendVerificationCode(id, name, email, users);
+    return;
+  }
+  else{
+    if (userCell){
+      var verificationPassword = users.getRange(userCell.getRow(), fieldUsers.verificationPassword).getValue();
+      if (text == verificationPassword)
+      {
+        users.getRange(userCell.getRow(), fieldUsers.authorized).setValue('true');
+        sendText(id, "Congrats! You are a verified now!")
+        welcomeUser(id);
+      }else{
+        sendText(id, "The verification code does not match. please try again.")
+      }
+    }else{
+      welcomeUser(id, name);
+    }
+    return;
+  }
+}
+
+/**
+ * Create a random code and sends it to the technion email
+ */
+// function athorize(id, name, users){
+//   var userCell = getUserCell(id, users);
+//   if (userCell){
+//     sendText(id, "Please insert your Technion email address to get a verification code");
+//     set(id, name, "sendEmail");
+//     return;
+//     }else{
+//       var row = rows[0].getRow();
+//       if (ss.getRange(row, 2).getValue() == "need to be verified"){
+//         if (text.includes(fisrtLogInPassword)){
+//           oldSet(id, 0, name, 0);
+//           sendKey(id, "How may I help you?", mainKeyBoard);
+//           sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
+//         }else if (text.includes("technion.ac.il")){
+//           sendText(id, "The passwors is sent to "+ text+ " please insert the password now");
+//           // Fetch the email address
+//           var emailAddress = text;
+//               // Send Alert Email.
+//               var message = text; 
+//               var subject = 'Tbot first log-in password';
+//           MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
+//           //TODO sent email
+//         }else{
+//           sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
+//         }
+//         return;
+//       }
+//     }
+//     else if (text == 'Re 404'){
+//       sendText( , 'Hi, thank you for your feedback');
+//       sendText( ,'You are right, I have not yet added a button that deletes a specific course. In the meantime, you can clear the list and build a new one. Hope to add an option to remove a specific course soon ..');
+//       sendText(id, 'Your massage sent');
+//     }
+//   return true;
+// }
 
 /**
  * 
