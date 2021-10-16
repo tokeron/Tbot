@@ -806,9 +806,7 @@ function updateUserStats(row){
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var users = dataBaseEx.getSheetByName("users");
   var statistics =  dataBaseEx.getSheetByName("statistics");
-
   const DAY = 1000 * 60 * 60 * 24; // ms per day
-
   var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
   var now = new Date();
   var diff = now - lastSeen;

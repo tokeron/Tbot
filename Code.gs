@@ -127,10 +127,17 @@ function handleCallback(contents){
   while(currCourse !== null && currCourse.getColumn() !== 1){
     currCourse = courseFinder.findNext();
   }
+  //Searching a course
+  var courseFinder = courses.createTextFinder(data);
+  var currCourse = courseFinder.findNext();
+  while(currCourse !== null && currCourse.getColumn() !== 1){
+    currCourse = courseFinder.findNext();
+  }
   if (currCourse){
     sendOpt(id, name, courses, currCourse.getRow());
   }
-  welcomeUser(id);
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
+  sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
   reset(id)
   return;
 }
@@ -260,7 +267,6 @@ function handleMessage(contents){
                     "\nLast Month: "+ monthly + 
                     "\nLast Week: " + weekly +
                     "\nLast Day: " + daily);
-      return;
     case("authoriseMe"):
       sendText(id, "Please insert your Technion email address to get a verification code");
       set(id, name, "sendEmail");

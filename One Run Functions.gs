@@ -158,6 +158,5 @@ function getLinks(){
       if (teams) courses.getRange(i, fieldCourses.teams).setValue(teams)
       if (spreadsheet) courses.getRange(i, fieldCourses.spreadsheet).setValue(spreadsheet)
     }
-    Logger.log("i:"  + i);
-  }  
+  }
 }

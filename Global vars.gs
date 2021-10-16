@@ -1,12 +1,16 @@
+
 var numberOfCourses = 2000; 
 var numberOfReviews = 2*26; 
 
 var token = "";
 var url = "https://api.telegram.org/bot" + token;
+// var webAppUrl = "";
+var webAppUrl = "";
+var numberOfCourses = 2000; 
+var numberOfReviews = 2*26;
 
 var webAppUrl = "";
 
-//var businessExcel = "https://docs.google.com/spreadsheets/d/1S0_4OcTn_woYIOcORr3fmdZxcid4uwdBSMfFeLztawo/edit?usp=sharing";
 var dataBase = ""; //new excel - contain all previous excel
 
 //Drive url
