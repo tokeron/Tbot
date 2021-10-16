@@ -113,7 +113,8 @@ function simpleText(id, name, text){
       sendText(id, 'General info - http://www.asat.org.il/academic/contents/print/צילום_והדפסה');
       sendText(id, 'in order to send a file to print start a new mail, type your ID in the SUBJECT.')
       sendText(id, 'Attach your files (Office documents, pictures and pdf files)');
-      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard)
+      sendKey(id, 'Insert the recipient according to your desired task (click suitable tab to get email)', printKeyBoard);
+      updateClickOnLinksStats();
       return true
     case("A4 B&W single sided"):
       sendText(id, 'A4 B&W single sided – print.bws@campus.technion.ac.il');
@@ -146,7 +147,8 @@ function simpleText(id, name, text){
       sendText(id, 'B&W 4 slides per page, two sided – print.4pbwd@campus.technion.ac.il')
       return true
     case(calendar):
-      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);   
+      sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);
+      updateClickOnLinksStats();   
       return true
     case("אזור תל אביב-יפו והמרכז"):
       sendKey(id, "Choose a city from the list below:", teKeyBoard);
@@ -170,40 +172,47 @@ function simpleText(id, name, text){
       return true
     case("scans - cf"):
       sendText(id, "https://tscans.cf/");
+      updateClickOnLinksStats();
       return true
     case('MyDegree'):
       sendText(id, "https://www.mydegree.co.il/");
+      updateClickOnLinksStats();
       return true
     case('Technion Students FAQ (doc)'):
       sendText(id,"https://docs.google.com/document/d/1XGWWns6IZy9QpsAhWZu_WxIQTXYbRVeAV3XGr6pcMpc/edit?fbclid=IwAR1bBn5g3NBdxf2JFPbeWinOmQ3F0qa2KxlQGlMZ5wPyr31l0yRfo7ESPLc");
+      updateClickOnLinksStats();
       return true
     case('useful links from facebook (doc)'):
       sendText(id,"https://docs.google.com/document/d/1tR8X8YawbK_h2VwQU1k1Fz4q12B0nWxOMSqxE_hV2sw/"+
                "edit?fbclid=IwAR1cQkxt1PG-gFwF_QWPG80u9ZNYuVwwBlWwmCes5MLst1ERmAIGijH8BRM");
+      updateClickOnLinksStats();
       return true
     case('cheese&fork'):
       sendKey(id,"https://cheesefork.cf/",usefulKeyBoard);
-      return true
-    case('testock'):
-      sendKey(id,"https://testock.tk/courses",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('ug '+ugSy):
       sendKey(id, 'https://ug3.technion.ac.il/rishum/search',usefulKeyBoard );
+      updateClickOnLinksStats();
       return true
     case('moodle '+moodleSy):
       sendKey(id, 'https://moodle.technion.ac.il/',usefulKeyBoard );
+      updateClickOnLinksStats();
       return true
     case("Git"):
       sendText(id, 'https://github.com/tokeron/Tbot');
       return true
     case('אסט'):
       sendKey(id,"http://www.asat.org.il/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case('ASA'):
       sendKey(id,"https://www.asatechnion.co.il/",usefulKeyBoard);
+      updateClickOnLinksStats();
       return true
     case(Korona):
       sendText(id, "https://t.me/asat_technion");
+      updateClickOnLinksStats();
       return true
     //}else if (text == 'חזור'){
     //  sendKey(id, "Choose from the list below", helpKeyBoard);
@@ -226,6 +235,7 @@ function simpleText(id, name, text){
       sendText(id, "https://t.me/joinchat/Amx7SinEWJBjNGM0");
       return true
     case(ride):
+      incRideStats(id);
     case('רשימת אזורים'):
       sendKey(id, "Send the required city name or choose your region from the list below " + downSy, rideKeyBoard);
       oldSet(id, "Ride");
@@ -250,6 +260,39 @@ function simpleText(id, name, text){
     }
 }
 
+function incTalkStats(id){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  for(var i = stats.talkIdsListStart.row; i < statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).getValue(); i++){
+    if(statistics.getRange(i,stats.talkIdsListStart.col).getValue() == id) return;
+  }
+  var talkIdsNextRow =  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).getValue();
+  statistics.getRange(todaysRow,stats.talkClicksCol).setValue(statistics.getRange(todaysRow,stats.talkClicksCol).getValue() + 1);
+  statistics.getRange(talkIdsNextRow,stats.talkIdsListStart.col).setValue(id);
+  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).setValue(talkIdsNextRow + 1);
+}
+
+function incRideStats(id){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  for(var i = stats.rideIdsListStart.row; i < statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).getValue(); i++){
+    if(statistics.getRange(i,stats.rideIdsListStart.col).getValue() == id) return;
+  }
+  var rideIdsNextRow =  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).getValue();
+  statistics.getRange(todaysRow,stats.rideClicksCol).setValue(statistics.getRange(todaysRow,stats.rideClicksCol).getValue() + 1);
+  statistics.getRange(rideIdsNextRow,stats.rideIdsListStart.col).setValue(id);
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(rideIdsNextRow + 1);
+}
+
+function updateClickOnLinksStats(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics = dataBaseEx.getSheetByName("statistics");
+  var todaysRow = statistics.getRange(stats.todaysRow.row, stats.todaysRow.col).getValue();
+  statistics.getRange(todaysRow,stats.clicksOnLinksCol).setValue(statistics.getRange(todaysRow,stats.clicksOnLinksCol).getValue() + 1);
+}
+
 
 function sendOpt(id, name, courses, courseRow){
   var excel = false;
@@ -262,6 +305,22 @@ function sendOpt(id, name, courses, courseRow){
   return
 }
 
+function askVerification(id, name){
+  set(id, name, "sendEmail");
+  removeKey(id, "In order to use this feature we need to verify that you are a technion student.");
+  sendText(id, "Please insert your Technion email.");
+  return;
+}
+
+function isAuthorized(id, users){
+  var userCell = getUserCell(id, users);
+  if (userCell){
+    return users.getRange(userCell.getRow(), fieldUsers.authorized).getValue();
+  }else{
+    welcomeUser(id);
+  }
+}
+
 
 function getDone(id, name, reg2, command, users, courses){
   var courseRow = reg2
@@ -272,7 +331,8 @@ function getDone(id, name, reg2, command, users, courses){
     var teams = courses.getRange(courseRow, fieldCourses.teams).getValue();
     var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
     var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
-    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue()
+    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue();
+    var authorized = isAuthorized(id, users);
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
@@ -285,6 +345,11 @@ function getDone(id, name, reg2, command, users, courses){
         //users.getRange(2, 9).setValue(++currentCounter);
         return;
       case telegramGroup:
+        if (authorized !== 'true')
+        {
+          askVerification(id, name);
+          return;
+        }
         sendText(id, "Looking for telegram group" + groupSy);
         if (group) sendText(id, group);
         else sendText(id, "There is no telegram group for this course yet. you can open and add a groupby using 'Add group'");
@@ -700,10 +765,13 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     if ((reg3 || reg3 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg3).setValue(reg3);
     if ((reg4 || reg4 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg4).setValue(reg4);
     if ((reg5 || reg5 == 0) && (name !== 'null')) users.getRange(row, fieldUsers.reg5).setValue(reg5);
+    updateUserStats(row);
     return;
   }
   else{ //new user
+
     var nextRow = users.getRange(1, 4).getValue();
+    var numOfUsers = users.getRange(1, 2).getValue();
     users.getRange(nextRow, fieldUsers.id).setValue(id);
     if (name || name == 0) users.getRange(nextRow, fieldUsers.name).setValue(name);
     if (reg1 || reg1 == 0) users.getRange(nextRow, fieldUsers.reg1).setValue(reg1);
@@ -713,18 +781,19 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     if (reg5 || reg5 == 0) users.getRange(nextRow, fieldUsers.reg5).setValue(reg5);
 
     users.getRange(1, 4).setValue(++nextRow);
-    //users.getRange(1, 2).setValue(++numOfUsers);
+    users.getRange(1, 2).setValue(++numOfUsers);
 
     // Stats part
-    var statUsersAllTime = statistics.getRange(2,2).getValue();
-    var statUsersMonthly = statistics.getRange(3,2).getValue();
-    var statUsersWeekly = statistics.getRange(4,2).getValue();
-    var statUsersDaily = statistics.getRange(5,2).getValue();
+    var statUsersAllTime = statistics.getRange(stats.users.allTime.row,stats.users.allTime.col).getValue();
+    var statUsersMonthly = statistics.getRange(stats.users.month.row,stats.users.month.col).getValue();
+    var statUsersWeekly = statistics.getRange(stats.users.week.row,stats.users.week.col).getValue();
+    var statUsersDaily = statistics.getRange(stats.users.day.row,stats.users.day.col).getValue();
 
-    statistics.getRange(2,2).setValue(++statUsersAllTime);
-    statistics.getRange(3,2).setValue(++statUsersMonthly);
-    statistics.getRange(4,2).setValue(++statUsersWeekly);
-    statistics.getRange(5,2).setValue(++statUsersDaily);
+    statistics.getRange(stats.users.allTime.row,stats.users.allTime.col).setValue(++statUsersAllTime);
+    statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(++statUsersMonthly);
+    statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(++statUsersWeekly);
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(++statUsersDaily);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     return;
   }
 }
@@ -740,16 +809,18 @@ function updateUserStats(row){
 
   const DAY = 1000 * 60 * 60 * 24; // ms per day
 
-  var lastSeen = users.getRange(row, 3).getValue();
+  var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
   var now = new Date();
   var diff = now - lastSeen;
 
   if(diff > DAY){
-    statistics.getRange(5,2).setValue(statistics.getRange(5,2).getValue() + 1);
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statistics.getRange(stats.users.day.row,stats.users.day.col).getValue() + 1);
+    statistics.getRange(stats.test.row,stats.test.col).setValue(1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     if(diff > 7*DAY){
-      statistics.getRange(4,2).setValue(statistics.getRange(4,2).getValue() + 1);
+      statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statistics.getRange(stats.users.week.row,stats.users.week.col).getValue() + 1);
       if(diff > 30*DAY){
-        statistics.getRange(3,2).setValue(statistics.getRange(3,2).getValue() + 1);
+        statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statistics.getRange(stats.users.month.row,stats.users.month.col).getValue() + 1);
         }
       }
     }
@@ -767,12 +838,12 @@ function statTrigger(){
 
   const DAY = 1000 * 60 * 60 * 24; // ms per day
   var today = new Date();
-  var nextFreeRow = users.getRange(1,4).getValue();
+  var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
   var statUsersMonthly = 0;
   var statUsersWeekly = 0;
   var statUsersDaily = 0;
   for(let row=3;row<nextFreeRow;row++){
-    var diff = today - users.getRange(row, 3).getValue();
+    var diff = today - users.getRange(row, fieldUsers.lastSeen).getValue();
     if(diff < 30*DAY){
       statUsersMonthly++;
       if(diff < 7*DAY){
@@ -783,14 +854,27 @@ function statTrigger(){
       }
     }
   }
-  statistics.getRange(3,2).setValue(statUsersMonthly);
-  statistics.getRange(4,2).setValue(statUsersWeekly);
-  statistics.getRange(5,2).setValue(statUsersDaily);
+  statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statUsersMonthly);
+  statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
+  statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
+
+  var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
+  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
+  statistics.getRange(row,stats.numOfUsersCol).setValue(0);
+  statistics.getRange(row,stats.clicksCol).setValue(0);
+  statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
+  statistics.getRange(row,stats.rideClicksCol).setValue(0);
+  statistics.getRange(row,stats.talkClicksCol).setValue(0);
+
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
   return;
 }
 
-function reset(id){
-  set(id, 0, 0, 0, 0, 0, 0)
+/**
+ * set all reg to zero
+ */
+function reset(id, name){
+  set(id, name, 0, 0, 0, 0, 0)
 }
 
 
@@ -829,7 +913,7 @@ function cleanList(id, users){
   }
   if (cell){
     var idRow = cell.getRow();
-    for (var currCol = 14;currCol <=29; currCol++){
+    for (var currCol = fieldUsers.firstCourse;currCol <=fieldUsers.lastCourse; currCol++){
       users.getRange(idRow, currCol).setValue(0);
     }
     sendText(id, "Your list is clean");
@@ -952,7 +1036,14 @@ function deleteCourse(id, name, data, users, courses){
   var flag = false;
   var courseCol = 0;
   var lastInCol;
-  var index = 5;
+  var index = fieldUsers.firstCourse;
+  var userCell = getUserCell(id, users);
+  if (userCell){
+    row = userCell.getRow();
+  }else{
+    welcomeUser(id);
+    return;
+  }
   var currCourseRow = users.getRange(row, index).getValue();
   var currCourse;
   while (currCourseRow){//while there is courses in the list
@@ -1002,53 +1093,141 @@ function cleanQuotationMarks(text){
 }
 
 /**
+ * Get the user cell if exists
+ */
+function getUserCell(id, users)
+{
+  var textFinder = users.createTextFinder(id);
+  var userCell = textFinder.findNext();
+  while (userCell && userCell.getColumn() !== 1)
+  {
+    userCell = textFinder.findNext();
+  }
+  return userCell;
+}
+
+/**
  * 
  */
-function isAuthorized(id, users){
-      ///////////////////////////////////////////////password - not in use for now
-    /*
-    var app = SpreadsheetApp.openByUrl(userExcel);
-    var ss = app.getActiveSheet();
-    var rows = ss.createTextFinder(id).findAll();
-    if (rows.length == 0){
-      sendText(id, "Hi " + name + " \ud83d\udc4b, welcome to Tbot \ud83d\udcd6");   
-      sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
-      var next = ss.getRange(2, 4).getValue();
-      ss.getRange(next, 1).setValue(id);
-      ss.getRange(next, 2).setValue("need to be verified");
-      if (name) ss.getRange(next, 3).setValue(name);
-      ss.getRange(2, 4).setValue(++next);
-      return;
-    }else{
-      var row = rows[0].getRow();
-      if (ss.getRange(row, 2).getValue() == "need to be verified"){
-        if (text.includes(fisrtLogInPassword)){
-          oldSet(id, 0, name, 0);
-          sendKey(id, "How may I help you?", mainKeyBoard);
-          sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-        }else if (text.includes("technion.ac.il")){
-          sendText(id, "The passwors is sent to "+ text+ " please insert the password now");
-          // Fetch the email address
-          var emailAddress = text;
-              // Send Alert Email.
-              var message = text; 
-              var subject = 'Tbot first log-in password';
-          MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
-          //TODO sent email
-        }else{
-          sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
-        }
-        return;
-      }
-    }*/
-    /*
-    else if (text == 'Re 404'){
-      sendText( , 'Hi, thank you for your feedback');
-      sendText( ,'You are right, I have not yet added a button that deletes a specific course. In the meantime, you can clear the list and build a new one. Hope to add an option to remove a specific course soon ..');
-      sendText(id, 'Your massage sent');
-    }*/
-  return true;
+function welcomeUser(id, name)
+{
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
+  reset(id, name)
+  return;
 }
+
+/**
+ * 
+ */
+function generateRandomNumber(){
+  var randomNumber = Math.floor(Math.random() * 10000);
+  var randomNumberAsString = randomNumber.toString();
+  return randomNumberAsString;
+}
+
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} data
+ * @param {spreadsheet} users users spreadsheet
+ */
+function sendVerificationCode(id, name, data, users){
+  var email = data;
+  if (email.indexOf("technion.ac.il") == -1)
+  {
+    sendText(id, "Your is not recognizes at a technion email in my system. Please send a valid technion email address.")
+    return;
+  }
+  else // it's a valid technion email address
+  {
+    var userCell = getUserCell(id, users);
+    if (userCell){
+      var pass = generateRandomNumber();
+      var subject = "Tbot verification code"
+      MailApp.sendEmail(email, subject, "Your verification code is: "+pass);
+      users.getRange(userCell.getRow(), fieldUsers.email).setValue(email);
+      users.getRange(userCell.getRow(), fieldUsers.verificationPassword).setValue(pass);
+      sendText(id, "Please insert the verification code that we sent to your email.")
+      sendText(id, "If you didn't get any email, type 'send again' and I will send you another verification code.")
+      set(id, name, "insertPass")
+    }else{
+      welcomeUser(id, name);
+    }
+    return;
+  }
+
+}
+
+
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} text
+ * @param {spreadsheet} users users spreadsheet
+ */
+function checkIfPass(id, name, text, users){
+  var userCell = getUserCell(id, users);
+  if (text == "send again" && userCell){
+    email = users.getRange(userCell.getRow(), fieldUsers.email).getValue();
+    sendVerificationCode(id, name, email, users);
+    return;
+  }
+  else{
+    if (userCell){
+      var verificationPassword = users.getRange(userCell.getRow(), fieldUsers.verificationPassword).getValue();
+      if (text == verificationPassword)
+      {
+        users.getRange(userCell.getRow(), fieldUsers.authorized).setValue('true');
+        sendText(id, "Congrats! You are a verified now!")
+        welcomeUser(id);
+      }else{
+        sendText(id, "The verification code does not match. please try again.")
+      }
+    }else{
+      welcomeUser(id, name);
+    }
+    return;
+  }
+}
+
+/**
+ * Create a random code and sends it to the technion email
+ */
+// function athorize(id, name, users){
+//   var userCell = getUserCell(id, users);
+//   if (userCell){
+//     sendText(id, "Please insert your Technion email address to get a verification code");
+//     set(id, name, "sendEmail");
+//     return;
+//     }else{
+//       var row = rows[0].getRow();
+//       if (ss.getRange(row, 2).getValue() == "need to be verified"){
+//         if (text.includes(fisrtLogInPassword)){
+//           oldSet(id, 0, name, 0);
+//           sendKey(id, "How may I help you?", mainKeyBoard);
+//           sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
+//         }else if (text.includes("technion.ac.il")){
+//           sendText(id, "The passwors is sent to "+ text+ " please insert the password now");
+//           // Fetch the email address
+//           var emailAddress = text;
+//               // Send Alert Email.
+//               var message = text; 
+//               var subject = 'Tbot first log-in password';
+//           MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
+//           //TODO sent email
+//         }else{
+//           sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
+//         }
+//         return;
+//       }
+//     }
+//     else if (text == 'Re 404'){
+//       sendText( , 'Hi, thank you for your feedback');
+//       sendText( ,'You are right, I have not yet added a button that deletes a specific course. In the meantime, you can clear the list and build a new one. Hope to add an option to remove a specific course soon ..');
+//       sendText(id, 'Your massage sent');
+//     }
+//   return true;
+// }
 
 /**
  * 
@@ -1312,9 +1491,9 @@ function sendFeedback(id, name, text){
 }
 
 /**
- * 
+ * sends 
  */
-function sendRideLink(id, telegramLinks){
+function sendRideLink(id, telegramLinks, text){
   var list = telegramLinks.createTextFinder(text).findAll();
   if (list.length > 0){
     var row = list[0].getRow();

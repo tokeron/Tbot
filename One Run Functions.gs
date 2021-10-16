@@ -36,7 +36,6 @@ function deleteNotInUse(){
 function getCourses(){
   var urlCourses = "https://raw.githubusercontent.com/michael-maltsev/cheese-fork/gh-pages/courses/courses_";
   var year = new Date().getFullYear();
-  year = year - 1 //the year in the script is minus one from the current year 
   var month = new Date().getMonth()
   var semesterNum;
   switch(month){
@@ -81,7 +80,6 @@ function updateCourses(){
   var courses_from_rishum  = getCourses();
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var courses = dataBaseEx.getSheetByName("courses");
-
   nextRow = courses.getRange(1,1).getValue()
   courses_from_rishum.forEach((course) => {
     faculty = course.general[fieldNamesGeneral.faculty]
@@ -101,7 +99,9 @@ function updateCourses(){
     //course is already in the list. only update the information 
     var textFinder = courses.createTextFinder(courseNumber);
     nextCourse = textFinder.findNext()
-    while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) nextCourse = textFinder.findNext()
+    while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) {
+      nextCourse = textFinder.findNext()
+    }
     if (nextCourse){ //The course already in the table
 
     }else{  //course is not in the list yet
@@ -120,7 +120,15 @@ function updateCourses(){
       if (examA) courses.getRange(nextRow,fieldCourses.examA).setValue(examA)
       if (examB) courses.getRange(nextRow,fieldCourses.examB).setValue(examB)
       //update the counter 
-      courses.getRange(1,1).setValue(++nextRow)
+      courses.getRange(1,1).setValue(++nextRow);
+      // Logger.log("new: " + courseNumber);
+      // textFinder = courses.createTextFinder(courseNumber);
+      // getRange = textFinder.findNext();
+      // while(getRange){
+      //   Logger.log("place: (" + getRange.getColumn() +", " + getRange.getRow() + ")");
+      //   getRange = textFinder.findNext();
+      // }
+      // return;
     }
   });
   Logger.log("done")
@@ -150,5 +158,6 @@ function getLinks(){
       if (teams) courses.getRange(i, fieldCourses.teams).setValue(teams)
       if (spreadsheet) courses.getRange(i, fieldCourses.spreadsheet).setValue(spreadsheet)
     }
-  }
+    Logger.log("i:"  + i);
+  }  
 }
