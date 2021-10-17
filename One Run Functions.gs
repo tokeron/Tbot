@@ -80,7 +80,6 @@ function updateCourses(){
   var courses_from_rishum  = getCourses();
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var courses = dataBaseEx.getSheetByName("courses");
-
   nextRow = courses.getRange(1,1).getValue()
   courses_from_rishum.forEach((course) => {
     faculty = course.general[fieldNamesGeneral.faculty]
@@ -100,7 +99,9 @@ function updateCourses(){
     //course is already in the list. only update the information 
     var textFinder = courses.createTextFinder(courseNumber);
     nextCourse = textFinder.findNext()
-    while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) nextCourse = textFinder.findNext()
+    while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) {
+      nextCourse = textFinder.findNext()
+    }
     if (nextCourse){ //The course already in the table
 
     }else{  //course is not in the list yet
@@ -119,7 +120,15 @@ function updateCourses(){
       if (examA) courses.getRange(nextRow,fieldCourses.examA).setValue(examA)
       if (examB) courses.getRange(nextRow,fieldCourses.examB).setValue(examB)
       //update the counter 
-      courses.getRange(1,1).setValue(++nextRow)
+      courses.getRange(1,1).setValue(++nextRow);
+      // Logger.log("new: " + courseNumber);
+      // textFinder = courses.createTextFinder(courseNumber);
+      // getRange = textFinder.findNext();
+      // while(getRange){
+      //   Logger.log("place: (" + getRange.getColumn() +", " + getRange.getRow() + ")");
+      //   getRange = textFinder.findNext();
+      // }
+      // return;
     }
   });
   Logger.log("done")
