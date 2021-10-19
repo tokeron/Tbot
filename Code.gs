@@ -171,11 +171,12 @@ function handleMessage(contents){
   reg4 = users.getRange(row, fieldUsers.reg4).getValue();
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
   
-  if(!text){
+  if(contents.message.document || contents.message.photo){
     handlePrint(contents.message);
     return;
   }
   // clean quotation marks in case it separated to parts - for example חדו"א    
+  if(!text)return;
   text = cleanQuotationMarks(text)
 
   //Boolean - true only if the user is authorized with the Technion email

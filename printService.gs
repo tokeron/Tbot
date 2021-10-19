@@ -4,6 +4,7 @@
  */
 function handlePrint(msg){
   var id = msg.from.id;
+  // removeKey(id);
   var data = {type:0, files:[]};
   if(reg1==PRINT_SERVICE.symbol)data = JSON.parse(reg3);
   else saveUser({id:id, reg1:PRINT_SERVICE.symbol, reg2:0, reg3:0, reg4:0, reg5:0});
@@ -111,6 +112,16 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQue
   saveUser({id, reg2:PRINT_SERVICE.cb.chengeType});
 }
 
+PRINT_CB_HANDLERS[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+  let id = cb.from.id;
+  let data = JSON.parse(reg3);
+  let message = cb.message;
+  let kb = data.files.reduce((k,t, i)=>{k.push([{text:t.name, callback_data:i},{text:"❌", callback_data:"d"+i}]);return k;}, []);
+  kb.push([{text:"סיימתי", callback_data:"done"}]);
+  data.filesMessage = editMessageText(id, message.message_id, "לחץ על הקובץ כדי לשנות את שמו, או על ❌ כדי למחוק אותו", kb);
+  saveUser({id, reg2:PRINT_SERVICE.cb.editFiles, reg3:JSON.stringify(data)});
+}
+
 PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb */ function(cb){
   let id = cb.from.id;
   let data = JSON.parse(reg3);
@@ -118,6 +129,7 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb
   editMessageText(id, data.message.message_id, "נשלח להדפסה.\nבעוד מספר רגעים תקבל אישור קליטה.", []);
   reset(id);
 }
+
 
 const PRINT_EDIT = {};
 
@@ -143,8 +155,54 @@ PRINT_EDIT[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb 
 }
 
 
-
-
+PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & TelegramMessage} obj */function(obj){
+  let id = obj.from.id;
+  let data = JSON.parse(reg3);
+  /** @type TelegramInlineKeyboard */
+  let kb;
+  let text;
+  if(obj.message_id){
+    if(data.renameFile){
+      let fileName = obj.text;
+      let extention = /\.\w+$/.exec(data.files[data.renameFile].name);
+      if(extention && !fileName.endsWith(extention[0]))fileName+=extention[0];
+      data.files[data.renameFile].name = fileName;
+      text = data.filesMessage.text;
+      sendText(id,text);
+      kb = data.filesMessage.reply_markup.inline_keyboard;
+      kb[data.renameFile][0].text = fileName;
+    }
+  }
+  else{
+    text = obj.message.text;
+    kb = obj.message.reply_markup.inline_keyboard;
+    if(obj.data=="done"){
+      text = data.files.reduce((s,f,i)=>{s+=`\n${i+1}. ${f.name}`;return s}, PRINT_SERVICE.messageBase);
+      kb = data.message.reply_markup.inline_keyboard;
+      saveUser({id, reg2:0});
+    }
+    else if(obj.data.startsWith("d")){//deleting file from the list
+      i = parseInt(obj.data.slice(1));
+      data.files.splice(i,1);
+      kb.splice(i,1);
+    }
+    else {
+      let fileId = parseInt(obj.data);
+      if(data.renameFile){
+        kb[data.renameFile][0].text = data.files[data.renameFile].name;
+      }
+      if(data.renameFile == fileId){
+        delete data.renameFile;
+        return;
+      }
+      data.renameFile = fileId;
+      kb[fileId][0].text += "✏️";
+    }
+  }
+  data.filesMessage = editMessageText(id, data.message.message_id, text, kb);
+  saveUser({id, reg3:JSON.stringify(data)});
+}
+function dummy(){Logger.log(PRINT_EDIT)}
 
 
 

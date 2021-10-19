@@ -110,6 +110,7 @@ function removeKey(chatId, text) {
  * @param {Number} msgId
  * @param {String} text
  * @param {TelegramInlineKeyboard} keyboard
+ * @return {TelegramMessage} the edited message.
  */
 function editMessageText(chatId, msgId, text, keyboard){
   var data = {
@@ -122,5 +123,5 @@ function editMessageText(chatId, msgId, text, keyboard){
     }
   };
   if(keyboard)data.payload.reply_markup = JSON.stringify({inline_keyboard: keyboard});
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+  return JSON.parse(UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data).getContentText()).result
 }
