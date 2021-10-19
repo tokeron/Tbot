@@ -162,15 +162,19 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
   let kb;
   let text;
   if(obj.message_id){
-    if(data.renameFile){
+    if(data.hasOwnProperty("renameFile")){
       let fileName = obj.text;
       let extention = /\.\w+$/.exec(data.files[data.renameFile].name);
       if(extention && !fileName.endsWith(extention[0]))fileName+=extention[0];
       data.files[data.renameFile].name = fileName;
       text = data.filesMessage.text;
-      sendText(id,text);
+      // sendText(id, text);
       kb = data.filesMessage.reply_markup.inline_keyboard;
       kb[data.renameFile][0].text = fileName;
+      delete data.renameFile;
+      // sendText(id, JSON.stringify(kb))
+    }else{
+      return;
     }
   }
   else{
@@ -180,6 +184,7 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
       text = data.files.reduce((s,f,i)=>{s+=`\n${i+1}. ${f.name}`;return s}, PRINT_SERVICE.messageBase);
       kb = data.message.reply_markup.inline_keyboard;
       saveUser({id, reg2:0});
+      delete data.filesMessage;
     }
     else if(obj.data.startsWith("d")){//deleting file from the list
       i = parseInt(obj.data.slice(1));
