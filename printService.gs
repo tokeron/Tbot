@@ -2,20 +2,24 @@
  * handles print message.
  * @param {TelegramMessage} msg Message that contains a file.
  */
-function handlePrint(msg){
+function handlePrint(msg, preferences){
   var id = msg.from.id;
   // removeKey(id);
-  var data = {type:0, files:[]};
+  var data;
   if(reg1==PRINT_SERVICE.symbol)data = JSON.parse(reg3);
-  else saveUser({id:id, reg1:PRINT_SERVICE.symbol, reg2:0, reg3:0, reg4:0, reg5:0});
+  else {
+    saveUser({id:id, reg1:PRINT_SERVICE.symbol, reg2:0, reg3:0, reg4:0, reg5:0});
+    if(preferences){
+      preferences = JSON.parse(preferences);
+      data = {type: preferences.type || 0, files:[], id: preferences.id || null}
+    }
+  }
   var file = null;
   if (msg.photo){
-    // file = downloadFile(msg.photo[msg.photo.length - 1].file_id, "photo.jpg");
     var id = msg.photo[msg.photo.length - 1].file_id;
     file = {id, name:id+".jpg"};
   }
   if (msg.document){
-    // file = downloadFile(msg.document.file_id, msg.document.file_name);
     file = {id:msg.document.file_id, name:msg.document.file_name};
   } 
   if(file){
@@ -125,8 +129,9 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuer
 PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb */ function(cb){
   let id = cb.from.id;
   let data = JSON.parse(reg3);
-  sendEmail(data.files.reduce((fs,f)=>{fs.push(downloadFile(f.id, f.name));return fs;}, []),id,data.id||id, PRINT_SERVICE.types[data.type]);
-  editMessageText(id, data.message.message_id, "נשלח להדפסה.\nבעוד מספר רגעים תקבל אישור קליטה.", []);
+  print_id = data.id || id;
+  sendEmail(data.files.reduce((fs,f)=>{fs.push(downloadFile(f.id, f.name));return fs;}, []), id, print_id, PRINT_SERVICE.types[data.type]);
+  editMessageText(id, data.message.message_id, `נשלח להדפסה עם מספר הזהות: ${print_id}.\nבעוד מספר רגעים תקבל אישור קליטה.`, []);
   reset(id);
 }
 
@@ -152,6 +157,11 @@ PRINT_EDIT[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb 
   kb[1][0].text = PRINT_SERVICE.typeNames[cb.data];
   editMessageText(id, data.message.message_id, data.message.text, kb);
   saveUser({id, reg2:0, reg3:JSON.stringify(data)});
+  let preferencesCell = users.getRange(row, fieldUsers.reg1);
+  let preferences = preferencesCell.getValue();
+  preferences = preferences?JSON.parse(preferences):{id: data.id};
+  preferences.type = data.type;
+  preferencesCell.setValue(JSON.stringify(preferences));
 }
 
 

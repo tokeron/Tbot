@@ -11,6 +11,7 @@ const fieldUsers = {
   reg4: 7,
   reg5: 8,
   authorized: 10,
+  printPref:11,
   nextFreeRow: {
     row: 1,
     col: 4
@@ -151,4 +152,4 @@ PRINT_SERVICE.defaultKeyboard = [
 ]
 PRINT_SERVICE.mailQuery += PRINT_SERVICE.types.reduce((s,t)=>{s+=`from:print.${t}@campus.technion.ac.il `;return s;},"{")+"}";
 /**global vars */
-var user,reg1,reg2,reg3,reg4,reg5;
+var user,reg1,reg2,reg3,reg4,reg5, users;

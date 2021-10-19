@@ -53,7 +53,7 @@ function handleCallback(contents){
   var statistics = dataBaseEx.getSheetByName("statistics");
   var telegramLinks = dataBaseEx.getSheetByName("telegram");
   var busi = dataBaseEx.getSheetByName("busi");
-  var users = dataBaseEx.getSheetByName("users");
+  users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
   var needsHelp = dataBaseEx.getSheetByName("needsHelp");
   var glassDoor = dataBaseEx.getSheetByName("glassDoor");
@@ -88,9 +88,12 @@ function handleCallback(contents){
     }
 
   //get registers
-  var cell = findUser(id, users);
-  if (cell == null) set(id, name);
-  var row = cell.getRow(); 
+  user = findUser(id, users);
+  if (user == null) {
+    set(id, name); //first use, may be "set" should return the user.
+    user = findUser(id, users);
+  }
+  var row = user.getRow(); 
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
@@ -138,7 +141,7 @@ function handleCallback(contents){
   reset(id)
   return;
 }
-  
+
 /**
  * Handle regular massage
  */
@@ -149,7 +152,7 @@ function handleMessage(contents){
   var statistics = dataBaseEx.getSheetByName("statistics");
   var telegramLinks = dataBaseEx.getSheetByName("telegramLinks");
   var busi= dataBaseEx.getSheetByName("busi");
-  var users = dataBaseEx.getSheetByName("users");
+  users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
   var needsHelp = dataBaseEx.getSheetByName("needsHelp");
   var glassDoor = dataBaseEx.getSheetByName("glassDoor");
@@ -172,7 +175,7 @@ function handleMessage(contents){
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
   
   if(contents.message.document || contents.message.photo){
-    handlePrint(contents.message);
+    handlePrint(contents.message, users.getRange(row, fieldUsers.printPref).getValue());
     return;
   }
   // clean quotation marks in case it separated to parts - for example חדו"א    
