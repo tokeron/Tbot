@@ -207,7 +207,6 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
   data.filesMessage = editMessageText(id, data.message.message_id, text, kb);
   saveUser({id, reg3:JSON.stringify(data)});
 }
-function dummy(){Logger.log(PRINT_EDIT)}
 
 
 
