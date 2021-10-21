@@ -74,7 +74,7 @@ var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
   [{ text: SFS}/*, {text: "Glass Door"}*/,{ text: help }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
-  [{ text: usefulLink}], //{text: add}],
+  [{ text: usefulLink},{text: "print 🖨"}], //{text: add}],
   [{ text: feedback}],
   [{ text: "Statistics"}],
   [{ text: About}]
