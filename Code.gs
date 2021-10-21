@@ -158,7 +158,7 @@ function handleMessage(contents){
   var id = contents.message.from.id;
   var name = contents.message.from.first_name;
   var text = contents.message.text;
-  
+    
   // clean quotation marks in case it separated to parts - for example חדו"א    
   text = cleanQuotationMarks(text)
   

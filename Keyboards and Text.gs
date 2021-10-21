@@ -198,6 +198,7 @@ var allKeyBoard = [
   [{ text: testock }, { text: facebook }, { text: 'Panopto' }],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
+//TODO: here he wants me to add zoom and whatzup groups.
   
 
 var contactKeyBoard = [
