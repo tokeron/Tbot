@@ -26,6 +26,8 @@ function handlePrint(msg, preferences){
     data.files.push(file);
     if(reg1!=PRINT_SERVICE.symbol){
       let text = PRINT_SERVICE.messageBase+`\n1. ${file.name}`;
+      PRINT_SERVICE.defaultKeyboard[1][0].text = PRINT_SERVICE.typeNames[data.type];
+      if(data.id)PRINT_SERVICE.defaultKeyboard[1][1].text = data.id;
       data.message = sendText(id, text, PRINT_SERVICE.defaultKeyboard);
     }else{
       data.message.text += `\n${data.files.length}. ${file.name}`;
@@ -92,6 +94,17 @@ function resetPrinterCounter(){
   // Logger.log(ScriptProperties.getProperty(PRINT_SERVICE.counter))
 }
 
+function printSettings(msg){
+  let preferences = JSON.parse(users.getRange(row, fieldUsers.printPref).getValue());
+  preferences = preferences?JSON.parse(preferences):{};
+  if(preferences.id){
+    //option to change the id
+    //option to delete id
+  }
+  else{
+    //option to set id
+  }
+}
 
 const PRINT_CB_HANDLERS = {};
 
@@ -137,7 +150,7 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb
   let data = JSON.parse(reg3);
   print_id = data.id || id;
   sendEmail(data.files.reduce((fs,f)=>{fs.push(downloadFile(f.id, f.name));return fs;}, []), id, print_id, PRINT_SERVICE.types[data.type]);
-  editMessageText(id, data.message.message_id, `נשלח להדפסה עם מספר הזהות: ${print_id}.\nבעוד מספר רגעים תקבל אישור קליטה.`, []);
+  editMessageText(id, data.message.message_id, `נשלח להדפסה עם מספר הזהות: ${print_id}.\nבעוד מספר רגעים יתקבל אישור קליטה.`, []);
   reset(id);
 }
 
@@ -149,9 +162,16 @@ PRINT_EDIT[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramMessage} msg */funct
   let data = JSON.parse(reg3);
   data.id = msg.text;
   editMessageText(id, data.message.message_id, data.message.text, []);
-  let kb = data.message.reply_markup.inline_keyboard;
-  kb[1][1].text = msg.text;
-  data.message = sendText(id, data.message.text, kb);
+  let preferences = users.getRange(row, fieldUsers.printPref).getValue();
+  preferences = preferences?JSON.parse(preferences):{};
+  if (preferences.never_ask){
+    let kb = data.message.reply_markup.inline_keyboard;
+    kb[1][1].text = msg.text;
+    data.message = sendText(id, data.message.text, kb);
+  }
+  else{
+    //ask for saving
+  }
   saveUser({id, reg2:0, reg3:JSON.stringify(data)});
 }
 
@@ -163,9 +183,9 @@ PRINT_EDIT[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb 
   kb[1][0].text = PRINT_SERVICE.typeNames[cb.data];
   editMessageText(id, data.message.message_id, data.message.text, kb);
   saveUser({id, reg2:0, reg3:JSON.stringify(data)});
-  let preferencesCell = users.getRange(row, fieldUsers.reg1);
+  let preferencesCell = users.getRange(row, fieldUsers.printPref);
   let preferences = preferencesCell.getValue();
-  preferences = preferences?JSON.parse(preferences):{id: data.id};
+  preferences = preferences?JSON.parse(preferences):{};
   preferences.type = data.type;
   preferencesCell.setValue(JSON.stringify(preferences));
 }
