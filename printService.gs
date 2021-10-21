@@ -11,8 +11,8 @@ function handlePrint(msg, preferences){
     saveUser({id:id, reg1:PRINT_SERVICE.symbol, reg2:0, reg3:0, reg4:0, reg5:0});
     if(preferences){
       preferences = JSON.parse(preferences);
-      data = {type: preferences.type || 0, files:[], id: preferences.id || null}
     }
+    data = {type: preferences.type || 0, files:[], id: preferences.id || null}
   }
   var file = null;
   if (msg.photo){
@@ -36,7 +36,7 @@ function handlePrint(msg, preferences){
 }
 
 /**
- * Send an email with files to print servise.
+ * Send an email with files to the print service.
  * @param {Blob[]} files The files to send.
  * @param {(String|Number)} chatId The identifier of the telegram chat.
  * @param {(String|Number)} studentId The ID number of the student.
@@ -102,7 +102,6 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.cancel] = /** @param {TelegramCallbackQuery} 
   reset(id);
 };
 
-
 PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramCallbackQuery} cb */ function(cb){
   let id = cb.from.id;
   saveUser({id, reg2:PRINT_SERVICE.cb.chengeID})
@@ -115,6 +114,13 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQue
   editMessageText(id, message.message_id, "בחר שיטת הדפסה", PRINT_SERVICE.typeNames.reduce((k,t, i)=>{k.push([{text:t, callback_data:i}]);return k;}, []));
   saveUser({id, reg2:PRINT_SERVICE.cb.chengeType});
 }
+
+// PRINT_CB_HANDLERS[PRINT_SERVICE.cb.settings] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+//   let id = cb.from.id;
+//   let message = cb.message;
+//   editMessageText(id, message.message_id, "<u><b>הגדרות</b></u>", PRINT_SERVICE.settings);
+//   saveUser({id, reg2:PRINT_SERVICE.cb.settings});
+// }
 
 PRINT_CB_HANDLERS[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery} cb */ function(cb){
   let id = cb.from.id;
