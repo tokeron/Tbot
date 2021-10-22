@@ -121,7 +121,7 @@ function handleCallback(contents){
       }
       return;
     case(PRINT_SERVICE.symbol):
-      if(reg2 == 0)
+      if(PRINT_CB_HANDLERS.hasOwnProperty(data))
         PRINT_CB_HANDLERS[data](contents.callback_query);
       else
         PRINT_EDIT[reg2](contents.callback_query);
@@ -175,7 +175,7 @@ function handleMessage(contents){
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
   
   if(contents.message.document || contents.message.photo){
-    handlePrint(contents.message, users.getRange(row, fieldUsers.printPref).getValue());
+    handlePrint(contents.message);
     return;
   }
   // clean quotation marks in case it separated to parts - for example חדו"א    
@@ -277,7 +277,11 @@ function handleMessage(contents){
                     "\nLast Month: "+ monthly + 
                     "\nLast Week: " + weekly +
                     "\nLast Day: " + daily);
-      return
+      return;
+    case PRINT_SERVICE.symbol:
+      sendText(id, "ניתן לשלוח להדפסה בטכניון דרך tbot!\nניתן לשלוח קבצים ללא פעולה מקדימה.");
+      handlePrint(contents.message);
+      return;
   }
 
   switch(reg1){

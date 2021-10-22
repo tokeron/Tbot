@@ -2,39 +2,31 @@
  * handles print message.
  * @param {TelegramMessage} msg Message that contains a file.
  */
-function handlePrint(msg, preferences){
+function handlePrint(msg){
   var id = msg.from.id;
-  // removeKey(id);
+  let preferences = users.getRange(user.getRow(), fieldUsers.printPref).getValue();
+  preferences = preferences?JSON.parse(preferences):{};
   var data;
   if(reg1==PRINT_SERVICE.symbol)data = JSON.parse(reg3);
   else {
+    removeKey(id, PRINT_SERVICE.headerMessage);
     saveUser({id:id, reg1:PRINT_SERVICE.symbol, reg2:0, reg3:0, reg4:0, reg5:0});
-    if(preferences){
-      preferences = JSON.parse(preferences);
-    }
     data = {type: preferences.type || 0, files:[], id: preferences.id || null}
   }
-  var file = null;
   if (msg.photo){
-    var id = msg.photo[msg.photo.length - 1].file_id;
-    file = {id, name:id+".jpg"};
+    let fid = msg.photo[msg.photo.length - 1].file_id;
+    data.files.push({fid, name:fid+".jpg"});
   }
   if (msg.document){
-    file = {id:msg.document.file_id, name:msg.document.file_name};
-  } 
-  if(file){
-    data.files.push(file);
-    if(reg1!=PRINT_SERVICE.symbol){
-      let text = PRINT_SERVICE.messageBase+`\n1. ${file.name}`;
-      PRINT_SERVICE.defaultKeyboard[1][0].text = PRINT_SERVICE.typeNames[data.type];
-      if(data.id)PRINT_SERVICE.defaultKeyboard[1][1].text = data.id;
-      data.message = sendText(id, text, PRINT_SERVICE.defaultKeyboard);
-    }else{
-      data.message.text += `\n${data.files.length}. ${file.name}`;
-      editMessageText(id, data.message.message_id, data.message.text, data.message.reply_markup.inline_keyboard);
-    }
-    saveUser({id:id, reg3:JSON.stringify(data)})
+    data.files.push({id:msg.document.file_id, name:msg.document.file_name});
   }
+  let text = data.files.reduce((s,f, i)=>s+`\n${i+1}. ${f.name}`,PRINT_SERVICE.messageBase);
+  if(reg1!=PRINT_SERVICE.symbol){
+    data.message = sendText(id, text, PRINT_SERVICE.getMainKB(data));
+  }else{
+    data.message = editMessageText(id, data.message.message_id, text, PRINT_SERVICE.getMainKB(data));
+  }
+  saveUser({id:id, reg3:JSON.stringify(data)})
 }
 
 /**
@@ -94,17 +86,7 @@ function resetPrinterCounter(){
   // Logger.log(ScriptProperties.getProperty(PRINT_SERVICE.counter))
 }
 
-function printSettings(msg){
-  let preferences = JSON.parse(users.getRange(row, fieldUsers.printPref).getValue());
-  preferences = preferences?JSON.parse(preferences):{};
-  if(preferences.id){
-    //option to change the id
-    //option to delete id
-  }
-  else{
-    //option to set id
-  }
-}
+
 
 const PRINT_CB_HANDLERS = {};
 
@@ -124,7 +106,7 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramCallbackQuery
 PRINT_CB_HANDLERS[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb */ function(cb){
   let id = cb.from.id;
   let message = cb.message;
-  editMessageText(id, message.message_id, "בחר שיטת הדפסה", PRINT_SERVICE.typeNames.reduce((k,t, i)=>{k.push([{text:t, callback_data:i}]);return k;}, []));
+  editMessageText(id, message.message_id, "בחר שיטת הדפסה", PRINT_SERVICE.typesKB);
   saveUser({id, reg2:PRINT_SERVICE.cb.chengeType});
 }
 
@@ -139,8 +121,7 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuer
   let id = cb.from.id;
   let data = JSON.parse(reg3);
   let message = cb.message;
-  let kb = data.files.reduce((k,t, i)=>{k.push([{text:t.name, callback_data:i},{text:"❌", callback_data:"d"+i}]);return k;}, []);
-  kb.push([{text:"סיימתי", callback_data:"done"}]);
+  let kb = PRINT_SERVICE.getEditKB(data);
   data.filesMessage = editMessageText(id, message.message_id, "לחץ על הקובץ כדי לשנות את שמו, או על ❌ כדי למחוק אותו", kb);
   saveUser({id, reg2:PRINT_SERVICE.cb.editFiles, reg3:JSON.stringify(data)});
 }
@@ -154,36 +135,76 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb
   reset(id);
 }
 
+PRINT_CB_HANDLERS[PRINT_SERVICE.cb.deleteID] = /** @param {TelegramCallbackQuery} cb */function(cb){
+  let id = cb.from.id;
+  let data = JSON.parse(reg3);
+  let preferencesCell = users.getRange(user.getRow(), fieldUsers.printPref);
+  let preferences = preferencesCell.getValue();
+  preferences = preferences?JSON.parse(preferences):{};
+  delete data.id;
+  delete preferences.id;
+  preferencesCell.setValue(JSON.stringify(preferences));
+  editMessageText(id, cb.message.message_id, cb.message.text, PRINT_SERVICE.getMainKB(data));
+  saveUser({id, reg2:0, reg3:JSON.stringify(data)});
+}
+
 
 const PRINT_EDIT = {};
 
 PRINT_EDIT[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramMessage} msg */function(msg){
   let id = msg.from.id;
+  if (!/^\d+$/.test(msg.text)){
+    sendText(id, "נא להזין ספרות בלבד.");
+    return;
+  }
   let data = JSON.parse(reg3);
   data.id = msg.text;
+  let r2 = 0;
   editMessageText(id, data.message.message_id, data.message.text, []);
-  let preferences = users.getRange(row, fieldUsers.printPref).getValue();
+  let preferences = users.getRange(user.getRow(), fieldUsers.printPref).getValue();
   preferences = preferences?JSON.parse(preferences):{};
   if (preferences.never_ask){
-    let kb = data.message.reply_markup.inline_keyboard;
-    kb[1][1].text = msg.text;
-    data.message = sendText(id, data.message.text, kb);
+    data.message = sendText(id, data.message.text, PRINT_SERVICE.getMainKB(data));
   }
   else{
-    //ask for saving
+    let text = "האם ברצונך לשמור מספר זה?";
+    let m = sendText(id, text, PRINT_SERVICE.changeIdKeyboard);
+    data.message.message_id = m.message_id;
+    r2 = PRINT_SERVICE.cb.chengeID+1;
   }
+  saveUser({id, reg2:r2, reg3:JSON.stringify(data)});
+}
+
+PRINT_EDIT[PRINT_SERVICE.cb.chengeID+1] = /** @param {TelegramCallbackQuery} cb */ function(cb){
+  let id = cb.from.id;
+  let data = JSON.parse(reg3);
+  let preferencesCell = users.getRange(user.getRow(), fieldUsers.printPref);
+  let preferences = preferencesCell.getValue();
+  preferences = preferences?JSON.parse(preferences):{};
+  switch (cb.data){
+    case "yes":
+      preferences.id = data.id;
+      break;
+    case "no":
+      break;
+    case "never":
+      preferences.never_ask = 1;
+      break;
+  }
+  preferencesCell.setValue(JSON.stringify(preferences));
+  data.message = editMessageText(id, data.message.message_id, data.message.text, PRINT_SERVICE.getMainKB(data));
   saveUser({id, reg2:0, reg3:JSON.stringify(data)});
 }
+
+
 
 PRINT_EDIT[PRINT_SERVICE.cb.chengeType] = /** @param {TelegramCallbackQuery} cb */function(cb){
   let id = cb.from.id;
   let data = JSON.parse(reg3);
   data.type = cb.data;
-  let kb = data.message.reply_markup.inline_keyboard;
-  kb[1][0].text = PRINT_SERVICE.typeNames[cb.data];
-  editMessageText(id, data.message.message_id, data.message.text, kb);
+  data.message = editMessageText(id, data.message.message_id, data.message.text, PRINT_SERVICE.getMainKB(data));
   saveUser({id, reg2:0, reg3:JSON.stringify(data)});
-  let preferencesCell = users.getRange(row, fieldUsers.printPref);
+  let preferencesCell = users.getRange(user.getRow(), fieldUsers.printPref);
   let preferences = preferencesCell.getValue();
   preferences = preferences?JSON.parse(preferences):{};
   preferences.type = data.type;
@@ -208,7 +229,6 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
       kb = data.filesMessage.reply_markup.inline_keyboard;
       kb[data.renameFile][0].text = fileName;
       delete data.renameFile;
-      // sendText(id, JSON.stringify(kb))
     }else{
       return;
     }
@@ -218,14 +238,14 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
     kb = obj.message.reply_markup.inline_keyboard;
     if(obj.data=="done"){
       text = data.files.reduce((s,f,i)=>{s+=`\n${i+1}. ${f.name}`;return s}, PRINT_SERVICE.messageBase);
-      kb = data.message.reply_markup.inline_keyboard;
+      kb = PRINT_SERVICE.getMainKB(data);
       saveUser({id, reg2:0});
       delete data.filesMessage;
     }
     else if(obj.data.startsWith("d")){//deleting file from the list
       i = parseInt(obj.data.slice(1));
       data.files.splice(i,1);
-      kb.splice(i,1);
+      kb = PRINT_SERVICE.getEditKB(data);
     }
     else {
       let fileId = parseInt(obj.data);

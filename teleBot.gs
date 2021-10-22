@@ -118,6 +118,7 @@ function editMessageText(chatId, msgId, text, keyboard){
     payload: {
       method: "editMessageText",
       chat_id: String(chatId),
+      parse_mode: "html",
       text: text,
       message_id: msgId,
     }
