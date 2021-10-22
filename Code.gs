@@ -87,7 +87,10 @@ function handleCallback(contents){
 
   //get registers
   var user = findUser(id, users);
-  if (user == null) set(id, name);
+  if (user == null) {
+    set(id, name); //first use, may be "set" should return the user.
+    user = findUser(id, users);
+  }
   var row = user.getRow();
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
@@ -166,7 +169,10 @@ function handleMessage(contents){
 
   //find user and load his registers
   user = findUser(id, users);
-  if (user == null) set(id, name);
+  if (user == null) {
+    set(id, name); //first use, may be "set" should return the user.
+    user = findUser(id, users);
+  }
   var row = user.getRow();
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
