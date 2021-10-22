@@ -10,8 +10,12 @@ const fieldUsers = {
   reg3: 6,
   reg4: 7,
   reg5: 8,
-  authorized: 10,
-  printPref:11,
+  authorized: 9,
+  verificationPassword: 10,
+  email: 11,
+  printPref: 12,
+  firstCourse: 14,
+  lastCourse: 29,
   nextFreeRow: {
     row: 1,
     col: 4

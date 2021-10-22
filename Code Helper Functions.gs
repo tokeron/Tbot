@@ -148,7 +148,7 @@ function simpleText(id, name, text){
       return true
     case(calendar):
       sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);
-      updateClickOnLinksStats();   
+      updateClickOnLinksStats();
       return true
     case("אזור תל אביב-יפו והמרכז"):
       sendKey(id, "Choose a city from the list below:", teKeyBoard);
@@ -245,7 +245,7 @@ function simpleText(id, name, text){
       removeKey(id, "Please insert the course number or course name in hebrew");
       set(id, name, "Course", 0)
       return true
-    case(faculty): 
+    case(faculty):
     case("Department Groups \ud83c\udfeb"):
       sendKey(id, "Choose your faculty from the list below ", coursesKeyBoard);
       oldSet(id, 'faculty');
@@ -305,6 +305,22 @@ function sendOpt(id, name, courses, courseRow){
   return
 }
 
+function askVerification(id, name){
+  set(id, name, "sendEmail");
+  removeKey(id, "In order to use this feature we need to verify that you are a technion student.");
+  sendText(id, "Please insert your Technion email.");
+  return;
+}
+
+function isAuthorized(id, users){
+  var userCell = getUserCell(id, users);
+  if (userCell){
+    return users.getRange(userCell.getRow(), fieldUsers.authorized).getValue();
+  }else{
+    welcomeUser(id);
+  }
+}
+
 
 function getDone(id, name, reg2, command, users, courses){
   var courseRow = reg2
@@ -315,7 +331,8 @@ function getDone(id, name, reg2, command, users, courses){
     var teams = courses.getRange(courseRow, fieldCourses.teams).getValue();
     var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
     var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
-    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue()
+    var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue();
+    var authorized = isAuthorized(id, users);
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
@@ -328,6 +345,11 @@ function getDone(id, name, reg2, command, users, courses){
         //users.getRange(2, 9).setValue(++currentCounter);
         return;
       case telegramGroup:
+        if (authorized !== 'true')
+        {
+          askVerification(id, name);
+          return;
+        }
         sendText(id, "Looking for telegram group" + groupSy);
         if (group) sendText(id, group);
         else sendText(id, "There is no telegram group for this course yet. you can open and add a groupby using 'Add group'");
@@ -686,7 +708,7 @@ function courseAdd(id ,courseNumber, courseName, link, courses){
   
 /**
  * not so usefull feature, probably goes down
- * 
+ *
  * */
 function reviewsHandler(id, i, courses, isAll){
   // sendText(id, "Looking for reviews " + reviewsSy);
@@ -723,7 +745,7 @@ function oldSet(id, data, name, num){
  * @param {reg2} helper parameter for "remembering" previous user data
  * @param {reg3} helper parameter for "remembering" previous user data
  * @param {reg4} helper parameter for "remembering" previous user data
- * @param {reg5} helper parameter for "remembering" previous user data 
+ * @param {reg5} helper parameter for "remembering" previous user data
  */
 
 function set(id, name, reg1, reg2, reg3, reg4, reg5){
@@ -867,6 +889,83 @@ function statTrigger(){
 function reset(id, name){
   set(id, name, 0, 0, 0, 0, 0)
 }
+/**
+ * function updateUserStats
+ * updates the user statistics when a known user is using the bot again.
+ * @param {row} the row of the user that logged-in in the users spreadsheet.
+ */
+function updateUserStats(row){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+  var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
+  var now = new Date();
+  var diff = now - lastSeen;
+
+  if(diff > DAY){
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statistics.getRange(stats.users.day.row,stats.users.day.col).getValue() + 1);
+    statistics.getRange(stats.test.row,stats.test.col).setValue(1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
+    if(diff > 7*DAY){
+      statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statistics.getRange(stats.users.week.row,stats.users.week.col).getValue() + 1);
+      if(diff > 30*DAY){
+        statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statistics.getRange(stats.users.month.row,stats.users.month.col).getValue() + 1);
+        }
+      }
+    }
+  return;
+}
+/**
+ * statTrigger:
+ * A function that updates the number of active users in the last day/week/month.
+ * Should be called daily by a trigger.
+ */
+function statTrigger(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+  var today = new Date();
+  var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
+  var statUsersMonthly = 0;
+  var statUsersWeekly = 0;
+  var statUsersDaily = 0;
+  for(let row=3;row<nextFreeRow;row++){
+    var diff = today - users.getRange(row, fieldUsers.lastSeen).getValue();
+    if(diff < 30*DAY){
+      statUsersMonthly++;
+      if(diff < 7*DAY){
+        statUsersWeekly++;
+        if(diff < DAY){
+          statUsersDaily++;
+        }
+      }
+    }
+  }
+  statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statUsersMonthly);
+  statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
+  statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
+
+  var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
+  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
+  statistics.getRange(row,stats.numOfUsersCol).setValue(0);
+  statistics.getRange(row,stats.clicksCol).setValue(0);
+  statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
+  statistics.getRange(row,stats.rideClicksCol).setValue(0);
+  statistics.getRange(row,stats.talkClicksCol).setValue(0);
+
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
+  return;
+}
+
+/**
+ * set all reg to zero
+ */
+function reset(id, name){
+  set(id, name, 0, 0, 0, 0, 0)
+}
 
 
 /**
@@ -904,7 +1003,7 @@ function cleanList(id, users){
   }
   if (cell){
     var idRow = cell.getRow();
-    for (var currCol = 14;currCol <=29; currCol++){
+    for (var currCol = fieldUsers.firstCourse;currCol <=fieldUsers.lastCourse; currCol++){
       users.getRange(idRow, currCol).setValue(0);
     }
     sendText(id, "Your list is clean");
@@ -921,13 +1020,13 @@ function findUser(id, users){
   var cell = cellFinder.findNext()
   while (cell !== null && cell.getColumn() !== 1)
   {
-    cell = cellFinder.findNext(); 
+    cell = cellFinder.findNext();
   }
   return cell;
 }
 
 /**
- * 
+ *
  */
 function  SFSHandler(id, name, busi, data, reg1)
 {
@@ -1018,8 +1117,8 @@ function  SFSHandler(id, name, busi, data, reg1)
 /**
  * This function deletes one course from the list of cources for the user
  * @param {string} id user id
- * @param {string} name 
- * @param {string} data 
+ * @param {string} name
+ * @param {string} data
  * @param {spreadsheet} users
  * @param {spreadsheet} courses
  */
@@ -1027,7 +1126,14 @@ function deleteCourse(id, name, data, users, courses){
   var flag = false;
   var courseCol = 0;
   var lastInCol;
-  var index = 5;
+  var index = fieldUsers.firstCourse;
+  var userCell = getUserCell(id, users);
+  if (userCell){
+    row = userCell.getRow();
+  }else{
+    welcomeUser(id);
+    return;
+  }
   var currCourseRow = users.getRange(row, index).getValue();
   var currCourse;
   while (currCourseRow){//while there is courses in the list
@@ -1066,7 +1172,7 @@ function connectHelper(id, data, helpers){
 }
 
 /**
- * 
+ *
  */
 function cleanQuotationMarks(text){
   var tmpText = text.split('"');
@@ -1077,56 +1183,145 @@ function cleanQuotationMarks(text){
 }
 
 /**
- * 
+ * Get the user cell if exists
  */
-function isAuthorized(id, users){
-      ///////////////////////////////////////////////password - not in use for now
-    /*
-    var app = SpreadsheetApp.openByUrl(userExcel);
-    var ss = app.getActiveSheet();
-    var rows = ss.createTextFinder(id).findAll();
-    if (rows.length == 0){
-      sendText(id, "Hi " + name + " \ud83d\udc4b, welcome to Tbot \ud83d\udcd6");   
-      sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
-      var next = ss.getRange(2, 4).getValue();
-      ss.getRange(next, 1).setValue(id);
-      ss.getRange(next, 2).setValue("need to be verified");
-      if (name) ss.getRange(next, 3).setValue(name);
-      ss.getRange(2, 4).setValue(++next);
-      return;
-    }else{
-      var row = rows[0].getRow();
-      if (ss.getRange(row, 2).getValue() == "need to be verified"){
-        if (text.includes(fisrtLogInPassword)){
-          oldSet(id, 0, name, 0);
-          sendKey(id, "How may I help you?", mainKeyBoard);
-          sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-        }else if (text.includes("technion.ac.il")){
-          sendText(id, "The passwors is sent to "+ text+ " please insert the password now");
-          // Fetch the email address
-          var emailAddress = text;
-              // Send Alert Email.
-              var message = text; 
-              var subject = 'Tbot first log-in password';
-          MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
-          //TODO sent email
-        }else{
-          sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
-        }
-        return;
-      }
-    }*/
-    /*
-    else if (text == 'Re 404'){
-      sendText( , 'Hi, thank you for your feedback');
-      sendText( ,'You are right, I have not yet added a button that deletes a specific course. In the meantime, you can clear the list and build a new one. Hope to add an option to remove a specific course soon ..');
-      sendText(id, 'Your massage sent');
-    }*/
-  return true;
+function getUserCell(id, users)
+{
+  var textFinder = users.createTextFinder(id);
+  var userCell = textFinder.findNext();
+  while (userCell && userCell.getColumn() !== 1)
+  {
+    userCell = textFinder.findNext();
+  }
+  return userCell;
 }
 
 /**
- * 
+ *
+ */
+function welcomeUser(id, name)
+{
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
+  reset(id, name)
+  return;
+}
+
+/**
+ *
+ */
+function generateRandomNumber(){
+  var randomNumber = Math.floor(Math.random() * 10000);
+  var randomNumberAsString = randomNumber.toString();
+  return randomNumberAsString;
+}
+
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} data
+ * @param {spreadsheet} users users spreadsheet
+ */
+function sendVerificationCode(id, name, data, users){
+  var email = data;
+  if (email.indexOf("technion.ac.il") == -1)
+  {
+    sendText(id, "Your is not recognizes at a technion email in my system. Please send a valid technion email address.")
+    return;
+  }
+  else // it's a valid technion email address
+  {
+    var userCell = getUserCell(id, users);
+    if (userCell){
+      var pass = generateRandomNumber();
+      var subject = "Tbot verification code"
+      MailApp.sendEmail(email, subject, "Your verification code is: "+pass);
+      users.getRange(userCell.getRow(), fieldUsers.email).setValue(email);
+      users.getRange(userCell.getRow(), fieldUsers.verificationPassword).setValue(pass);
+      sendText(id, "Please insert the verification code that we sent to your email.")
+      sendText(id, "Please check the spam email!")
+      sendText(id, "If you didn't get any email, type 'send again'.")
+      set(id, name, "insertPass")
+    }else{
+      welcomeUser(id, name);
+    }
+    return;
+  }
+
+}
+
+
+/**
+ * @param {string} id
+ * @param {string} name
+ * @param {string} text
+ * @param {spreadsheet} users users spreadsheet
+ */
+function checkIfPass(id, name, text, users){
+  var userCell = getUserCell(id, users);
+  if (text == "send again" && userCell){
+    email = users.getRange(userCell.getRow(), fieldUsers.email).getValue();
+    sendVerificationCode(id, name, email, users);
+    return;
+  }
+  else{
+    if (userCell){
+      var verificationPassword = users.getRange(userCell.getRow(), fieldUsers.verificationPassword).getValue();
+      if (text == verificationPassword)
+      {
+        users.getRange(userCell.getRow(), fieldUsers.authorized).setValue('true');
+        sendText(id, "Congrats! You are a verified now!")
+        welcomeUser(id);
+      }else{
+        sendText(id, "The verification code does not match. please try again.")
+      }
+    }else{
+      welcomeUser(id, name);
+    }
+    return;
+  }
+}
+
+/**
+ * Create a random code and sends it to the technion email
+ */
+// function athorize(id, name, users){
+//   var userCell = getUserCell(id, users);
+//   if (userCell){
+//     sendText(id, "Please insert your Technion email address to get a verification code");
+//     set(id, name, "sendEmail");
+//     return;
+//     }else{
+//       var row = rows[0].getRow();
+//       if (ss.getRange(row, 2).getValue() == "need to be verified"){
+//         if (text.includes(fisrtLogInPassword)){
+//           oldSet(id, 0, name, 0);
+//           sendKey(id, "How may I help you?", mainKeyBoard);
+//           sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
+//         }else if (text.includes("technion.ac.il")){
+//           sendText(id, "The passwors is sent to "+ text+ " please insert the password now");
+//           // Fetch the email address
+//           var emailAddress = text;
+//               // Send Alert Email.
+//               var message = text;
+//               var subject = 'Tbot first log-in password';
+//           MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
+//           //TODO sent email
+//         }else{
+//           sendText(id, "To get access to the bot Please insert your Technion email address to get the first time log-in password");
+//         }
+//         return;
+//       }
+//     }
+//     else if (text == 'Re 404'){
+//       sendText( , 'Hi, thank you for your feedback');
+//       sendText( ,'You are right, I have not yet added a button that deletes a specific course. In the meantime, you can clear the list and build a new one. Hope to add an option to remove a specific course soon ..');
+//       sendText(id, 'Your massage sent');
+//     }
+//   return true;
+// }
+
+/**
+ *
  */
 function registrationToHelp(id, helpers){
   var helperFinder = helpers.createTextFinder(id);
@@ -1190,7 +1385,7 @@ function addToList(id, reg2, row, users, courses){
 }
 
 /**
- * 
+ *
  */
 function loadCourses(id, row, users, courses){
   sendText(id, "Loading your Courses..");
@@ -1228,7 +1423,7 @@ function loadCourses(id, row, users, courses){
 }
 
 /**
- * 
+ *
  */
 function setAnonymousTalk(id, users, helpers){
   var helperCol = 2;
@@ -1269,7 +1464,7 @@ function setAnonymousTalk(id, users, helpers){
 }
 
 /**
- * 
+ *
  */
 function sendHelperSettings(id, name, text, needsHelp){
   var cellFinder = needsHelp.createTextFinder(id);
@@ -1299,7 +1494,7 @@ function sendHelperSettings(id, name, text, needsHelp){
 }
 
 /**
- * 
+ *
  */
 function sendSFS(id, name, text, busi){
   sendText(id, "Students for Students is a project designed to encourage students to support other students businesses");
@@ -1308,12 +1503,12 @@ function sendSFS(id, name, text, busi){
   var topicBase = busi.getRange(4, 2).getValue();
   var sectionBase = busi.getRange(5, 2).getValue();
   var sectionsNum = busi.getRange(6, 2).getValue();
-  //var topicNum = busi.getRange(7, 2).getValue(  
+  //var topicNum = busi.getRange(7, 2).getValue(
   var courseList = [];
   var numberList = [];
   for (var i = sectionBase + 1; i < sectionBase*sectionsNum; i += sectionBase){
     var currTopic = busi.getRange(1, i).getValue();
-    //sendText(id, "test: currTopic: "+currTopic); 
+    //sendText(id, "test: currTopic: "+currTopic);
     numberList.push(currTopic);
     courseList.push(currTopic);
   }
@@ -1328,7 +1523,7 @@ function sendSFS(id, name, text, busi){
 }
 
 /**
- * 
+ *
  */
 function  updateBusi(id, busi, reg2){
   var maxCol = busi.getRange(2, 2).getValue();
@@ -1336,7 +1531,7 @@ function  updateBusi(id, busi, reg2){
   var topicBase = busi.getRange(4, 2).getValue();
   var sectionBase = busi.getRange(5, 2).getValue();
   var sectionsNum = busi.getRange(6, 2).getValue();
-  var topicNum = busi.getRange(7, 2).getValue(); 
+  var topicNum = busi.getRange(7, 2).getValue();
   var currBusi = busi.createTextFinder(reg3).findNext();
   var busiRow = currBusi.getRow();
   var busiCol = currBusi.getColumn();
@@ -1350,7 +1545,7 @@ function  updateBusi(id, busi, reg2){
 }
 
 /**
- * 
+ *
  */
 function sendMassage(id, text, users){
   var otherId = users.getRange(row, 4).getValue();
@@ -1371,13 +1566,13 @@ function sendMassage(id, text, users){
 
 
 /**
- * 
+ *
  */
 function sendFeedback(id, name, text){
   // Fetch the email address
   var emailAddress = "technobot404@gmail.com";
   // Send Alert Email.
-  var message = text;       
+  var message = text;
   var subject = 'You have a new feedback from technoBot user';
   MailApp.sendEmail(emailAddress, subject, message + 'id: '+id+' ');
   sendText(id, "Thank you for your feedback! \uD83D\uDE4F");
@@ -1387,7 +1582,7 @@ function sendFeedback(id, name, text){
 }
 
 /**
- * sends 
+ * sends
  */
 function sendRideLink(id, telegramLinks, text){
   var list = telegramLinks.createTextFinder(text).findAll();
@@ -1401,7 +1596,7 @@ function sendRideLink(id, telegramLinks, text){
 }
 
 /**
- * 
+ *
  */
 function addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses){
   if (!(courseNumber) || !(courseName)){
@@ -1417,7 +1612,7 @@ function addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, course
 }
 
 /**
- * 
+ *
  */
 function addCourseReview(id, name, row, users, course){
   var idRow = row;
@@ -1437,7 +1632,7 @@ function addCourseReview(id, name, row, users, course){
 }
 
 /**
- * 
+ *
  */
 function addTelegramGroup(id, name, row, courses, users){
   var courseRow = 0;
@@ -1470,7 +1665,7 @@ function addTelegramGroup(id, name, row, courses, users){
 }
 
 /**
- * 
+ *
  */
  function addTeamsGroup(id, name, users, courses){
   var courseRow = 0;
@@ -1503,7 +1698,7 @@ function addTelegramGroup(id, name, row, courses, users){
 }
 
 /**
- * 
+ *
  */
 function addExamExcel(id, name, users, courses){
   var courseRow = 0;
@@ -1518,7 +1713,7 @@ function addExamExcel(id, name, users, courses){
 }
 
 /**
- * 
+ *
  */
 function findCourse(id, name, text, courses){
   var list = courses.createTextFinder(text).findAll();
@@ -1563,7 +1758,7 @@ function findCourse(id, name, text, courses){
 
 
 /**
- * 
+ *
  */
 function handleSettingsSFS(id, name, text, reg1, needsHelp){
   // init user in needsHelp table
@@ -1635,7 +1830,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
             var studentNumber = IdCol-9;
             sendText(helperId, "Student number "+studentNumber+" no longer needs your help.");
             var lastNumber = nextFree-1 - 9;
-            sendText(helperId, "From now student number "+lastNumber+" has a new number: "+studentNumber); 
+            sendText(helperId, "From now student number "+lastNumber+" has a new number: "+studentNumber);
           }
           //find in table and move to right place
           var numberOfPatients = nextFree - 10;
@@ -1657,7 +1852,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
       }
       return;
     case("Back"):
-    case('חזור'):        
+    case('חזור'):
       sendKey(id, "Choose from the list below", helpKeyBoard);
       return;
 
@@ -1686,7 +1881,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
     case('הפקולטה לביולוגיה'):
     case('רפואה'):
     case('ארכיטקטורה ובינוי ערים'):
-    case('חינוך למדע וטכנולוגיה'): 
+    case('חינוך למדע וטכנולוגיה'):
     case('הפקולטה להנדסת אוירונוטיקה וחלל'):
     needsHelp.getRange(row, 4).setValue(text);
     sendKey(id, "Your prefernce has been updated "+text+" faculty", settingsKeyBoard);
@@ -1695,7 +1890,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
 }
 
 /**
- * 
+ *
  */
 function deleteByNumber(id, name, users, courses){
   //get course row
@@ -1718,7 +1913,7 @@ function deleteByNumber(id, name, users, courses){
 }
 
 /**
- * 
+ *
  */
 function addTopicSFS(id, name, text, busi){
   var isExist = busi.createTextFinder(text).findNext();
@@ -1728,14 +1923,14 @@ function addTopicSFS(id, name, text, busi){
       busi.getRange(1, sectionBase*sectionsNum+1).setValue(text);
       busi.getRange(2, sectionBase*sectionsNum).setValue(0);
       busi.getRange(6, 2).setValue(sectionsNum+1);
-      sendText(id, "Got it! "+text+" topic is initialized");          
+      sendText(id, "Got it! "+text+" topic is initialized");
       oldSet(id, "null", name, "null");
     }
     return;
 }
 
 /**
- * 
+ *
  */
 function deleteBusi(id, reg3, busi){
   var textFinder = busi.createTextFinder(reg3);
@@ -1758,7 +1953,7 @@ function deleteBusi(id, reg3, busi){
 }
 
 /**
- * 
+ *
  */
 function deleteIfPass(text, busi){
   var busiToDelete = busi.createTextFinder(text).findNext();
@@ -1777,7 +1972,7 @@ function deleteIfPass(text, busi){
 }
 
 /**
- * 
+ *
  */
 function editBusi(id, text, busi){
   var textFinder = busi.createTextFinder(reg3);
@@ -1796,7 +1991,7 @@ function editBusi(id, text, busi){
 }
 
 /**
- * 
+ *
  */
 function createBusi(id, text, reg1, reg3, busi){
   var topic = reg3;
@@ -1805,7 +2000,7 @@ function createBusi(id, text, reg1, reg3, busi){
   var topicCounter = 0;
   if (currTopic){
    topicCol = currTopic.getColumn();
-   topicCounter = busi.getRange(2, topicCol-1).getValue(); 
+   topicCounter = busi.getRange(2, topicCol-1).getValue();
   }
   var isExist = busi.createTextFinder(text).findNext();
   if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");

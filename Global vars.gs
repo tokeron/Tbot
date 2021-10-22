@@ -1,12 +1,22 @@
-"use strict";
 
-//Global variables
-var token = "1954455054:AAE-xUGi6mks6mCOx8rmWrJoVcw3rTqEXI8";
-var url = "https://api.telegram.org/bot" + token;
-// var webAppUrl = "https://script.google.com/macros/s/AKfycbxV1kDinMkts7PJEFpmgHlGsJrmAEaUsQ8s0n346f4rziUAeFAu5KUeUqZpew4UlD0VzQ/exec";
-var numberOfCourses = 2000; 
+var numberOfCourses = 2000;
 var numberOfReviews = 2*26; 
 
+var token = "";
+var url = "https://api.telegram.org/bot" + token;
+// var webAppUrl = "";
+var webAppUrl = "";
+var numberOfCourses = 2000;
+var numberOfReviews = 2*26;
 
-var dataBase = "https://docs.google.com/spreadsheets/d/1msb2Th0Kb1cu8vfCP8dnSJ1K8zJxsK0q44guoLIGzqc/edit?usp=sharing";
-var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+var webAppUrl = "";
+
+var dataBase = ""; //new excel - contain all previous excel
+
+//Drive url
+var csDriveUrl = "https://drive.google.com/drive/folders/0B1ne4XyZXorvYmNFN19odjZGaEk?resourcekey=0-pbwZbH-RFt1_Ar9ztS-lzA"
+var taonDriveUrl = "https://drive.google.com/drive/folders/1JRFsxGmagk4pO81XBSx9EKWNduld-jet"
+var electricalDriveUrl = "https://drive.google.com/drive/folders/16g08YIerCR2YX-NcgI8bzy7sRA3xIi7t"
+var mechanicalDriveUrl = "https://drive.google.com/drive/folders/1KYwpHXvyewWaXC5YIvSnamSW5YD7nlBR"
+var physicsDriveUrl = "https://drive.google.com/drive/folders/1g5687tI9s-fwjgbp4C28qpOQerYVEQVp"
+var aeroDriveUrl = "https://drive.google.com/drive/folders/1gWBhTQwzvHyxR-oNLKxSI51TZYxxj3rM"

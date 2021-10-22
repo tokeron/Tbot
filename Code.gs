@@ -1,4 +1,3 @@
-"use strict";
 /**
  * This is a bot that was developed for the use of Technion students.
  * The bot is running on the google script platform and google sheets.
@@ -19,11 +18,10 @@ function doGet(e) {
 
 /**
  * Execution of requestes of users (Main function)
- * @param {class} JSON 
+ * @param {class} JSON
  */
 function doPost(e){
   var contents = JSON.parse(e.postData.contents);
-  var file;
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var statistics = dataBaseEx.getSheetByName("statistics");
 
@@ -43,7 +41,7 @@ function doPost(e){
 
 
 /**
- * Handle internal command. 
+ * Handle internal command.
  * Internal keyboard command - different from regular text
  */
 function handleCallback(contents){
@@ -81,19 +79,16 @@ function handleCallback(contents){
     case("Clean My List"):
       cleanList(id, users);
       return;
-    case ("Delete A Course From My List"): 
+    case ("Delete A Course From My List"):
       oldSet(id, data, name, 0);
       sendText(id, "Please tap on a course in order to delete it from your list");
       return;
     }
 
   //get registers
-  user = findUser(id, users);
-  if (user == null) {
-    set(id, name); //first use, may be "set" should return the user.
-    user = findUser(id, users);
-  }
-  var row = user.getRow(); 
+  var user = findUser(id, users);
+  if (user == null) set(id, name);
+  var row = user.getRow();
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
@@ -101,14 +96,14 @@ function handleCallback(contents){
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
   switch(reg1){
     case("help by number"): // helper is getting in contact with a student
-      connectHelper(id, data, helpers, needsHelp);
-      return;
+      connectHelper(id, data, helpers, needsHelp)
+      return
     case("Delete A Course From My List"):
-      deleteCourse(id, name, data, users, courses);
-      return;
+      deleteCourse(id, name, data, users, courses)
+      return
     case(SFS): //students fo students
-      SFSHandler(id, name, busi, data, reg1);
-      return;
+      SFSHandler(id, name, busi, data, reg1)
+      return
     case("Course"):
       //Searching a course
       var courseFinder = courses.createTextFinder(data);
@@ -119,6 +114,10 @@ function handleCallback(contents){
       if (currCourse){
         sendOpt(id, name, courses, currCourse.getRow());
       }
+      return;
+    case("authoriseMe"):
+      sendText(id, "Please insert your Technion email address to get a verification code");
+      set(id, name, "sendEmail");
       return;
     case(PRINT_SERVICE.symbol):
       if(PRINT_CB_HANDLERS.hasOwnProperty(data))
@@ -133,12 +132,16 @@ function handleCallback(contents){
   while(currCourse !== null && currCourse.getColumn() !== 1){
     currCourse = courseFinder.findNext();
   }
+  //Searching a course
+  var courseFinder = courses.createTextFinder(data);
+  var currCourse = courseFinder.findNext();
+  while(currCourse !== null && currCourse.getColumn() !== 1){
+    currCourse = courseFinder.findNext();
+  }
   if (currCourse){
     sendOpt(id, name, courses, currCourse.getRow());
   }
-  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
-  sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-  reset(id)
+  welcomeUser(id);
   return;
 }
 
@@ -160,25 +163,22 @@ function handleMessage(contents){
   var id = contents.message.from.id;
   var name = contents.message.from.first_name;
   var text = contents.message.text;
-  
+
   //find user and load his registers
   user = findUser(id, users);
-  if (user == null) {
-    set(id, name); //first use, may be "set" should return the user.
-    user = findUser(id, users);
-  }
-  var row = user.getRow(); 
+  if (user == null) set(id, name);
+  var row = user.getRow();
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
   reg4 = users.getRange(row, fieldUsers.reg4).getValue();
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
-  
+
   if(contents.message.document || contents.message.photo){
     handlePrint(contents.message);
     return;
   }
-  // clean quotation marks in case it separated to parts - for example חדו"א    
+  // clean quotation marks in case it separated to parts - for example חדו"א
   if(!text)return;
   text = cleanQuotationMarks(text)
 
@@ -189,18 +189,16 @@ function handleMessage(contents){
   //var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
   var date = new Date();
   users.getRange(row, fieldUsers.lastSeen).setValue(date);
-  
+
   //if simple command: execute
   var isDone = simpleText(id, name, text);
   if (isDone) return;
-  
+
 
 
   switch(text){
     case("/start"):
-      sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
-      sendText(id, "To add a course to your list, simply search for it in the courses, and click 'Add to My List' button");
-      reset(id, name)
+      welcomeUser(id);
       return;
     case('תפריט ראשי'):
     case('Main Menu'):
@@ -274,9 +272,13 @@ function handleMessage(contents){
       var weekly = statistics.getRange(4,2).getValue();
       var daily = statistics.getRange(5,2).getValue();
       sendText(id, "Users Statistics:\nAll Time Users: "+ allTime +
-                    "\nLast Month: "+ monthly + 
+                    "\nLast Month: "+ monthly +
                     "\nLast Week: " + weekly +
                     "\nLast Day: " + daily);
+      return;
+    case("authoriseMe"):
+      sendText(id, "Please insert your Technion email address to get a verification code");
+      set(id, name, "sendEmail");
       return;
     case PRINT_SERVICE.symbol:
       sendText(id, "ניתן לשלוח להדפסה בטכניון דרך tbot!\nניתן לשלוח קבצים ללא פעולה מקדימה.");
@@ -299,7 +301,7 @@ function handleMessage(contents){
       sendRideLink(id, telegramLinks, text)
       return
     case('Add course'):
-      addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses) 
+      addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses)
       return
     case('Write a review'):
       addCourseReview(id, name, row, users, course)
@@ -312,7 +314,7 @@ function handleMessage(contents){
     case('Add exams Excel'):
       addExamExcel(id, name, users, courses)
       return
-    case("faculty"): 
+    case("faculty"):
       facultyGroupHandler(id, text, reg1, reg2);
     case("Course"):
       findCourse(id, name, text, courses)
@@ -323,7 +325,13 @@ function handleMessage(contents){
     case("Delete by Course Number"):
       deleteByNumber(id, name, users, courses)
       return
-    case(SFS):     
+    case("sendEmail"):
+      sendVerificationCode(id, name, text, users);
+      return;
+    case("insertPass"):
+      checkIfPass(id, name, text, users);
+      return;
+    case(SFS):
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -371,7 +379,7 @@ function handleMessage(contents){
           //sendText(id, "curr topic: "+topic+" "+currTopic);
           if (currTopic){
            topicCol = currTopic.getColumn();
-           topicCounter = busi.getRange(2, topicCol-1).getValue(); 
+           topicCounter = busi.getRange(2, topicCol-1).getValue();
           }
           var isExist = busi.createTextFinder(text).findNext();
           if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");
@@ -448,10 +456,10 @@ function handleMessage(contents){
             }
           }
       }
-      case(PRINT_SERVICE.symbol):
-        if(reg2 != 0)PRINT_EDIT[reg2](contents.message);
-        return;
+    case(PRINT_SERVICE.symbol):
+      if(reg2 != 0)PRINT_EDIT[reg2](contents.message);
+      return;
   }
-  
+
   sendKey(id,"How may I help you?",mainKeyBoard);
 }
