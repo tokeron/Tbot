@@ -295,12 +295,9 @@ function updateClickOnLinksStats(){
 
 
 function sendOpt(id, name, courses, courseRow){
-  var excel = false;
-  var cs = false;
-  var teams = false;
   set(id, null, 'Course', courseRow);
-  var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
-  var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  //var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+  //var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
   sendKey(id, "Choose the required information",allKeyBoard)
   return
 }
@@ -352,10 +349,38 @@ function getDone(id, name, reg2, command, users, courses){
         }
         sendText(id, "Looking for telegram group" + groupSy);
         if (group) sendText(id, group);
-        else sendText(id, "There is no telegram group for this course yet. you can open and add a groupby using 'Add group'");
+        else {
+          sendText(id, "There is no telegram group for this course yet.");
+          set(id, null, "addTelegram");
+          sendKey(id, "Do you want to add a group now?", yesNoKey);
+        }
         //var currentCounter = users.getRange(2, 8).getValue();
         //users.getRange(2, 8).setValue(++currentCounter);
         return;
+      // case whatsappGroup:
+      //   if (authorized !== 'true')
+      //   {
+      //     askVerification(id, name);
+      //     return;
+      //   }
+      //   sendText(id, "Looking for whatsapp group" + groupSy);
+      //   if (whatsApp) sendText(id, whatsApp);
+      //   else sendText(id, "There is no whatsapp group for this course yet. you can open a group and send it now");
+      //   //var currentCounter = users.getRange(2, 8).getValue();
+      //   //users.getRange(2, 8).setValue(++currentCounter);
+      //   return;
+      // case zoom:
+      //   if (authorized !== 'true')
+      //   {
+      //     askVerification(id, name);
+      //     return;
+      //   }
+      //   sendText(id, "Looking for zoom link");
+      //   if (group) sendText(id, group);
+      //   else sendText(id, "There is no zoom link for this course yet. If you have a link, send it ");
+      //   //var currentCounter = users.getRange(2, 8).getValue();
+      //   //users.getRange(2, 8).setValue(++currentCounter);
+      //   return;
       case "Teams Group \ud83d\udc6a":
         sendText(id, "Looking for Teams Group \ud83d\udc6a" + groupSy);
         if (teams) sendText(id, teams);
@@ -899,7 +924,7 @@ function fetchAndDec(key){
 }
 
 /**
- * This function cleans the list of cources for the user
+ * This function cleans the list of courses for the user
  * @param {string} id user id
  * @param {spreadsheet} users users spreadsheet
  */
@@ -1023,7 +1048,7 @@ function  SFSHandler(id, name, busi, data, reg1)
 }
 
 /**
- * This function deletes one course from the list of cources for the user
+ * This function deletes one course from the list of courses for the user
  * @param {string} id user id
  * @param {string} name 
  * @param {string} data 
@@ -1085,7 +1110,7 @@ function connectHelper(id, data, helpers){
 function cleanQuotationMarks(text){
   var tmpText = text.split('"');
   if (tmpText.length == 2){
-    text=clean[0]+clean[1];
+    text=tmpText[0]+tmpText[1];
   }
   return text;
 }
@@ -1146,7 +1171,8 @@ function sendVerificationCode(id, name, data, users){
       users.getRange(userCell.getRow(), fieldUsers.email).setValue(email);
       users.getRange(userCell.getRow(), fieldUsers.verificationPassword).setValue(pass);
       sendText(id, "Please insert the verification code that we sent to your email.")
-      sendText(id, "If you didn't get any email, type 'send again' and I will send you another verification code.")
+      sendText(id, "Please check the spam email!")
+      sendText(id, "If you didn't get any email, type 'send again'.")
       set(id, name, "insertPass")
     }else{
       welcomeUser(id, name);
@@ -1257,7 +1283,7 @@ function registrationToHelp(id, helpers){
 }
 
 /**
- * Add a cource to the users' list
+ * Add a course to the users' list
  * @param {string} id
  * @param {string} reg2
  * @param {int} row user row
@@ -1622,41 +1648,55 @@ function addExamExcel(id, name, users, courses){
 /**
  * 
  */
+function countCourses(list, id)
+{
+  var counter = 0;
+  var len = list.length;
+  for (var i = 0; i < len; ++i)
+  {
+    if (list[i].getColumn() == fieldCourses.courseName || list[i].getColumn() == fieldCourses.courseNumber){
+      counter++;
+    }
+  }
+  return counter;
+}
+
+/**
+ * 
+ */
 function findCourse(id, name, text, courses){
   var list = courses.createTextFinder(text).findAll();
-  var len = list.length;
+  var len = countCourses(list, id); //Some of the results may come from the course description
   if (len == 1){
     sendOpt(id, name, courses, list[0].getRow());
+    return;
   }
   else if (len > 1){
-    var tooLong = false;
     if (len > 50){
       tooLong = true;
       sendText(id, 'There is too many courses containing: '+text);
       sendText(id, 'Try to search full course name or course number');
+      return;
     }
-    if (!(tooLong)){
-      sendText(id, "looking for relevant courses..");
-      var courseNames = [];
-      var courseNumbers = [];
-      var count = 0;
-      while (count < len){
-        var courseCol = list[count].getColumn();
-        courseRow = list[count].getRow();
-        if (courseCol == 1 || courseCol == 2){
-          var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
-          var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
-          //if (!(courseNumbers.includes(courseNumber))){
-          courseNames.push(courseName+" - "+courseNumber);
-          courseNumbers.push(courseNumber)
-        }
-        count++;
-        //}
+    sendText(id, "looking for relevant courses..");
+    var courseNames = [];
+    var courseNumbers = [];
+    var count = 0;
+    while (count < len){
+      var courseCol = list[count].getColumn();
+      courseRow = list[count].getRow();
+      if (courseCol == 1 || courseCol == 2){
+        var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+        var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+        //if (!(courseNumbers.includes(courseNumber))){
+        courseNames.push(courseName+" - "+courseNumber);
+        courseNumbers.push(courseNumber)
       }
-      courseNames.push("Search For Another Course");
-      courseNumbers.push("Search For Another Course");
-      makeKeyBoard(id, courseNames, courseNumbers);
+      count++;
     }
+    courseNames.push("Search For Another Course");
+    courseNumbers.push("Search For Another Course");
+    makeKeyBoard(id, courseNames, courseNumbers);
   }else{
     sendKey(id, "can't find "+text+". Try typing somthing else or type 'home' to return to main menu.");
   }
@@ -1919,3 +1959,14 @@ function createBusi(id, text, reg1, reg3, busi){
     oldSet(id, reg1, 0, "Description");
   }
 }
+
+/**
+ * User is goint to send a new link
+ * @param {string} id
+ * @param {string} type can be whatsapp, telegram, zoom, ect..
+ */
+function waitForLink(id, type){
+  set(id, null, null, type);
+  sendText(id, "please send the " + type + " link now");
+}
+

@@ -35,6 +35,7 @@ var calendar = "Calendar \ud83d\udcc5";
 var drive = "Drive "+driveSy;
 var telegramGroup = "Telegram group "+groupSy;
 var whatsappGroup = "whatsapp group "+groupSy;
+var zoom = "Zoom";
 var testock = "Scans - testock "+scansSy;
 var facebook = "Facebook "+facebookSy;
 var youTube = "YouTube " +YouTubeSy;
@@ -72,9 +73,9 @@ function makeKeyBoard(id, names, numbers){
  */ 
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
-  [{ text: SFS}/*, {text: "Glass Door"}*/,{ text: help }],
+  [{ text: SFS},{ text: help }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
-  [{ text: usefulLink}], //{text: add}],
+  [{ text: usefulLink}],,
   [{ text: feedback}],
   [{ text: "Statistics"}],
   [{ text: About}]
@@ -194,8 +195,8 @@ var allKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: drive }, { text: ug }, { text: moodle }, { text: cs }],
-  [{ text: whatsappGroup }, { text: telegramGroup }, { text: 'Teams Group \ud83d\udc6a' }],
-  [{ text: testock }, { text: facebook }, { text: 'Panopto' }],
+  [/*{ text: whatsappGroup },*/ { text: telegramGroup }, { text: 'Teams Group \ud83d\udc6a' }],
+  [{ text: testock }, { text: facebook }, { text: 'Panopto' },  /*{ text: zoom }*/],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
 ]
   
@@ -269,5 +270,10 @@ var GDKeyBoard = [
 
 var statsKeyboard = [
   [{ text: "Users" + groupSy}],
+  [{ text: mainMenu}]
+]
+
+var yesNoKey = [
+  [{ text: "Yes"}, { text: "No"}],
   [{ text: mainMenu}]
 ]
