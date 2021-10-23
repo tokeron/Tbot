@@ -339,7 +339,7 @@ function handleMessage(contents){
     case("insertPass"):
       checkIfPass(id, name, text, users);
       return;
-    case(SFS):     
+    case(SFS):
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();

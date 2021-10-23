@@ -2068,4 +2068,3 @@ function waitForLink(id, type){
   set(id, null, null, type);
   sendText(id, "please send the " + type + " link now");
 }
-
