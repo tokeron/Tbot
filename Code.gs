@@ -215,6 +215,8 @@ function handleMessage(contents){
       return;
     case(drive):
     case(telegramGroup):
+    case(whatsappGroup):
+    case(zoom):
     case(reviews):
     case('Get all'):
     case(facebook):
