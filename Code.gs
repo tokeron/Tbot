@@ -18,11 +18,10 @@ function doGet(e) {
 
 /**
  * Execution of requestes of users (Main function)
- * @param {class} JSON 
+ * @param {class} JSON
  */
 function doPost(e){
   var contents = JSON.parse(e.postData.contents);
-  var file;
   var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
   var statistics = dataBaseEx.getSheetByName("statistics");
 
@@ -42,7 +41,7 @@ function doPost(e){
 
 
 /**
- * Handle internal command. 
+ * Handle internal command.
  * Internal keyboard command - different from regular text
  */
 function handleCallback(contents){
@@ -52,7 +51,7 @@ function handleCallback(contents){
   var statistics = dataBaseEx.getSheetByName("statistics");
   var telegramLinks = dataBaseEx.getSheetByName("telegram");
   var busi = dataBaseEx.getSheetByName("busi");
-  var users = dataBaseEx.getSheetByName("users");
+  users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
   var needsHelp = dataBaseEx.getSheetByName("needsHelp");
   var glassDoor = dataBaseEx.getSheetByName("glassDoor");
@@ -80,16 +79,19 @@ function handleCallback(contents){
     case("Clean My List"):
       cleanList(id, users);
       return;
-    case ("Delete A Course From My List"): 
+    case ("Delete A Course From My List"):
       oldSet(id, data, name, 0);
       sendText(id, "Please tap on a course in order to delete it from your list");
       return;
     }
 
   //get registers
-  var cell = findUser(id, users);
-  if (cell == null) set(id, name);
-  var row = cell.getRow(); 
+  var user = findUser(id, users);
+  if (user == null) {
+    set(id, name); //first use, may be "set" should return the user.
+    user = findUser(id, users);
+  }
+  var row = user.getRow();
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
@@ -115,10 +117,16 @@ function handleCallback(contents){
       if (currCourse){
         sendOpt(id, name, courses, currCourse.getRow());
       }
-      return
+      return;
     case("authoriseMe"):
       sendText(id, "Please insert your Technion email address to get a verification code");
       set(id, name, "sendEmail");
+      return;
+    case(PRINT_SERVICE.symbol):
+      if(PRINT_CB_HANDLERS.hasOwnProperty(data))
+        PRINT_CB_HANDLERS[data](contents.callback_query);
+      else
+        PRINT_EDIT[reg2](contents.callback_query);
       return;
   }
   //Searching a course
@@ -139,7 +147,7 @@ function handleCallback(contents){
   welcomeUser(id);
   return;
 }
-  
+
 /**
  * Handle regular massage
  */
@@ -150,7 +158,7 @@ function handleMessage(contents){
   var statistics = dataBaseEx.getSheetByName("statistics");
   var telegramLinks = dataBaseEx.getSheetByName("telegramLinks");
   var busi= dataBaseEx.getSheetByName("busi");
-  var users = dataBaseEx.getSheetByName("users");
+  users = dataBaseEx.getSheetByName("users");
   var helpers = dataBaseEx.getSheetByName("helpers");
   var needsHelp = dataBaseEx.getSheetByName("needsHelp");
   var glassDoor = dataBaseEx.getSheetByName("glassDoor");
@@ -158,19 +166,27 @@ function handleMessage(contents){
   var id = contents.message.from.id;
   var name = contents.message.from.first_name;
   var text = contents.message.text;
-  
-  // clean quotation marks in case it separated to parts - for example חדו"א    
-  text = cleanQuotationMarks(text)
-  
+
   //find user and load his registers
-  var user = findUser(id, users);
-  if (user == null) set(id, name);
-  var row = user.getRow(); 
+  user = findUser(id, users);
+  if (user == null) {
+    set(id, name); //first use, may be "set" should return the user.
+    user = findUser(id, users);
+  }
+  var row = user.getRow();
   reg1 = users.getRange(row, fieldUsers.reg1).getValue();
   reg2 = users.getRange(row, fieldUsers.reg2).getValue();
   reg3 = users.getRange(row, fieldUsers.reg3).getValue();
   reg4 = users.getRange(row, fieldUsers.reg4).getValue();
   reg5 = users.getRange(row, fieldUsers.reg5).getValue();
+
+  if(contents.message.document || contents.message.photo){
+    handlePrint(contents.message);
+    return;
+  }
+  // clean quotation marks in case it separated to parts - for example חדו"א
+  if(!text)return;
+  text = cleanQuotationMarks(text)
 
   //Boolean - true only if the user is authorized with the Technion email
   var authorized = users.getRange(row, fieldUsers.authorized).getValue();
@@ -179,11 +195,11 @@ function handleMessage(contents){
   //var date = Utilities.formatDate(new Date(), "GMT+3", "dd/MM/yyyy");
   var date = new Date();
   users.getRange(row, fieldUsers.lastSeen).setValue(date);
-  
+
   //if simple command: execute
   var isDone = simpleText(id, name, text);
   if (isDone) return;
-  
+
 
 
   switch(text){
@@ -262,12 +278,17 @@ function handleMessage(contents){
       var weekly = statistics.getRange(4,2).getValue();
       var daily = statistics.getRange(5,2).getValue();
       sendText(id, "Users Statistics:\nAll Time Users: "+ allTime +
-                    "\nLast Month: "+ monthly + 
+                    "\nLast Month: "+ monthly +
                     "\nLast Week: " + weekly +
                     "\nLast Day: " + daily);
+      return;
     case("authoriseMe"):
       sendText(id, "Please insert your Technion email address to get a verification code");
       set(id, name, "sendEmail");
+      return;
+    case PRINT_SERVICE.symbol:
+      sendText(id, "ניתן לשלוח להדפסה בטכניון דרך tbot!\nניתן לשלוח קבצים ללא פעולה מקדימה.");
+      handlePrint(contents.message);
       return;
   }
 
@@ -286,7 +307,7 @@ function handleMessage(contents){
       sendRideLink(id, telegramLinks, text)
       return
     case('Add course'):
-      addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses) 
+      addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses)
       return
     case('Write a review'):
       addCourseReview(id, name, row, users, course)
@@ -299,7 +320,7 @@ function handleMessage(contents){
     case('Add exams Excel'):
       addExamExcel(id, name, users, courses)
       return
-    case("faculty"): 
+    case("faculty"):
       facultyGroupHandler(id, text, reg1, reg2);
     case("Course"):
       findCourse(id, name, text, courses)
@@ -316,7 +337,7 @@ function handleMessage(contents){
     case("insertPass"):
       checkIfPass(id, name, text, users);
       return;
-    case(SFS):     
+    case(SFS):
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
@@ -364,7 +385,7 @@ function handleMessage(contents){
           //sendText(id, "curr topic: "+topic+" "+currTopic);
           if (currTopic){
            topicCol = currTopic.getColumn();
-           topicCounter = busi.getRange(2, topicCol-1).getValue(); 
+           topicCounter = busi.getRange(2, topicCol-1).getValue();
           }
           var isExist = busi.createTextFinder(text).findNext();
           if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");
@@ -422,7 +443,7 @@ function handleMessage(contents){
           busi.getRange(busiRow+1, busiCol).setValue(lastInColDes);
           busi.getRange(busiRow+3, busiCol).setValue(lastInColContact);
           busi.getRange(1, busiCol).setValue(afteLastInCol-1);
-          return
+          return;
         default:
           if (text == "Location"){
             if (currBusi){
@@ -441,7 +462,10 @@ function handleMessage(contents){
             }
           }
       }
+    case(PRINT_SERVICE.symbol):
+      if(reg2 != 0)PRINT_EDIT[reg2](contents.message);
+      return;
   }
-  
+
   sendKey(id,"How may I help you?",mainKeyBoard);
 }
