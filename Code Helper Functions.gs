@@ -148,7 +148,7 @@ function simpleText(id, name, text){
       return true
     case(calendar):
       sendKey(id,"http://www.admin.technion.ac.il/dpcalendar/Student.aspx" ,usefulKeyBoard);
-      updateClickOnLinksStats();   
+      updateClickOnLinksStats();
       return true
     case("אזור תל אביב-יפו והמרכז"):
       sendKey(id, "Choose a city from the list below:", teKeyBoard);
@@ -245,7 +245,7 @@ function simpleText(id, name, text){
       removeKey(id, "Please insert the course number or course name in hebrew");
       set(id, name, "Course", 0)
       return true
-    case(faculty): 
+    case(faculty):
     case("Department Groups \ud83c\udfeb"):
       sendKey(id, "Choose your faculty from the list below ", coursesKeyBoard);
       oldSet(id, 'faculty');
@@ -296,8 +296,9 @@ function updateClickOnLinksStats(){
 
 function sendOpt(id, name, courses, courseRow){
   set(id, null, 'Course', courseRow);
-  //var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
-  //var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+  var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  sendText(id, courseName + " - " + courseNumber);
   sendKey(id, "Choose the required information",allKeyBoard)
   return
 }
@@ -314,7 +315,7 @@ function isAuthorized(id, users){
   if (userCell){
     return users.getRange(userCell.getRow(), fieldUsers.authorized).getValue();
   }else{
-    welcomeUser(id);
+    welcomeUser(id, name);
   }
 }
 
@@ -733,7 +734,7 @@ function courseAdd(id ,courseNumber, courseName, link, courses){
   
 /**
  * not so usefull feature, probably goes down
- * 
+ *
  * */
 function reviewsHandler(id, i, courses, isAll){
   // sendText(id, "Looking for reviews " + reviewsSy);
@@ -770,7 +771,7 @@ function oldSet(id, data, name, num){
  * @param {reg2} helper parameter for "remembering" previous user data
  * @param {reg3} helper parameter for "remembering" previous user data
  * @param {reg4} helper parameter for "remembering" previous user data
- * @param {reg5} helper parameter for "remembering" previous user data 
+ * @param {reg5} helper parameter for "remembering" previous user data
  */
 
 function set(id, name, reg1, reg2, reg3, reg4, reg5){
@@ -821,6 +822,98 @@ function set(id, name, reg1, reg2, reg3, reg4, reg5){
     statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
     return;
   }
+}
+
+/**
+ * save the user state.
+ * @param {Object} user
+ * @param {String} user.id
+ * @param [user.name]
+ * @param [user.reg1]
+ * @param [user.reg2]
+ * @param [user.reg3]
+ * @param [user.reg4]
+ * @param [user.reg5]
+ */
+function saveUser(user){
+  set(user.id, user.name, user.reg1, user.reg2, user.reg3, user.reg4, user.reg5);
+}
+
+/**
+ * function updateUserStats
+ * updates the user statistics when a known user is using the bot again.
+ * @param {row} the row of the user that logged-in in the users spreadsheet.
+ */
+function updateUserStats(row){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+
+  var lastSeen = users.getRange(row, fieldUsers.lastSeen).getValue();
+  var now = new Date();
+  var diff = now - lastSeen;
+
+  if(diff > DAY){
+    statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statistics.getRange(stats.users.day.row,stats.users.day.col).getValue() + 1);
+    statistics.getRange(stats.test.row,stats.test.col).setValue(1);
+    statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).setValue(statistics.getRange(statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).getValue(),stats.numOfUsersCol).getValue() + 1);
+    if(diff > 7*DAY){
+      statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statistics.getRange(stats.users.week.row,stats.users.week.col).getValue() + 1);
+      if(diff > 30*DAY){
+        statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statistics.getRange(stats.users.month.row,stats.users.month.col).getValue() + 1);
+        }
+      }
+    }
+  return;
+}
+/**
+ * statTrigger:
+ * A function that updates the number of active users in the last day/week/month.
+ * Should be called daily by a trigger.
+ */
+function statTrigger(){
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var users = dataBaseEx.getSheetByName("users");
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  const DAY = 1000 * 60 * 60 * 24; // ms per day
+  var today = new Date();
+  var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
+  var statUsersMonthly = 0;
+  var statUsersWeekly = 0;
+  var statUsersDaily = 0;
+  for(let row=3;row<nextFreeRow;row++){
+    var diff = today - users.getRange(row, fieldUsers.lastSeen).getValue();
+    if(diff < 30*DAY){
+      statUsersMonthly++;
+      if(diff < 7*DAY){
+        statUsersWeekly++;
+        if(diff < DAY){
+          statUsersDaily++;
+        }
+      }
+    }
+  }
+  statistics.getRange(stats.users.month.row,stats.users.month.col).setValue(statUsersMonthly);
+  statistics.getRange(stats.users.week.row,stats.users.week.col).setValue(statUsersWeekly);
+  statistics.getRange(stats.users.day.row,stats.users.day.col).setValue(statUsersDaily);
+
+  var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
+  statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
+  statistics.getRange(row,stats.numOfUsersCol).setValue(0);
+  statistics.getRange(row,stats.clicksCol).setValue(0);
+  statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
+  statistics.getRange(row,stats.rideClicksCol).setValue(0);
+  statistics.getRange(row,stats.talkClicksCol).setValue(0);
+
+  statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
+  return;
+}
+
+function reset(id, name){
+  set(id, name, 0, 0, 0, 0, 0)
 }
 /**
  * function updateUserStats
@@ -953,13 +1046,13 @@ function findUser(id, users){
   var cell = cellFinder.findNext()
   while (cell !== null && cell.getColumn() !== 1)
   {
-    cell = cellFinder.findNext(); 
+    cell = cellFinder.findNext();
   }
   return cell;
 }
 
 /**
- * 
+ *
  */
 function  SFSHandler(id, name, busi, data, reg1)
 {
@@ -1050,8 +1143,8 @@ function  SFSHandler(id, name, busi, data, reg1)
 /**
  * This function deletes one course from the list of courses for the user
  * @param {string} id user id
- * @param {string} name 
- * @param {string} data 
+ * @param {string} name
+ * @param {string} data
  * @param {spreadsheet} users
  * @param {spreadsheet} courses
  */
@@ -1064,7 +1157,7 @@ function deleteCourse(id, name, data, users, courses){
   if (userCell){
     row = userCell.getRow();
   }else{
-    welcomeUser(id);
+    welcomeUser(id, name);
     return;
   }
   var currCourseRow = users.getRange(row, index).getValue();
@@ -1105,7 +1198,7 @@ function connectHelper(id, data, helpers){
 }
 
 /**
- * 
+ *
  */
 function cleanQuotationMarks(text){
   var tmpText = text.split('"');
@@ -1130,17 +1223,22 @@ function getUserCell(id, users)
 }
 
 /**
- * 
+ *
  */
 function welcomeUser(id, name)
 {
-  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);  
+  if (name == undefined){
+    sendKey(id, "Hi \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
+    reset(id)
+    return;
+  }
+  sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
   reset(id, name)
   return;
 }
 
 /**
- * 
+ *
  */
 function generateRandomNumber(){
   var randomNumber = Math.floor(Math.random() * 10000);
@@ -1203,7 +1301,7 @@ function checkIfPass(id, name, text, users){
       {
         users.getRange(userCell.getRow(), fieldUsers.authorized).setValue('true');
         sendText(id, "Congrats! You are a verified now!")
-        welcomeUser(id);
+        welcomeUser(id, name);
       }else{
         sendText(id, "The verification code does not match. please try again.")
       }
@@ -1235,7 +1333,7 @@ function checkIfPass(id, name, text, users){
 //           // Fetch the email address
 //           var emailAddress = text;
 //               // Send Alert Email.
-//               var message = text; 
+//               var message = text;
 //               var subject = 'Tbot first log-in password';
 //           MailApp.sendEmail(emailAddress, subject, "The password is: "+fisrtLogInPassword);
 //           //TODO sent email
@@ -1254,7 +1352,7 @@ function checkIfPass(id, name, text, users){
 // }
 
 /**
- * 
+ *
  */
 function registrationToHelp(id, helpers){
   var helperFinder = helpers.createTextFinder(id);
@@ -1318,7 +1416,7 @@ function addToList(id, reg2, row, users, courses){
 }
 
 /**
- * 
+ *
  */
 function loadCourses(id, row, users, courses){
   sendText(id, "Loading your Courses..");
@@ -1351,12 +1449,13 @@ function loadCourses(id, row, users, courses){
     }
     else{
       sendText(id, "There is no registered courses yet");
+      sendText(id, "To add a course to your list, find it in the courses search and add it by 'Add to my course list' button.");
     }
   }
 }
 
 /**
- * 
+ *
  */
 function setAnonymousTalk(id, users, helpers){
   var helperCol = 2;
@@ -1397,7 +1496,7 @@ function setAnonymousTalk(id, users, helpers){
 }
 
 /**
- * 
+ *
  */
 function sendHelperSettings(id, name, text, needsHelp){
   var cellFinder = needsHelp.createTextFinder(id);
@@ -1427,7 +1526,7 @@ function sendHelperSettings(id, name, text, needsHelp){
 }
 
 /**
- * 
+ *
  */
 function sendSFS(id, name, text, busi){
   sendText(id, "Students for Students is a project designed to encourage students to support other students businesses");
@@ -1436,12 +1535,12 @@ function sendSFS(id, name, text, busi){
   var topicBase = busi.getRange(4, 2).getValue();
   var sectionBase = busi.getRange(5, 2).getValue();
   var sectionsNum = busi.getRange(6, 2).getValue();
-  //var topicNum = busi.getRange(7, 2).getValue(  
+  //var topicNum = busi.getRange(7, 2).getValue(
   var courseList = [];
   var numberList = [];
   for (var i = sectionBase + 1; i < sectionBase*sectionsNum; i += sectionBase){
     var currTopic = busi.getRange(1, i).getValue();
-    //sendText(id, "test: currTopic: "+currTopic); 
+    //sendText(id, "test: currTopic: "+currTopic);
     numberList.push(currTopic);
     courseList.push(currTopic);
   }
@@ -1456,7 +1555,7 @@ function sendSFS(id, name, text, busi){
 }
 
 /**
- * 
+ *
  */
 function  updateBusi(id, busi, reg2){
   var maxCol = busi.getRange(2, 2).getValue();
@@ -1464,7 +1563,7 @@ function  updateBusi(id, busi, reg2){
   var topicBase = busi.getRange(4, 2).getValue();
   var sectionBase = busi.getRange(5, 2).getValue();
   var sectionsNum = busi.getRange(6, 2).getValue();
-  var topicNum = busi.getRange(7, 2).getValue(); 
+  var topicNum = busi.getRange(7, 2).getValue();
   var currBusi = busi.createTextFinder(reg3).findNext();
   var busiRow = currBusi.getRow();
   var busiCol = currBusi.getColumn();
@@ -1478,7 +1577,7 @@ function  updateBusi(id, busi, reg2){
 }
 
 /**
- * 
+ *
  */
 function sendMassage(id, text, users){
   var otherId = users.getRange(row, 4).getValue();
@@ -1499,13 +1598,13 @@ function sendMassage(id, text, users){
 
 
 /**
- * 
+ *
  */
 function sendFeedback(id, name, text){
   // Fetch the email address
   var emailAddress = "technobot404@gmail.com";
   // Send Alert Email.
-  var message = text;       
+  var message = text;
   var subject = 'You have a new feedback from technoBot user';
   MailApp.sendEmail(emailAddress, subject, message + 'id: '+id+' ');
   sendText(id, "Thank you for your feedback! \uD83D\uDE4F");
@@ -1515,7 +1614,7 @@ function sendFeedback(id, name, text){
 }
 
 /**
- * sends 
+ * sends
  */
 function sendRideLink(id, telegramLinks, text){
   var list = telegramLinks.createTextFinder(text).findAll();
@@ -1529,7 +1628,7 @@ function sendRideLink(id, telegramLinks, text){
 }
 
 /**
- * 
+ *
  */
 function addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, courses){
   if (!(courseNumber) || !(courseName)){
@@ -1545,7 +1644,7 @@ function addCourseToSpreadsheet(id, courseNumber, courseName, courseLink, course
 }
 
 /**
- * 
+ *
  */
 function addCourseReview(id, name, row, users, course){
   var idRow = row;
@@ -1565,7 +1664,7 @@ function addCourseReview(id, name, row, users, course){
 }
 
 /**
- * 
+ *
  */
 function addTelegramGroup(id, name, row, courses, users){
   var courseRow = 0;
@@ -1598,7 +1697,7 @@ function addTelegramGroup(id, name, row, courses, users){
 }
 
 /**
- * 
+ *
  */
  function addTeamsGroup(id, name, users, courses){
   var courseRow = 0;
@@ -1631,7 +1730,7 @@ function addTelegramGroup(id, name, row, courses, users){
 }
 
 /**
- * 
+ *
  */
 function addExamExcel(id, name, users, courses){
   var courseRow = 0;
@@ -1646,7 +1745,7 @@ function addExamExcel(id, name, users, courses){
 }
 
 /**
- * 
+ *
  */
 function countCourses(list, id)
 {
@@ -1705,7 +1804,7 @@ function findCourse(id, name, text, courses){
 
 
 /**
- * 
+ *
  */
 function handleSettingsSFS(id, name, text, reg1, needsHelp){
   // init user in needsHelp table
@@ -1777,7 +1876,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
             var studentNumber = IdCol-9;
             sendText(helperId, "Student number "+studentNumber+" no longer needs your help.");
             var lastNumber = nextFree-1 - 9;
-            sendText(helperId, "From now student number "+lastNumber+" has a new number: "+studentNumber); 
+            sendText(helperId, "From now student number "+lastNumber+" has a new number: "+studentNumber);
           }
           //find in table and move to right place
           var numberOfPatients = nextFree - 10;
@@ -1799,7 +1898,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
       }
       return;
     case("Back"):
-    case('חזור'):        
+    case('חזור'):
       sendKey(id, "Choose from the list below", helpKeyBoard);
       return;
 
@@ -1828,7 +1927,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
     case('הפקולטה לביולוגיה'):
     case('רפואה'):
     case('ארכיטקטורה ובינוי ערים'):
-    case('חינוך למדע וטכנולוגיה'): 
+    case('חינוך למדע וטכנולוגיה'):
     case('הפקולטה להנדסת אוירונוטיקה וחלל'):
     needsHelp.getRange(row, 4).setValue(text);
     sendKey(id, "Your prefernce has been updated "+text+" faculty", settingsKeyBoard);
@@ -1837,7 +1936,7 @@ function handleSettingsSFS(id, name, text, reg1, needsHelp){
 }
 
 /**
- * 
+ *
  */
 function deleteByNumber(id, name, users, courses){
   //get course row
@@ -1860,7 +1959,7 @@ function deleteByNumber(id, name, users, courses){
 }
 
 /**
- * 
+ *
  */
 function addTopicSFS(id, name, text, busi){
   var isExist = busi.createTextFinder(text).findNext();
@@ -1870,14 +1969,14 @@ function addTopicSFS(id, name, text, busi){
       busi.getRange(1, sectionBase*sectionsNum+1).setValue(text);
       busi.getRange(2, sectionBase*sectionsNum).setValue(0);
       busi.getRange(6, 2).setValue(sectionsNum+1);
-      sendText(id, "Got it! "+text+" topic is initialized");          
+      sendText(id, "Got it! "+text+" topic is initialized");
       oldSet(id, "null", name, "null");
     }
     return;
 }
 
 /**
- * 
+ *
  */
 function deleteBusi(id, reg3, busi){
   var textFinder = busi.createTextFinder(reg3);
@@ -1900,7 +1999,7 @@ function deleteBusi(id, reg3, busi){
 }
 
 /**
- * 
+ *
  */
 function deleteIfPass(text, busi){
   var busiToDelete = busi.createTextFinder(text).findNext();
@@ -1919,7 +2018,7 @@ function deleteIfPass(text, busi){
 }
 
 /**
- * 
+ *
  */
 function editBusi(id, text, busi){
   var textFinder = busi.createTextFinder(reg3);
@@ -1938,7 +2037,7 @@ function editBusi(id, text, busi){
 }
 
 /**
- * 
+ *
  */
 function createBusi(id, text, reg1, reg3, busi){
   var topic = reg3;
@@ -1947,7 +2046,7 @@ function createBusi(id, text, reg1, reg3, busi){
   var topicCounter = 0;
   if (currTopic){
    topicCol = currTopic.getColumn();
-   topicCounter = busi.getRange(2, topicCol-1).getValue(); 
+   topicCounter = busi.getRange(2, topicCol-1).getValue();
   }
   var isExist = busi.createTextFinder(text).findNext();
   if (text.length >= 34) sendText(id, "The name is too long. Please choose another name for your business");

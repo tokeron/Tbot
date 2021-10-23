@@ -47,19 +47,19 @@ function getCourses(){
       break
     case(0):
     case(1):
-      year = year - 1 
+      year = year - 1
       semesterNum = "01"
       break
     case(2):
     case(3):
     case(4):
     case(5):
-      year = year - 1 
+      year = year - 1
       semesterNum = "02"
       break
     case(6):
     case(7):
-      year = year - 1  
+      year = year - 1
       semesterNum = "03"
       break
   }
@@ -74,7 +74,7 @@ function getCourses(){
 
 /**
  * This function uses the json from cheese&fork git in order to fetch courses info from
- * To update the information just run this function 
+ * To update the information just run this function
  */
 function updateCourses(){
   var courses_from_rishum  = getCourses();
@@ -95,8 +95,8 @@ function updateCourses(){
     lead = course.general[fieldNamesGeneral.lead]
     examA = course.general[fieldNamesGeneral.examA]
     examB = course.general[fieldNamesGeneral.examB]
-    
-    //course is already in the list. only update the information 
+
+    //course is already in the list. only update the information
     var textFinder = courses.createTextFinder(courseNumber);
     nextCourse = textFinder.findNext()
     while(nextCourse !== null && nextCourse.getColumn() !== fieldCourses.courseNumber) {
@@ -119,7 +119,7 @@ function updateCourses(){
       if (lead) courses.getRange(nextRow,fieldCourses.lead).setValue(lead)
       if (examA) courses.getRange(nextRow,fieldCourses.examA).setValue(examA)
       if (examB) courses.getRange(nextRow,fieldCourses.examB).setValue(examB)
-      //update the counter 
+      //update the counter
       courses.getRange(1,1).setValue(++nextRow);
       // Logger.log("new: " + courseNumber);
       // textFinder = courses.createTextFinder(courseNumber);
@@ -142,7 +142,7 @@ function getLinks(){
   var courses = dataBaseEx.getSheetByName("courses");
   
   var old = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1X0hW9bVrshckxj8ft0whEgRnTiquoKfzoHSr5Ji2n5E/edit#gid=0").getActiveSheet();
-  
+
   nextRow = courses.getRange(1,1).getValue()
 
   for (i = 3; i < nextRow; ++i){

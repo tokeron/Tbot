@@ -13,6 +13,7 @@ const fieldUsers = {
   authorized: 9,
   verificationPassword: 10,
   email: 11,
+  printPref: 12,
   firstCourse: 14,
   lastCourse: 29,
   nextFreeRow: {
@@ -131,3 +132,67 @@ const stats = {
     col: 2
   }
 }
+
+/**
+ * Const values for print service.
+ */
+const PRINT_SERVICE = {
+  counter: "printerCounter",
+  responseFunc: "readPrinterEmailResponse",
+  mailQuery: "is:unread ",
+  symbol: "print 🖨",
+  types:["bws", "bwd", "A3bws", "A3bwd", "color", "A3color", "2pbws", "2pbwd", "4pbws", "4pbwd"],
+  typeNames:["שחור-לבן צד אחד", 'שחור-לבן דו"צ', 'A3 שחור-לבן צד אחד', 'A3 שחור-לבן דו"צ', 'צבעוני', 'A3 צבעוני','שתי שקופיות בעמוד שחור לבן צד אחד', 'שתי שקופיות בעמוד שחור לבן דו"צ', '4 שקופיות בעמוד שחור לבן צד אחד', '4 שקופיות בעמוד שחור לבן דו"צ'],
+  headerMessage:"הדפסת מסמכים בטכניון.",
+  messageBase:"In order to change your preference, click of the button",
+  cb:{send:"send", chengeType:"chengeType", chengeID:"chengeID", setID:"setID", deleteID:"delID", cancel:"cancel", editFiles: "editFiles", settings:"settings"},
+  defaultKeyboard:null,
+  getMainKB:null,
+  settingsKeyboard:null,
+  typesKB:null,
+  changeIdKeyboard:[
+    [{text:"לא", callback_data:"no"}, {text:"כן", callback_data:"yes"}],
+    //[{text:"לא, ולא לשאול שוב", callback_data:"never"}]
+  ]
+}
+
+/** @type TelegramInlineKeyboard */
+PRINT_SERVICE.defaultKeyboard = [
+  [{text:"שלח להדפסה", callback_data:PRINT_SERVICE.cb.send}],
+  [{text:"ערוך קבצים", callback_data:PRINT_SERVICE.cb.editFiles}],
+  [{text:PRINT_SERVICE.typeNames[0], callback_data:PRINT_SERVICE.cb.chengeType}],
+  [{text:"הגדר מספר זהות", callback_data:PRINT_SERVICE.cb.chengeID}],
+  [{text: 'Main Menu \ud83c\udfe0', 'callback_data': 'Main Menu \ud83c\udfe0'}]
+]
+
+// PRINT_SERVICE.settingsKeyboard = [
+//   [{text:"הגדר ת.ז.", callback_data:PRINT_SERVICE.cb.setID}, {text:"מחק ת.ז.", callback_data:PRINT_SERVICE.cb.deleteID}],
+//   [{text:"חזור", callback_data:PRINT_SERVICE.cb.cancel}]
+// ]
+
+PRINT_SERVICE.typesKB = PRINT_SERVICE.typeNames.reduce((k,t, i)=>{k.push([{text:t, callback_data:i}]);return k;}, []);
+
+PRINT_SERVICE.mailQuery += PRINT_SERVICE.types.reduce((s,t)=>{s+=`from:print.${t}@campus.technion.ac.il `;return s;},"{")+"}";
+
+PRINT_SERVICE.getMainKB = function(data){
+  var kb = PRINT_SERVICE.defaultKeyboard;
+  kb[2][0].text = PRINT_SERVICE.typeNames[data.type];
+  if(data.id){
+    kb[3][0].text = data.id;
+    kb[3].push({text:"מחק ת.ז.", callback_data:PRINT_SERVICE.cb.deleteID})
+  }
+  if(data.files.length==0)kb.shift(),kb.shift();//remove keys of send and file edit in case there is no files.
+  return kb;
+}
+
+PRINT_SERVICE.getEditKB = function(data){
+  var kb = data.files.reduce((k,t, i)=>{k.push([{text:t.name, callback_data:i},{text:"❌", callback_data:"d"+i}]);return k;}, []);
+  kb.push([{text:"סיימתי", callback_data:"done"}]);
+  return kb;
+}
+
+/**global vars */
+var user,reg1,reg2,reg3,reg4,reg5, users;
+
+function helperObjectsDummy(){}
+
