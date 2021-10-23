@@ -51,6 +51,8 @@ var ContactLinkdIn = "linkedin";
 var WantToTalk = "Anonymous talk with a student";
 var SFS = "Students Business "+	"\ud83d\udcb8";
 
+const DAY = 1000 * 60 * 60 * 24; // ms per day
+
 /**
  * function that makes an internal keyboard from the numbers in the spreadsheet. 
  */
