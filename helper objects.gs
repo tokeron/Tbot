@@ -127,6 +127,7 @@ const stats = {
     row: 6,
     col: 3
   },
+  datesCol: 4,
   test: {
     row: 6,
     col: 2
@@ -144,7 +145,7 @@ const PRINT_SERVICE = {
   types:["bws", "bwd", "A3bws", "A3bwd", "color", "A3color", "2pbws", "2pbwd", "4pbws", "4pbwd"],
   typeNames:["שחור-לבן צד אחד", 'שחור-לבן דו"צ', 'A3 שחור-לבן צד אחד', 'A3 שחור-לבן דו"צ', 'צבעוני', 'A3 צבעוני','שתי שקופיות בעמוד שחור לבן צד אחד', 'שתי שקופיות בעמוד שחור לבן דו"צ', '4 שקופיות בעמוד שחור לבן צד אחד', '4 שקופיות בעמוד שחור לבן דו"צ'],
   headerMessage:"הדפסת מסמכים בטכניון.",
-  messageBase:"אלה המסמכים שהתקבלו:",
+  messageBase:"In order to change your preference, click of the button",
   cb:{send:"send", chengeType:"chengeType", chengeID:"chengeID", setID:"setID", deleteID:"delID", cancel:"cancel", editFiles: "editFiles", settings:"settings"},
   defaultKeyboard:null,
   getMainKB:null,
@@ -155,13 +156,14 @@ const PRINT_SERVICE = {
     //[{text:"לא, ולא לשאול שוב", callback_data:"never"}]
   ]
 }
+
 /** @type TelegramInlineKeyboard */
 PRINT_SERVICE.defaultKeyboard = [
   [{text:"שלח להדפסה", callback_data:PRINT_SERVICE.cb.send}],
   [{text:"ערוך קבצים", callback_data:PRINT_SERVICE.cb.editFiles}],
   [{text:PRINT_SERVICE.typeNames[0], callback_data:PRINT_SERVICE.cb.chengeType}],
   [{text:"הגדר מספר זהות", callback_data:PRINT_SERVICE.cb.chengeID}],
-  [{text:"ביטול", callback_data:PRINT_SERVICE.cb.cancel}]
+  [{text: 'Main Menu \ud83c\udfe0', 'callback_data': 'Main Menu \ud83c\udfe0'}]
 ]
 
 // PRINT_SERVICE.settingsKeyboard = [

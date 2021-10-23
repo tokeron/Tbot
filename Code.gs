@@ -144,7 +144,7 @@ function handleCallback(contents){
   if (currCourse){
     sendOpt(id, name, courses, currCourse.getRow());
   }
-  welcomeUser(id);
+  welcomeUser(id, name);
   return;
 }
 
@@ -204,7 +204,7 @@ function handleMessage(contents){
 
   switch(text){
     case("/start"):
-      welcomeUser(id);
+      welcomeUser(id, name);
       return;
     case('תפריט ראשי'):
     case('Main Menu'):
@@ -215,6 +215,8 @@ function handleMessage(contents){
       return;
     case(drive):
     case(telegramGroup):
+    case(whatsappGroup):
+    case(zoom):
     case(reviews):
     case('Get all'):
     case(facebook):
@@ -286,8 +288,8 @@ function handleMessage(contents){
       sendText(id, "Please insert your Technion email address to get a verification code");
       set(id, name, "sendEmail");
       return;
-    case PRINT_SERVICE.symbol:
-      sendText(id, "ניתן לשלוח להדפסה בטכניון דרך tbot!\nניתן לשלוח קבצים ללא פעולה מקדימה.");
+    case (PRINT_SERVICE.symbol):
+      sendText(id, "Any file you send to the bot will be sent to the printer!");
       handlePrint(contents.message);
       return;
   }
@@ -337,7 +339,7 @@ function handleMessage(contents){
     case("insertPass"):
       checkIfPass(id, name, text, users);
       return;
-    case(SFS):
+    case(SFS):     
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
       var topicBase = busi.getRange(4, 2).getValue();
