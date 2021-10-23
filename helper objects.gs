@@ -127,6 +127,7 @@ const stats = {
     row: 6,
     col: 3
   },
+  datesCol: 4,
   test: {
     row: 6,
     col: 2

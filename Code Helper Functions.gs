@@ -330,12 +330,32 @@ function getDone(id, name, reg2, command, users, courses){
     var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
     var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
     var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue();
+
+    var silabusAns = courses.getRange(courseRow, fieldCourses.silabus).getValue();
+    var kdamimAns = courses.getRange(courseRow, fieldCourses.kdam).getValue();
+    var profAns = courses.getRange(courseRow, fieldCourses.lead).getValue();
+    var examsAnsA = courses.getRange(courseRow, fieldCourses.examA).getValue();
+    var examsAnsB = courses.getRange(courseRow, fieldCourses.examB).getValue();
+
     var authorized = isAuthorized(id, users);
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
     }
     switch(command){
+      case(silabus):
+        sendText(id, silabusAns)
+        return
+      case(kdamim):
+        sendText(id, kdamimAns)
+        return
+      case(prof):
+        sendText(id, profAns)
+        return
+      case(exams):
+        sendText(id, "מועד א :" + examsAnsA)
+        sendText(id, "מועד ב :" + examsAnsB)
+        return
       case drive:
         sendText(id, "Looking for a link to the drive "+ driveSy);
         driveHandler(id, courseNumber, courseName);
@@ -952,7 +972,6 @@ function statTrigger(){
   var users = dataBaseEx.getSheetByName("users");
   var statistics =  dataBaseEx.getSheetByName("statistics");
 
-  const DAY = 1000 * 60 * 60 * 24; // ms per day
   var today = new Date();
   var nextFreeRow = users.getRange(fieldUsers.nextFreeRow.row,fieldUsers.nextFreeRow.col).getValue();
   var statUsersMonthly = 0;
@@ -976,6 +995,7 @@ function statTrigger(){
 
   var row = Math.floor((today - new Date(2021,9,2))/DAY + 2.1); //row of the day that comes after tommorow
   statistics.getRange(stats.todaysRow.row,stats.todaysRow.col).setValue(row - 1);
+  statistics.getRange(row - 1, stats.datesCol).setValue(today.getDate() + "/" + (today.getMonth()+1) + "/" +today.getFullYear());
   statistics.getRange(row,stats.numOfUsersCol).setValue(0);
   statistics.getRange(row,stats.clicksCol).setValue(0);
   statistics.getRange(row,stats.clicksOnLinksCol).setValue(0);
@@ -983,7 +1003,26 @@ function statTrigger(){
   statistics.getRange(row,stats.talkClicksCol).setValue(0);
 
   statistics.getRange(stats.rideIdsNextRow.row,stats.rideIdsNextRow.col).setValue(stats.rideIdsListStart.row);
+  statistics.getRange(stats.talkIdsNextRow.row,stats.talkIdsNextRow.col).setValue(stats.talkIdsListStart.row);
   return;
+}
+
+function getRelevantStatNumber(fromDate, toDate, col){
+  /*var fromDate = new Date(2021, 9, 2);
+  var toDate = new Date(2021,9,7);
+  var col = stats.clicksCol;
+  */
+  var dataBaseEx = SpreadsheetApp.openByUrl(dataBase);
+  var statistics =  dataBaseEx.getSheetByName("statistics");
+
+  var fromRow = Math.floor((fromDate - new Date(2021, 9, 2))/DAY + 2.1);
+  var toRow = Math.floor((toDate - new Date(2021, 9, 2))/DAY + 2.1);
+  var res = 0;
+  for(var row = fromRow; row <= toRow; row++){
+    res += statistics.getRange(row, col).getValue();
+  }
+  statistics.getRange(stats.test.row, stats.test.col).setValue(res);
+  return res;
 }
 
 /**
@@ -1162,7 +1201,7 @@ function deleteCourse(id, name, data, users, courses){
   }
   var currCourseRow = users.getRange(row, index).getValue();
   var currCourse;
-  while (currCourseRow){//while there is courses in the list
+  while (currCourseRow && currCourseRow !== 0 && currCourseRow !== "0"){//while there is courses in the list
     currCourse = courses.getRange(currCourseRow, 1).getValue();
     if (currCourse == data) courseCol = index;//the course to delete is found
     currCourseRow = users.getRange(row, ++index).getValue();
@@ -1172,7 +1211,7 @@ function deleteCourse(id, name, data, users, courses){
     users.getRange(row, courseCol).setValue(lastCourse);
     users.getRange(row, index-1).setValue(0);
   }
-  oldSet(id, 0, name, 0);
+  reset(id, name);
   sendText(id, "Course number " + data + " is not on your list anymore");
   return;
 }
@@ -1387,22 +1426,23 @@ function registrationToHelp(id, helpers){
  * @param {int} row user row
  * @param {spreadsheet} courses
  */
-function addToList(id, reg2, row, users, courses){
+function addToList(id, courseToAdd, idRow, users, courses){
   var added = false;
-  if (row){ //user found in the course list
-    var idRow = row;
-    var courseToAdd = reg2;
-    var currCol = 14;
-    while (currCol <= 29){
+  if (idRow){ //user found in the course list
+    var currCol = fieldUsers.firstCourse;
+    while (currCol <= fieldUsers.lastCourse){
       var currNumber = users.getRange(idRow, currCol).getValue();
       if (courseToAdd == currNumber){
         sendText(id, "This course is already in your course list");
         return;
       }
-      if (currNumber) currCol++;
+      if (currNumber && currNumber !== 0 && currNumber !== "0") {
+        sendText(id, "currNumber: " + currNumber) 
+        currCol++;
+      }
       else{
-        (users.getRange(idRow, currCol).setValue(courseToAdd));
-        var currCourseName = courses.getRange(courseToAdd, 2).getValue();
+        users.getRange(idRow, currCol).setValue(courseToAdd);
+        var currCourseName = courses.getRange(courseToAdd, fieldCourses.courseName).getValue();
         sendText(id, currCourseName+" is added to your list")
         added = true;
         return;
@@ -1422,24 +1462,24 @@ function loadCourses(id, row, users, courses){
   sendText(id, "Loading your Courses..");
   var idRow = row;
   if (idRow){
-    var currCol = 14;
+    var currCol = fieldUsers.firstCourse;
     var courseList = [];
     var numberList = [];
-    while (currCol <= 28){
+    while (currCol <= fieldUsers.lastCourse){
       var courseRow = users.getRange(idRow, currCol).getValue();
-      if (courseRow){
+      if (courseRow && courseRow > 0){
         var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
         var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
         numberList.push(courseNumber);
         courseList.push(courseName+" - "+courseNumber);
         currCol++;
       }else{
-        currCol = 29;
+        currCol = fieldUsers.lastCourse + 1;
       }
     }
     if (numberList.length > 0){
-      courseList.push("Delete A Course From My List");
-      numberList.push("Delete A Course From My List");
+      //courseList.push("Delete A Course From My List");
+      //numberList.push("Delete A Course From My List");
       courseList.push("Clean My List");
       numberList.push("Clean My List");
       courseList.push("Search For Another Course");
@@ -1763,9 +1803,26 @@ function countCourses(list, id)
 /**
  * 
  */
+function findCoursesList(id, course, courses){
+  var newList = [];
+  var list = courses.createTextFinder(course).findAll();
+  var len = list.length;
+  for (var i = 0; i < len; ++i)
+  {
+    if (list[i].getColumn() == fieldCourses.courseName || list[i].getColumn() == fieldCourses.courseNumber){
+      newList.push(list[i])
+    }
+  }
+  return newList;
+}
+
+
+/**
+ * 
+ */
 function findCourse(id, name, text, courses){
-  var list = courses.createTextFinder(text).findAll();
-  var len = countCourses(list, id); //Some of the results may come from the course description
+  var list = findCoursesList(id, text, courses);
+  var len = list.length;
   if (len == 1){
     sendOpt(id, name, courses, list[0].getRow());
     return;
