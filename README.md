@@ -13,7 +13,6 @@ we use google script in order to host the code, and we use telegram API for the 
 Team members:
 - [Michael Toker](https://github.com/tokeron)
 - [Mor Ventura](https://github.com/venturamor)
-- [Dolev Shema](https://github.com/shemadolev)
 - [Maor Ben-Zaquen](https://github.com/maor828)
 - [David Shem-Tov](https://github.com/d-s-t)
 - [Aviv Shem-Tov](https://github.com/staviv)
