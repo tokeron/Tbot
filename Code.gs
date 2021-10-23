@@ -144,7 +144,7 @@ function handleCallback(contents){
   if (currCourse){
     sendOpt(id, name, courses, currCourse.getRow());
   }
-  welcomeUser(id);
+  welcomeUser(id, name);
   return;
 }
 
@@ -204,7 +204,7 @@ function handleMessage(contents){
 
   switch(text){
     case("/start"):
-      welcomeUser(id);
+      welcomeUser(id, name);
       return;
     case('תפריט ראשי'):
     case('Main Menu'):
@@ -286,8 +286,8 @@ function handleMessage(contents){
       sendText(id, "Please insert your Technion email address to get a verification code");
       set(id, name, "sendEmail");
       return;
-    case PRINT_SERVICE.symbol:
-      sendText(id, "ניתן לשלוח להדפסה בטכניון דרך tbot!\nניתן לשלוח קבצים ללא פעולה מקדימה.");
+    case (PRINT_SERVICE.symbol):
+      sendText(id, "Any file you send to the bot will be sent to the printer!");
       handlePrint(contents.message);
       return;
   }

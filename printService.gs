@@ -75,6 +75,7 @@ async function printerResponseNotify(mail){
   var chatId = mail.getTo().split(/[+@]/)[1];
   var content = mail.getPlainBody();
   sendText(chatId, content.split("Hello\n",2)[1]);
+  welcomeUser(id);
   mail.markRead();
 }
 
@@ -132,12 +133,14 @@ PRINT_CB_HANDLERS[PRINT_SERVICE.cb.send] = /** @param {TelegramCallbackQuery} cb
   print_id = data.id || id;
   sendEmail(data.files.reduce((fs,f)=>{fs.push(downloadFile(f.id, f.name));return fs;}, []), id, print_id, PRINT_SERVICE.types[data.type]);
   editMessageText(id, data.message.message_id, `נשלח להדפסה עם מספר הזהות: ${print_id}.\nבעוד מספר רגעים יתקבל אישור קליטה.`, []);
+  welcomeUser(id);
   reset(id);
 }
 
 PRINT_CB_HANDLERS[PRINT_SERVICE.cb.deleteID] = /** @param {TelegramCallbackQuery} cb */function(cb){
   let id = cb.from.id;
   let data = JSON.parse(reg3);
+  let user = findUser(id, users);
   let preferencesCell = users.getRange(user.getRow(), fieldUsers.printPref);
   let preferences = preferencesCell.getValue();
   preferences = preferences?JSON.parse(preferences):{};
@@ -167,7 +170,7 @@ PRINT_EDIT[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramMessage} msg */funct
     data.message = sendText(id, data.message.text, PRINT_SERVICE.getMainKB(data));
   }
   else{
-    let text = "האם ברצונך לשמור מספר זה?";
+    let text = "Do you want to save this number?";
     let m = sendText(id, text, PRINT_SERVICE.changeIdKeyboard);
     data.message.message_id = m.message_id;
     r2 = PRINT_SERVICE.cb.chengeID+1;
@@ -178,6 +181,7 @@ PRINT_EDIT[PRINT_SERVICE.cb.chengeID] = /** @param {TelegramMessage} msg */funct
 PRINT_EDIT[PRINT_SERVICE.cb.chengeID+1] = /** @param {TelegramCallbackQuery} cb */ function(cb){
   let id = cb.from.id;
   let data = JSON.parse(reg3);
+  let user = findUser(id, users);
   let preferencesCell = users.getRange(user.getRow(), fieldUsers.printPref);
   let preferences = preferencesCell.getValue();
   preferences = preferences?JSON.parse(preferences):{};

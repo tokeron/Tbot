@@ -295,12 +295,10 @@ function updateClickOnLinksStats(){
 
 
 function sendOpt(id, name, courses, courseRow){
-  var excel = false;
-  var cs = false;
-  var teams = false;
   set(id, null, 'Course', courseRow);
   var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
   var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  sendText(id, courseName + " - " + courseNumber);
   sendKey(id, "Choose the required information",allKeyBoard)
   return
 }
@@ -317,7 +315,7 @@ function isAuthorized(id, users){
   if (userCell){
     return users.getRange(userCell.getRow(), fieldUsers.authorized).getValue();
   }else{
-    welcomeUser(id);
+    welcomeUser(id, name);
   }
 }
 
@@ -1131,7 +1129,7 @@ function deleteCourse(id, name, data, users, courses){
   if (userCell){
     row = userCell.getRow();
   }else{
-    welcomeUser(id);
+    welcomeUser(id, name);
     return;
   }
   var currCourseRow = users.getRange(row, index).getValue();
@@ -1201,6 +1199,11 @@ function getUserCell(id, users)
  */
 function welcomeUser(id, name)
 {
+  if (name == undefined){
+    sendKey(id, "Hi \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
+    reset(id)
+    return;
+  }
   sendKey(id, "Hi," + name + " \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
   reset(id, name)
   return;
@@ -1270,7 +1273,7 @@ function checkIfPass(id, name, text, users){
       {
         users.getRange(userCell.getRow(), fieldUsers.authorized).setValue('true');
         sendText(id, "Congrats! You are a verified now!")
-        welcomeUser(id);
+        welcomeUser(id, name);
       }else{
         sendText(id, "The verification code does not match. please try again.")
       }
@@ -1418,6 +1421,7 @@ function loadCourses(id, row, users, courses){
     }
     else{
       sendText(id, "There is no registered courses yet");
+      sendText(id, "To add a course to your list, find it in the courses search and add it by 'Add to my course list' button.");
     }
   }
 }
