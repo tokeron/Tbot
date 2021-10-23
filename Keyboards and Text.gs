@@ -78,7 +78,7 @@ function makeKeyBoard(id, names, numbers){
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
-  [{ text: usefulLink},{text: "print 🖨"}], //{text: add}],
+  [{ text: usefulLink},{text: PRINT_SERVICE.symbol}], //{text: add}],
   [{ text: SFS}/*,{ text: help }*/],
   [{ text: feedback}],
   [{ text: "Statistics"}],
