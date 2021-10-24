@@ -330,12 +330,47 @@ function getDone(id, name, reg2, command, users, courses){
     var whatsApp = courses.getRange(courseRow, fieldCourses.whatsApp).getValue();
     var zoom = courses.getRange(courseRow, fieldCourses.zoom).getValue();
     var excel = courses.getRange(courseRow, fieldCourses.spreadsheet).getValue();
+
+    var silabusAns = courses.getRange(courseRow, fieldCourses.silabus).getValue();
+    var kdamimAns = courses.getRange(courseRow, fieldCourses.kdam).getValue();
+    var profAns = courses.getRange(courseRow, fieldCourses.lead).getValue();
+    var examsAnsA = courses.getRange(courseRow, fieldCourses.examA).getValue();
+    var examsAnsB = courses.getRange(courseRow, fieldCourses.examB).getValue();
+
     var authorized = isAuthorized(id, users);
     var csCourse = false;
     if ((courseNumber.indexOf('236') !== -1) || (courseNumber.indexOf('234') !== -1)){
       csCourse = true;
     }
     switch(command){
+      case(silabus):
+        if(!(silabusAns)){
+          silabusAns = "The silabus informaion is not available in the ug for now.."
+        } 
+        sendText(id, silabusAns)
+        return
+      case(kdamim):
+        if(!(kdamimAns)){
+          kdamimAns = "The 'Kdamim' informaion is not available in the ug for now.."
+        } 
+        sendText(id, kdamimAns)
+        return
+      case(prof):
+        if(!(profAns)){
+          profAns = "The lecturer informaion is not available in the ug for now.."
+        } 
+        sendText(id, profAns)
+        return
+      case(exams):
+        if(!(examsAnsA)){
+          examsAnsA = "The exam A informaion is not available in the ug for now.."
+        } 
+        if(!(examsAnsB)){
+          examsAnsB = "The exam B informaion is not available in the ug for now.."
+        } 
+        sendText(id, "מועד א :" + examsAnsA)
+        sendText(id, "מועד ב :" + examsAnsB)
+        return
       case drive:
         sendText(id, "Looking for a link to the drive "+ driveSy);
         driveHandler(id, courseNumber, courseName);
@@ -423,10 +458,13 @@ function getDone(id, name, reg2, command, users, courses){
         //users.getRange(2, 6).setValue(++currentCounter);
         return;
       case cs:
-        sendText(id, "Looking for computer science link " + csSy);
-        sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
-        //var currentCounter = users.getRange(2, 6).getValue();
-        //users.getRange(2, 6).setValue(++currentCounter);
+        if (csCourse){
+          sendText(id, "Looking for computer science link " + csSy);
+          sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
+        }
+        else{
+          sendText(id, "This is not a CS course");
+        }
         return;
       case moodle:
         sendText(id, "Looking for moodle link " + moodleSy);
@@ -1181,7 +1219,7 @@ function deleteCourse(id, name, data, users, courses){
   }
   var currCourseRow = users.getRange(row, index).getValue();
   var currCourse;
-  while (currCourseRow){//while there is courses in the list
+  while (currCourseRow && currCourseRow !== 0 && currCourseRow !== "0"){//while there is courses in the list
     currCourse = courses.getRange(currCourseRow, 1).getValue();
     if (currCourse == data) courseCol = index;//the course to delete is found
     currCourseRow = users.getRange(row, ++index).getValue();
@@ -1191,7 +1229,7 @@ function deleteCourse(id, name, data, users, courses){
     users.getRange(row, courseCol).setValue(lastCourse);
     users.getRange(row, index-1).setValue(0);
   }
-  oldSet(id, 0, name, 0);
+  reset(id, name);
   sendText(id, "Course number " + data + " is not on your list anymore");
   return;
 }
@@ -1406,22 +1444,22 @@ function registrationToHelp(id, helpers){
  * @param {int} row user row
  * @param {spreadsheet} courses
  */
-function addToList(id, reg2, row, users, courses){
+function addToList(id, courseToAdd, idRow, users, courses){
   var added = false;
-  if (row){ //user found in the course list
-    var idRow = row;
-    var courseToAdd = reg2;
-    var currCol = 14;
-    while (currCol <= 29){
+  if (idRow){ //user found in the course list
+    var currCol = fieldUsers.firstCourse;
+    while (currCol <= fieldUsers.lastCourse){
       var currNumber = users.getRange(idRow, currCol).getValue();
       if (courseToAdd == currNumber){
         sendText(id, "This course is already in your course list");
         return;
       }
-      if (currNumber) currCol++;
+      if (currNumber && currNumber !== 0 && currNumber !== "0") {
+        currCol++;
+      }
       else{
-        (users.getRange(idRow, currCol).setValue(courseToAdd));
-        var currCourseName = courses.getRange(courseToAdd, 2).getValue();
+        users.getRange(idRow, currCol).setValue(courseToAdd);
+        var currCourseName = courses.getRange(courseToAdd, fieldCourses.courseName).getValue();
         sendText(id, currCourseName+" is added to your list")
         added = true;
         return;
@@ -1441,24 +1479,24 @@ function loadCourses(id, row, users, courses){
   sendText(id, "Loading your Courses..");
   var idRow = row;
   if (idRow){
-    var currCol = 14;
+    var currCol = fieldUsers.firstCourse;
     var courseList = [];
     var numberList = [];
-    while (currCol <= 28){
+    while (currCol <= fieldUsers.lastCourse){
       var courseRow = users.getRange(idRow, currCol).getValue();
-      if (courseRow){
+      if (courseRow && courseRow > 0){
         var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
         var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
         numberList.push(courseNumber);
         courseList.push(courseName+" - "+courseNumber);
         currCol++;
       }else{
-        currCol = 29;
+        currCol = fieldUsers.lastCourse + 1;
       }
     }
     if (numberList.length > 0){
-      courseList.push("Delete A Course From My List");
-      numberList.push("Delete A Course From My List");
+      //courseList.push("Delete A Course From My List");
+      //numberList.push("Delete A Course From My List");
       courseList.push("Clean My List");
       numberList.push("Clean My List");
       courseList.push("Search For Another Course");
@@ -1782,9 +1820,26 @@ function countCourses(list, id)
 /**
  * 
  */
+function findCoursesList(id, course, courses){
+  var newList = [];
+  var list = courses.createTextFinder(course).findAll();
+  var len = list.length;
+  for (var i = 0; i < len; ++i)
+  {
+    if (list[i].getColumn() == fieldCourses.courseName || list[i].getColumn() == fieldCourses.courseNumber){
+      newList.push(list[i])
+    }
+  }
+  return newList;
+}
+
+
+/**
+ * 
+ */
 function findCourse(id, name, text, courses){
-  var list = courses.createTextFinder(text).findAll();
-  var len = countCourses(list, id); //Some of the results may come from the course description
+  var list = findCoursesList(id, text, courses);
+  var len = list.length;
   if (len == 1){
     sendOpt(id, name, courses, list[0].getRow());
     return;

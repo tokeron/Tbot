@@ -228,6 +228,10 @@ function handleMessage(contents){
     case("Panopto"):
     case("Course info"):
     case('Teams Group \ud83d\udc6a'):
+    case(silabus):
+    case(kdamim):
+    case(prof):
+    case(exams):
       getDone(id, name, reg2, text, users, courses);
       return
     case(WantToHelp):

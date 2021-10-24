@@ -44,6 +44,10 @@ var mainMenu = "Main Menu "+mainSy;
 var ug = "Ug "+ugSy;
 var moodle = "Moodle "+moodleSy;
 var cs = "CS "+csSy;
+var silabus = "silabus";
+var kdamim = "קדמים";
+var prof = "Lecturer";
+var exams = "exams";
 
 var ContactFacebook = "facebook";
 var ContactEmail = "email";
@@ -73,9 +77,9 @@ function makeKeyBoard(id, names, numbers){
  */ 
 var mainKeyBoard = [
   [{text: course }, { text: "My Courses \ud83d\udccc" }],
-  [{ text: SFS},{ text: help }],
   [{ text: ride}, { text: fun} ,{ text: faculty}],
-  [{ text: usefulLink},{text: "print 🖨"}], //{text: add}],
+  [{ text: usefulLink},{text: PRINT_SERVICE.symbol}], //{text: add}],
+  [{ text: SFS}/*,{ text: help }*/],
   [{ text: feedback}],
   [{ text: "Statistics"}],
   [{ text: About}]
@@ -195,6 +199,7 @@ var allKeyBoard = [
   [{ text: "Add to my course list \ud83d\udccd" }, { text: "My Courses \ud83d\udccc"}],
   [{ text: "Get all" }],
   [{ text: drive }, { text: ug }, { text: moodle }, { text: cs }],
+  [{ text: silabus }, { text: kdamim }, { text: prof }, { text: exams }],
   [/*{ text: whatsappGroup },*/ { text: telegramGroup }, { text: 'Teams Group \ud83d\udc6a' }],
   [{ text: testock }, { text: facebook }, { text: 'Panopto' },  /*{ text: zoom }*/],
   [{ text: mainMenu }, { text: "Search For Another Course" }]
