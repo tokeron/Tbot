@@ -75,7 +75,7 @@ async function printerResponseNotify(mail){
   var chatId = mail.getTo().split(/[+@]/)[1];
   var content = mail.getPlainBody();
   sendText(chatId, content.split("Hello\n",2)[1]);
-  welcomeUser(id);
+  welcomeUser(chatId);
   mail.markRead();
 }
 
@@ -244,7 +244,6 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
       text = data.files.reduce((s,f,i)=>{s+=`\n${i+1}. ${f.name}`;return s}, PRINT_SERVICE.messageBase);
       kb = PRINT_SERVICE.getMainKB(data);
       saveUser({id, reg2:0});
-      delete data.filesMessage;
     }
     else if(obj.data.startsWith("d")){//deleting file from the list
       i = parseInt(obj.data.slice(1));
@@ -264,7 +263,7 @@ PRINT_EDIT[PRINT_SERVICE.cb.editFiles] = /** @param {TelegramCallbackQuery & Tel
       kb[fileId][0].text += "✏️";
     }
   }
-  data.filesMessage = editMessageText(id, data.message.message_id, text, kb);
+  data.message = editMessageText(id, data.message.message_id, text, kb);
   saveUser({id, reg3:JSON.stringify(data)});
 }
 

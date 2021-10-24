@@ -344,15 +344,30 @@ function getDone(id, name, reg2, command, users, courses){
     }
     switch(command){
       case(silabus):
+        if(!(silabusAns)){
+          silabusAns = "The silabus informaion is not available in the ug for now.."
+        } 
         sendText(id, silabusAns)
         return
       case(kdamim):
+        if(!(kdamimAns)){
+          kdamimAns = "The 'Kdamim' informaion is not available in the ug for now.."
+        } 
         sendText(id, kdamimAns)
         return
       case(prof):
+        if(!(profAns)){
+          profAns = "The lecturer informaion is not available in the ug for now.."
+        } 
         sendText(id, profAns)
         return
       case(exams):
+        if(!(examsAnsA)){
+          examsAnsA = "The exam A informaion is not available in the ug for now.."
+        } 
+        if(!(examsAnsB)){
+          examsAnsB = "The exam B informaion is not available in the ug for now.."
+        } 
         sendText(id, "מועד א :" + examsAnsA)
         sendText(id, "מועד ב :" + examsAnsB)
         return
@@ -443,10 +458,13 @@ function getDone(id, name, reg2, command, users, courses){
         //users.getRange(2, 6).setValue(++currentCounter);
         return;
       case cs:
-        sendText(id, "Looking for computer science link " + csSy);
-        sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
-        //var currentCounter = users.getRange(2, 6).getValue();
-        //users.getRange(2, 6).setValue(++currentCounter);
+        if (csCourse){
+          sendText(id, "Looking for computer science link " + csSy);
+          sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
+        }
+        else{
+          sendText(id, "This is not a CS course");
+        }
         return;
       case moodle:
         sendText(id, "Looking for moodle link " + moodleSy);
@@ -1267,7 +1285,7 @@ function getUserCell(id, users)
 function welcomeUser(id, name)
 {
   if (name == undefined){
-    sendKey(id, "Hi \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
+    sendKey(id, "Hi \ud83d\udc4b, how may I help you?", mainKeyBoard);
     reset(id)
     return;
   }
@@ -1437,7 +1455,6 @@ function addToList(id, courseToAdd, idRow, users, courses){
         return;
       }
       if (currNumber && currNumber !== 0 && currNumber !== "0") {
-        sendText(id, "currNumber: " + currNumber) 
         currCol++;
       }
       else{
@@ -1703,16 +1720,15 @@ function addCourseReview(id, name, row, users, course){
   }
 }
 
+
+
 /**
  *
  */
-function addTelegramGroup(id, name, row, courses, users){
-  var courseRow = 0;
-  var idRow = row;
-  courseRow = users.getRange(idRow, 4).getValue();
-  var courseNumber = courses.getRange(courseRow, 1).getValue();
-  var courseName = courses.getRange(courseRow, 2).getValue();
-  var group = courses.getRange(courseRow, 3).getValue();
+function addTelegramGroup(id, name, courses, text, courseRow){
+  var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+  var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  var group = courses.getRange(courseRow, fieldCourses.telegram).getValue();
   if (group){
     sendText(id, 'The group is already exist');
     sendText(id, group);
@@ -1728,7 +1744,7 @@ function addTelegramGroup(id, name, row, courses, users){
       oldSet(id, 0, name, 0);
     }
     else{
-      courses.getRange(courseRow, 3).setValue(text);
+      courses.getRange(courseRow, fieldCourses.telegram).setValue(text);
       sendText(id, "The group is added to " + courseNumber + ' ' + courseName);
       oldSet(id, 0, name, 0);
       sendKey(id,'What would you like to do next?',mainKeyBoard)
@@ -2122,7 +2138,7 @@ function createBusi(id, text, reg1, reg3, busi){
  * @param {string} type can be whatsapp, telegram, zoom, ect..
  */
 function waitForLink(id, type){
-  set(id, null, null, type);
-  sendText(id, "please send the " + type + " link now");
+  set(id, null, type);
+  removeKey(id, "please send the " + type + " link now");
 }
 
