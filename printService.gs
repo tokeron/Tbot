@@ -15,7 +15,7 @@ function handlePrint(msg){
   }
   if (msg.photo){
     let fid = msg.photo[msg.photo.length - 1].file_id;
-    data.files.push({fid, name:fid+".jpg"});
+    data.files.push({id: fid, name:fid.slice(0,7)+".jpg"});
   }
   if (msg.document){
     data.files.push({id:msg.document.file_id, name:msg.document.file_name});
