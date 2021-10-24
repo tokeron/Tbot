@@ -1285,7 +1285,7 @@ function getUserCell(id, users)
 function welcomeUser(id, name)
 {
   if (name == undefined){
-    sendKey(id, "Hi \ud83d\udc4b, Welcome to Tbot \ud83d\udcd6", mainKeyBoard);
+    sendKey(id, "Hi \ud83d\udc4b, how may I help you?", mainKeyBoard);
     reset(id)
     return;
   }
@@ -1720,16 +1720,15 @@ function addCourseReview(id, name, row, users, course){
   }
 }
 
+
+
 /**
  *
  */
-function addTelegramGroup(id, name, row, courses, users){
-  var courseRow = 0;
-  var idRow = row;
-  courseRow = users.getRange(idRow, 4).getValue();
-  var courseNumber = courses.getRange(courseRow, 1).getValue();
-  var courseName = courses.getRange(courseRow, 2).getValue();
-  var group = courses.getRange(courseRow, 3).getValue();
+function addTelegramGroup(id, name, courses, text, courseRow){
+  var courseNumber = courses.getRange(courseRow, fieldCourses.courseNumber).getValue();
+  var courseName = courses.getRange(courseRow, fieldCourses.courseName).getValue();
+  var group = courses.getRange(courseRow, fieldCourses.telegram).getValue();
   if (group){
     sendText(id, 'The group is already exist');
     sendText(id, group);
@@ -1745,7 +1744,7 @@ function addTelegramGroup(id, name, row, courses, users){
       oldSet(id, 0, name, 0);
     }
     else{
-      courses.getRange(courseRow, 3).setValue(text);
+      courses.getRange(courseRow, fieldCourses.telegram).setValue(text);
       sendText(id, "The group is added to " + courseNumber + ' ' + courseName);
       oldSet(id, 0, name, 0);
       sendKey(id,'What would you like to do next?',mainKeyBoard)
@@ -2139,7 +2138,7 @@ function createBusi(id, text, reg1, reg3, busi){
  * @param {string} type can be whatsapp, telegram, zoom, ect..
  */
 function waitForLink(id, type){
-  set(id, null, null, type);
-  sendText(id, "please send the " + type + " link now");
+  set(id, null, type);
+  removeKey(id, "please send the " + type + " link now");
 }
 

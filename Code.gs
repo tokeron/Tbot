@@ -275,6 +275,22 @@ function handleMessage(contents){
     case(SFS):
       sendSFS(id, name, text, busi)
       return
+    case("No"):
+      welcomeUser(id, name);
+      return;
+    case("Yes"):
+      switch(reg1){
+        case("addTelegram"):
+          waitForLink(id, "telegram");
+          return
+        case("addWhatsapp"):
+          waitForLink(id, "whatsapp");
+          return
+        case("addZoom"):
+          waitForLink(id, "zoom");
+          return
+      }
+      return;
     case("Statistics"):
       sendKey(id,"Which statistics do you want to see?", statsKeyboard);
       return
@@ -343,6 +359,8 @@ function handleMessage(contents){
     case("insertPass"):
       checkIfPass(id, name, text, users);
       return;
+    case("telegram"):
+      addTelegramGroup(id, name, courses, text, reg2);
     case(SFS):     
       var maxCol = busi.getRange(2, 2).getValue();
       var maxRow = busi.getRange(3, 2).getValue();
