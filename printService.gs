@@ -75,7 +75,7 @@ async function printerResponseNotify(mail){
   var chatId = mail.getTo().split(/[+@]/)[1];
   var content = mail.getPlainBody();
   sendText(chatId, content.split("Hello\n",2)[1]);
-  welcomeUser(id);
+  welcomeUser(chatId);
   mail.markRead();
 }
 

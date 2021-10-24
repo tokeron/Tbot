@@ -344,15 +344,30 @@ function getDone(id, name, reg2, command, users, courses){
     }
     switch(command){
       case(silabus):
+        if(!(silabusAns)){
+          silabusAns = "The silabus informaion is not available in the ug for now.."
+        } 
         sendText(id, silabusAns)
         return
       case(kdamim):
+        if(!(kdamimAns)){
+          kdamimAns = "The 'Kdamim' informaion is not available in the ug for now.."
+        } 
         sendText(id, kdamimAns)
         return
       case(prof):
+        if(!(profAns)){
+          profAns = "The lecturer informaion is not available in the ug for now.."
+        } 
         sendText(id, profAns)
         return
       case(exams):
+        if(!(examsAnsA)){
+          examsAnsA = "The exam A informaion is not available in the ug for now.."
+        } 
+        if(!(examsAnsB)){
+          examsAnsB = "The exam B informaion is not available in the ug for now.."
+        } 
         sendText(id, "מועד א :" + examsAnsA)
         sendText(id, "מועד ב :" + examsAnsB)
         return
@@ -443,10 +458,13 @@ function getDone(id, name, reg2, command, users, courses){
         //users.getRange(2, 6).setValue(++currentCounter);
         return;
       case cs:
-        sendText(id, "Looking for computer science link " + csSy);
-        sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
-        //var currentCounter = users.getRange(2, 6).getValue();
-        //users.getRange(2, 6).setValue(++currentCounter);
+        if (csCourse){
+          sendText(id, "Looking for computer science link " + csSy);
+          sendText(id, "https://webcourse.cs.technion.ac.il/"+courseNumber);
+        }
+        else{
+          sendText(id, "This is not a CS course");
+        }
         return;
       case moodle:
         sendText(id, "Looking for moodle link " + moodleSy);
@@ -1437,7 +1455,6 @@ function addToList(id, courseToAdd, idRow, users, courses){
         return;
       }
       if (currNumber && currNumber !== 0 && currNumber !== "0") {
-        sendText(id, "currNumber: " + currNumber) 
         currCol++;
       }
       else{
